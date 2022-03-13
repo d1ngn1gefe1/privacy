@@ -1,0 +1,21 @@
+dir_data: /home/ssd/data
+dir_wandb: /home/ssd/log
+dir_weights: /home/ssd/weights
+
+net: dpsgd_net
+dataset: cifar10
+num_classes: 10
+
+gpus: [0, 1]
+num_workers: 3
+
+batch_size: 512
+num_epochs: 500
+lr: 0.1
+momentum: 0.9
+wd: 1e-4
+
+dp: True
+sigma: 1.5  # noise_multiplier
+c: 10  # max_grad_norm
+delta: 1e-5
