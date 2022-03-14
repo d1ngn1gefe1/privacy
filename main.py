@@ -6,8 +6,7 @@ from trainers import get_trainer
 
 
 def main():
-  #cfg = OmegaConf.load('./configs/config.yaml')
-  cfg = OmegaConf.load('./configs/config_dp.yaml')
+  cfg = OmegaConf.load('./configs/config.yaml')
 
   data = get_data(cfg)
   model = get_model(cfg)

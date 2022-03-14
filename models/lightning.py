@@ -1,7 +1,6 @@
 from opacus import PrivacyEngine
 from opacus.data_loader import DPDataLoader
 import pytorch_lightning as pl
-import torch
 
 
 class DPLightningModule(pl.LightningModule):
@@ -21,23 +20,23 @@ class DPLightningModule(pl.LightningModule):
     return self.module.validation_step(batch, batch_idx)
 
   def configure_optimizers(self):
+    # Reference: https://github.com/pytorch/opacus/blob/main/examples/mnist_lightning.py#L98
     optimizer = self.module.configure_optimizers()
 
-    data_loader = (self.trainer._data_connector._train_dataloader_source.dataloader())
-
-    net_dp, optimizer, dataloader = self.privacy_engine.make_private(
-      module=self,
+    data_loader = self.trainer._data_connector._train_dataloader_source.dataloader()
+    if hasattr(self, 'dp'):
+      self.dp['module'].remove_hooks()
+    module, optimizer, data_loader = self.privacy_engine.make_private(
+      module=self.module,
       optimizer=optimizer,
       data_loader=data_loader,
       noise_multiplier=self.cfg.sigma,
       max_grad_norm=self.cfg.c,
       poisson_sampling=isinstance(data_loader, DPDataLoader),
     )
-    self.dp = {'model': net_dp}
-
+    self.dp = {'module': module}
     return optimizer
 
   def on_train_epoch_end(self):
     epsilon = self.privacy_engine.get_epsilon(self.cfg.delta)
-    self.module.log('epsilon', epsilon, on_epoch=True, sync_dist=True, prog_bar=True)
-
+    self.log('epsilon', epsilon, on_epoch=True, sync_dist=True, prog_bar=True)

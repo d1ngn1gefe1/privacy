@@ -1,7 +1,4 @@
-# LightningModule for image classification
-
 from pytorch_lightning import LightningModule
-import torch
 import torch.nn.functional as F
 from torch.optim import SGD
 import torchmetrics
@@ -9,7 +6,7 @@ import torchmetrics
 from .nets import get_net
 
 
-class ImgClsModule(LightningModule):
+class ImageClassifierModule(LightningModule):
   def __init__(self, cfg):
     super().__init__()
     self.cfg = cfg

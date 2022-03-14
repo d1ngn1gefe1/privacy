@@ -1,4 +1,4 @@
-# Ref: https://arxiv.org/pdf/1607.00133.pdf
+# Reference: https://arxiv.org/pdf/1607.00133.pdf
 
 import torch.nn as nn
 

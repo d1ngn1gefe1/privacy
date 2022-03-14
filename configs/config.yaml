@@ -15,3 +15,7 @@ lr: 0.1
 momentum: 0.9
 wd: 1e-4
 
+dp: True
+sigma: 1.5  # noise_multiplier
+c: 10  # max_grad_norm
+delta: 1e-5
