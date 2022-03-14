@@ -24,14 +24,15 @@ class CIFAR10DataModule(LightningDataModule):
 
   def train_dataloader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar10_train = DataLoader(self.cifar10_train, batch_size=self.cfg.batch_size//num_gpus, num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    cifar10_train = DataLoader(self.cifar10_train, batch_size=self.cfg.batch_size//num_gpus,
+                               num_workers=self.cfg.num_workers, pin_memory=True, drop_last=True)
     return cifar10_train
 
   def val_dataloader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar10_val = DataLoader(self.cifar10_val, batch_size=self.cfg.batch_size//num_gpus, num_workers=self.cfg.num_workers, pin_memory=True)
+    cifar10_val = DataLoader(self.cifar10_val, batch_size=self.cfg.batch_size//num_gpus,
+                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return cifar10_val
 
   def test_loader(self):
     return self.val_dataloader()
-

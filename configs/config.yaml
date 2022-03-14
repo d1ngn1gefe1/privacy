@@ -1,5 +1,5 @@
 dir_data: /home/ssd/data
-dir_wandb: /home/ssd/log
+dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
 net: dpsgd_net

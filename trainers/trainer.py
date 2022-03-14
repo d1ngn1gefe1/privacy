@@ -3,6 +3,7 @@ import os
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.plugins import DDPPlugin
 
 
 def get_trainer(cfg):
@@ -11,7 +12,7 @@ def get_trainer(cfg):
     project='cifar10',
     name=name,
     log_model='all',
-    save_dir=cfg.dir_wandb
+    save_dir=cfg.dir_log+f'_{os.getlogin()}'
   )
   logger.log_hyperparams(cfg)
 
@@ -21,7 +22,7 @@ def get_trainer(cfg):
     callbacks=[
       ModelCheckpoint(every_n_epochs=5,
                       save_last=True,
-                      dirpath=os.path.join(cfg.dir_weights, f'ckpt/{name}'))
+                      dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{name}'))
     ],
     check_val_every_n_epoch=1,
     num_sanity_val_steps=2,
@@ -29,7 +30,7 @@ def get_trainer(cfg):
     gpus=cfg.gpus,
     **(
       {
-        'strategy': 'ddp'
+        'strategy': DDPPlugin(find_unused_parameters=False)
       } if len(cfg.gpus) > 1 else {}
     )
   )
