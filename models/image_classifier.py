@@ -42,3 +42,22 @@ class ImageClassifierModule(LightningModule):
     optimizer = SGD(self.net.parameters(), lr=self.cfg.lr, momentum=self.cfg.momentum, weight_decay=self.cfg.wd)
     scheduler = CosineAnnealingLR(optimizer, T_max=self.cfg.num_epochs)
     return {'optimizer': optimizer, 'lr_scheduler': scheduler}
+
+  def optimizer_step(
+      self,
+      epoch,
+      batch_idx,
+      optimizer,
+      optimizer_idx,
+      optimizer_closure,
+      on_tpu=False,
+      using_native_amp=False,
+      using_lbfgs=False
+  ):
+    # linear warmup
+    if self.trainer.global_step < self.cfg.warmup_steps:
+      lr_scale = min(1.0, float(self.trainer.global_step+1)/self.cfg.warmup_steps)
+      for pg in optimizer.param_groups:
+        pg['lr'] = lr_scale*self.cfg.lr
+
+    optimizer.step(closure=optimizer_closure)

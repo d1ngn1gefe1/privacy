@@ -7,7 +7,7 @@ from pytorch_lightning.plugins import DDPPlugin
 
 
 def get_trainer(cfg):
-  name = f"cifar10_{'dp' if cfg.dp else 'non_dp'}"
+  name = f"{cfg.dataset}_{cfg.net}_{'dp' if cfg.dp else 'non_dp'}"
   logger = WandbLogger(
     project='cifar10',
     name=name,
@@ -20,6 +20,7 @@ def get_trainer(cfg):
     max_epochs=cfg.num_epochs,
     logger=logger,
     callbacks=[
+      LearningRateMonitor(logging_interval='step'),
       ModelCheckpoint(every_n_epochs=5,
                       save_last=True,
                       dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{name}'))

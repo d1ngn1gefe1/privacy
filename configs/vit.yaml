@@ -5,17 +5,18 @@ dir_weights: /home/ssd/weights
 net: vit
 dataset: cifar10
 
-gpus: [0, 1]
-num_workers: 3
+gpus: [0]
+num_workers: 4
 
-num_epochs: 500
+num_epochs: 100
+warmup_steps: 500
 batch_size: 512
-lr: 0.1
+lr: 3e-2
 momentum: 0.9
 wd: 0
 
 dp: True
-augment: True
+augment: False
 sigma: 1.5
 c: 10
 delta: 1e-5
