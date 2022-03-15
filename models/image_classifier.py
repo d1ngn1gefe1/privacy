@@ -17,6 +17,9 @@ class ImageClassifierModule(LightningModule):
         param.requires_grad = False
       for param in self.net.get_classifier().parameters():
         param.requires_grad = True
+    elif cfg.mode == 'adapter':
+      for param in self.net.parameters():
+        param.requires_grad = False
     self.top1 = torchmetrics.Accuracy(top_k=1)
 
   def forward(self, x):
