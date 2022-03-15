@@ -9,15 +9,15 @@ mode: from_scratch
 gpus: [0, 1]
 num_workers: 3
 
-num_epochs: 500
-warmup_steps: 500
+num_epochs: 100
+warmup_steps: 100
 batch_size: 512
 lr: 0.1
 momentum: 0.9
 wd: 1e-4
 
 dp: True
-augment: True
+augment: False
 sigma: 1.5
 c: 10
 delta: 1e-5

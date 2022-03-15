@@ -23,21 +23,21 @@ class CIFAR10DataModule(LightningDataModule):
 
   def train_dataloader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar10_train = DataLoader(self.cifar10_train, batch_size=self.cfg.batch_size//num_gpus,
-                               num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return cifar10_train
+    dataloader = DataLoader(self.cifar10_train, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
 
   def val_dataloader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar10_val = DataLoader(self.cifar10_val, batch_size=self.cfg.batch_size//num_gpus,
-                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return cifar10_val
+    dataloader = DataLoader(self.cifar10_val, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
 
   def test_loader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar10_test = DataLoader(self.cifar10_val, batch_size=self.cfg.batch_size//num_gpus,
-                              num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return cifar10_test
+    dataloader = DataLoader(self.cifar10_val, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
 
 
 class CIFAR100DataModule(LightningDataModule):
@@ -58,18 +58,18 @@ class CIFAR100DataModule(LightningDataModule):
 
   def train_dataloader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar100_train = DataLoader(self.cifar100_train, batch_size=self.cfg.batch_size//num_gpus,
-                                num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return cifar100_train
+    dataloader = DataLoader(self.cifar100_train, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
 
   def val_dataloader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar100_val = DataLoader(self.cifar100_val, batch_size=self.cfg.batch_size//num_gpus,
-                              num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return cifar100_val
+    dataloader = DataLoader(self.cifar100_val, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
 
   def test_loader(self):
     num_gpus = len(self.cfg.gpus)
-    cifar100_test = DataLoader(self.cifar100_val, batch_size=self.cfg.batch_size//num_gpus,
-                               num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return cifar100_test
+    dataloader = DataLoader(self.cifar100_val, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
