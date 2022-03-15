@@ -6,7 +6,7 @@ from trainers import get_trainer
 
 
 def main():
-  cfg = OmegaConf.load('./configs/config.yaml')
+  cfg = OmegaConf.load('./configs/dpsgd_net.yaml')
 
   data = get_data(cfg)
   model = get_model(cfg)

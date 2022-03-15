@@ -1,5 +1,4 @@
 from torchvision.transforms import (
-  CenterCrop,
   Compose,
   Normalize,
   RandomCrop,
@@ -8,31 +7,28 @@ from torchvision.transforms import (
 )
 
 
-def get_dpsgd_net_transforms(augment):
+def get_opacus_net_transforms(augment):
   if augment:
     transform_train = Compose([
       ToTensor(),
-      Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-      RandomCrop(24),
+      Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010]),
+      RandomCrop(32, padding=4),
       RandomHorizontalFlip()
     ])
   else:
     transform_train = Compose([
-      ToTensor(),
-      Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-      CenterCrop(24)
+      RandomCrop(32, padding=4),
+      RandomHorizontalFlip()
     ])
 
   transform_val = Compose([
     ToTensor(),
-    Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-    CenterCrop(24)
+    Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010])
   ])
 
   transform_test = Compose([
     ToTensor(),
-    Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-    CenterCrop(24)
+    Normalize(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010])
   ])
 
   return transform_train, transform_val, transform_test
