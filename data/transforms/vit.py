@@ -2,39 +2,43 @@ from torchvision.transforms import (
   CenterCrop,
   Compose,
   Normalize,
-  RandomCrop,
+  RandomResizedCrop,
   RandomHorizontalFlip,
+  Resize,
   ToTensor
 )
 
 from .constants import *
 
 
-def get_dpsgd_net_transforms(augment):
+def get_vit_transforms(augment):
   if augment:
     transform_train = Compose([
-      RandomCrop(24),
+      RandomResizedCrop(224, scale=(0.05, 1.0)),
       RandomHorizontalFlip(),
       ToTensor(),
-      Normalize(mean=MEAN_DEFAULT, std=STD_DEFAULT)
+      Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)
     ])
   else:
     transform_train = Compose([
-      CenterCrop(24),
+      Resize(224),
+      CenterCrop(224),
       ToTensor(),
-      Normalize(mean=MEAN_DEFAULT, std=STD_DEFAULT)
+      Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)
     ])
 
   transform_val = Compose([
-    CenterCrop(24),
+    Resize(224),
+    CenterCrop(224),
     ToTensor(),
-    Normalize(mean=MEAN_DEFAULT, std=STD_DEFAULT)
+    Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)
   ])
 
   transform_test = Compose([
-    CenterCrop(24),
+    Resize(224),
+    CenterCrop(224),
     ToTensor(),
-    Normalize(mean=MEAN_DEFAULT, std=STD_DEFAULT)
+    Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)
   ])
 
   return transform_train, transform_val, transform_test

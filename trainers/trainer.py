@@ -26,7 +26,7 @@ def get_trainer(cfg):
     ],
     check_val_every_n_epoch=1,
     num_sanity_val_steps=2,
-    log_every_n_steps=100,
+    log_every_n_steps=50,
     gpus=cfg.gpus,
     **(
       {

@@ -3,7 +3,7 @@
 import torch.nn as nn
 
 
-def DPSGDNet(num_classes):
+def get_dpsgd_net(num_classes):
   """ Input size： 24x24x3 """
   return nn.Sequential(
     nn.Conv2d(3, 64, kernel_size=5, stride=1, padding=2),

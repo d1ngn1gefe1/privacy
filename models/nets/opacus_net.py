@@ -3,7 +3,7 @@
 import torch.nn as nn
 
 
-def OpacusNet(num_classes):
+def get_opacus_net(num_classes):
   return nn.Sequential(
     nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1),
     nn.ReLU(),
