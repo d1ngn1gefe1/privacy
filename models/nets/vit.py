@@ -71,20 +71,10 @@ class VisionTransformer(vision_transformer.VisionTransformer):
       return self.head, self.head_dist
 
 
-def get_vit(num_classes):
+def get_vit(num_classes, pretrained):
   vision_transformer.VisionTransformer = VisionTransformer
-  model = timm.create_model('vit_tiny_patch16_224_in21k', pretrained=True, num_classes=num_classes)
+  model = timm.create_model('vit_tiny_patch16_224_in21k', pretrained=pretrained, num_classes=num_classes)
   delattr(model, 'cls_token')
   delattr(model, 'dist_token')
   delattr(model, 'pos_embed')
   return model
-
-
-def main():
-  net = get_vit(10)
-  for name, param in net.named_parameters():
-    print(name)
-
-
-if __name__ == '__main__':
-  main()

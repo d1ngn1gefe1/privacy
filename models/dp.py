@@ -58,6 +58,7 @@ def make_private(model):
 
   # Reference: https://github.com/pytorch/opacus/blob/main/opacus/privacy_engine.py#L153
   model.net = model.privacy_engine._prepare_model(model.net)
+  model.net.get_classifier = model.net._module.get_classifier
   # model.net.register_forward_pre_hook(forbid_accumulation_hook)  # todo: lightning will trigger an error
 
   # Reference: https://github.com/pytorch/opacus/blob/main/opacus/privacy_engine.py#L120

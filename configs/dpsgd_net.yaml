@@ -2,8 +2,9 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-net: dpsgd_net
 dataset: cifar10
+net: dpsgd_net
+mode: from_scratch
 
 gpus: [0, 1]
 num_workers: 3

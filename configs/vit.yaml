@@ -2,8 +2,10 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-net: vit
 dataset: cifar10
+net: vit
+#mode: fine_tuning
+mode: linear_probing
 
 gpus: [0]
 num_workers: 4
@@ -11,7 +13,7 @@ num_workers: 4
 num_epochs: 100
 warmup_steps: 500
 batch_size: 512
-lr: 3e-2
+lr: 3e-3
 momentum: 0.9
 wd: 0
 
