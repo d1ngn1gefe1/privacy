@@ -12,14 +12,11 @@ class ImageClassifierModule(LightningModule):
     super().__init__()
     self.cfg = cfg
     self.net = get_net(cfg.net, cfg.num_classes, cfg.mode != 'from_scratch')
-    if cfg.mode == 'linear_probing':
+    if cfg.mode == 'linear_probing' or cfg.mode == 'adapter':
       for param in self.net.parameters():
         param.requires_grad = False
       for param in self.net.get_classifier().parameters():
         param.requires_grad = True
-    elif cfg.mode == 'adapter':
-      for param in self.net.parameters():
-        param.requires_grad = False
     self.top1 = torchmetrics.Accuracy(top_k=1)
 
   def forward(self, x):
