@@ -6,9 +6,8 @@ import torch.nn.functional as F
 
 
 class DPSGDNet(nn.Module):
-  def __init__(self, num_classes, pretrained):
+  def __init__(self, num_classes):
     super(DPSGDNet, self).__init__()
-    assert pretrained is False, 'Pre-trained weights not available'
 
     self.conv1 = nn.Conv2d(3, 64, kernel_size=5, stride=1, padding=2)
     self.conv2 = nn.Conv2d(64, 64, kernel_size=5, stride=1, padding=2)
@@ -30,5 +29,5 @@ class DPSGDNet(nn.Module):
     return self.fc2
 
 
-def get_dpsgd_net(num_classes, pretrained):
-  return DPSGDNet(num_classes, pretrained)
+def get_dpsgd_net(num_classes):
+  return DPSGDNet(num_classes)
