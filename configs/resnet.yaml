@@ -2,14 +2,14 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-dataset: cifar10
+dataset: chexpert
 net: resnet
 adapter: mlp_adapter
 mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 
-gpus: [0, 1]
+gpus: [0]
 num_workers: 4
 
 num_epochs: 100

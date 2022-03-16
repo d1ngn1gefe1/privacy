@@ -2,6 +2,11 @@ import os
 import torch
 import torch.nn as nn
 from torchvision import models
+from types import MethodType
+
+
+def get_classifier(self):
+  return self.fc
 
 
 def get_resnet(num_classes, pretrained, dir_weights):
@@ -15,5 +20,7 @@ def get_resnet(num_classes, pretrained, dir_weights):
     state_dict.pop('fc.bias', None)
     print(f'{list(set(model.state_dict())-set(state_dict.keys()))} will be trained from scratch')
     model.load_state_dict(state_dict, strict=False)
+
+    model.get_classifier = MethodType(get_classifier, model)
 
   return model

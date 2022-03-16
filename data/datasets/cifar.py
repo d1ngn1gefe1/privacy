@@ -29,7 +29,6 @@ class CIFARDataModule(LightningDataModule):
     num_gpus = len(self.cfg.gpus)
     dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//num_gpus,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    print(f'len_dataloader={len(dataloader)}, len_dataset={len(self.dataset_train)}')
     return dataloader
 
   def val_dataloader(self):

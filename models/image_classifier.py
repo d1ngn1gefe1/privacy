@@ -12,12 +12,23 @@ class ImageClassifierModule(LightningModule):
     super().__init__()
     self.cfg = cfg
     self.net = get_net(cfg.net, cfg.num_classes, cfg.mode != 'from_scratch', cfg.dir_weights)
+    
+    # set trainable parameters
     if cfg.mode == 'linear_probing' or cfg.mode == 'adapter':
       for param in self.net.parameters():
         param.requires_grad = False
       for param in self.net.get_classifier().parameters():
         param.requires_grad = True
-    self.top1 = torchmetrics.Accuracy(top_k=1)
+    
+    # multi-label vs single-label
+    if cfg.dataset == 'chexpert':
+      self.metric = torchmetrics.AUROC(cfg.num_classes)
+      self.name_stat = 'roc'
+      self.get_loss = F.multilabel_soft_margin_loss
+    else: 
+      self.metric = torchmetrics.Accuracy(top_k=1)
+      self.name_stat = 'acc1'
+      self.get_loss = F.cross_entropy
 
   def forward(self, x):
     return self.net(x)
@@ -25,23 +36,23 @@ class ImageClassifierModule(LightningModule):
   def training_step(self, batch, batch_idx):
     x, y = batch
     y_hat = self.net(x)
-    loss = F.cross_entropy(y_hat, y)
+    loss = self.get_loss(y_hat, y)
     pred = F.softmax(y_hat, dim=-1)
-    top1 = self.top1(pred, y)
+    stat = self.metric(pred, y)
 
     self.log('train/loss', loss, prog_bar=True)
-    self.log('train/acc1', top1, prog_bar=True)
+    self.log(f'train/{self.name_stat}', stat, prog_bar=True)
     return loss
 
   def validation_step(self, batch, batch_idx):
     x, y = batch
     y_hat = self.net(x)
-    loss = F.cross_entropy(y_hat, y)
+    loss = self.get_loss(y_hat, y)   
     pred = F.softmax(y_hat, dim=-1)
-    top1 = self.top1(pred, y)
+    stat = self.metric(pred, y)
 
     self.log('val/loss', loss, sync_dist=True, prog_bar=True)
-    self.log('val/acc1', top1, sync_dist=True, prog_bar=True)
+    self.log(f'val/{self.name_stat}', stat, sync_dist=True, prog_bar=True)
 
   def configure_optimizers(self):
     optimizer = SGD(self.net.parameters(), lr=self.cfg.lr, momentum=self.cfg.momentum, weight_decay=self.cfg.wd)
