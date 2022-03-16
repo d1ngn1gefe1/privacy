@@ -13,6 +13,7 @@ class CIFARDataModule(LightningDataModule):
   def __init__(self, cfg):
     super().__init__()
     cfg.num_classes = num_classes[cfg.dataset]
+    cfg.metrics = ['acc1']
     self.cfg = cfg
 
   def prepare_data(self):
@@ -20,10 +21,10 @@ class CIFARDataModule(LightningDataModule):
     CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, download=True)
 
   def setup(self, stage=None):
-    transforms_train, transforms_val, transforms_test = get_transforms(self.cfg.net, self.cfg.augment)
-    self.dataset_train = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=True, transform=transforms_train)
-    self.dataset_val = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transforms_val)
-    self.dataset_test = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transforms_test)
+    transform_train, transform_val, transform_test = get_transforms(self.cfg.net, self.cfg.augment)
+    self.dataset_train = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=True, transform=transform_train)
+    self.dataset_val = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_val)
+    self.dataset_test = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_test)
 
   def train_dataloader(self):
     num_gpus = len(self.cfg.gpus)

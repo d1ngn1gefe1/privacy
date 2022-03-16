@@ -54,17 +54,18 @@ class CheXpertDataModule(LightningDataModule):
   def __init__(self, cfg):
     super().__init__()
     cfg.num_classes = 14
+    cfg.metrics = ['auc']
     self.cfg = cfg
 
   def prepare_data(self):
     if not CheXpert.exists(self.cfg.dir_data):
-      raise Exception('Please download the dataset on https://stanfordmlgroup.github.io/competitions/chexpert/.')
+      raise RuntimeError('Please download the dataset on https://stanfordmlgroup.github.io/competitions/chexpert/.')
 
   def setup(self, stage=None):
-    transforms_train, transforms_val, transforms_test = get_transforms(self.cfg.net, self.cfg.augment)
-    self.dataset_train = CheXpert(self.cfg.dir_data, train=True, transform=transforms_train)
-    self.dataset_val = CheXpert(self.cfg.dir_data, train=False, transform=transforms_val)
-    self.dataset_test = CheXpert(self.cfg.dir_data, train=False, transform=transforms_test)
+    transform_train, transform_val, transform_test = get_transforms(self.cfg.net, self.cfg.augment)
+    self.dataset_train = CheXpert(self.cfg.dir_data, train=True, transform=transform_train)
+    self.dataset_val = CheXpert(self.cfg.dir_data, train=False, transform=transform_val)
+    self.dataset_test = CheXpert(self.cfg.dir_data, train=False, transform=transform_test)
 
   def train_dataloader(self):
     num_gpus = len(self.cfg.gpus)

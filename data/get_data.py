@@ -1,4 +1,4 @@
-from .datasets import CIFARDataModule, CheXpertDataModule
+from .datasets import CIFARDataModule, CheXpertDataModule, MedMNISTDataModule
 from .dp import make_private
 
 
@@ -7,6 +7,8 @@ def get_data(cfg):
     data = CIFARDataModule(cfg)
   elif cfg.dataset == 'chexpert':
     data = CheXpertDataModule(cfg)
+  elif cfg.dataset.endswith('mnist'):
+    data = MedMNISTDataModule(cfg)
   else:
     raise NotImplementedError
 

@@ -5,22 +5,22 @@ dir_weights: /home/ssd/weights
 dataset: cifar100
 net: vit
 adapter: mlp_adapter
-#mode: fine_tuning
-mode: linear_probing
+mode: fine_tuning
+#mode: linear_probing
 #mode: adapter
 
-gpus: [0, 1]
-num_workers: 4
+gpus: [0]
+num_workers: 8
 
 num_epochs: 100
 warmup_steps: 500
 batch_size: 512
-lr: 1e-3
+lr: 1e-2
 momentum: 0.9
-wd: 0
+wd: 1e-4
 
-dp: True
-augment: False
+dp: False
+augment: True
 sigma: 1.5
 c: 10
 delta: 1e-5

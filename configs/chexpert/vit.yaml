@@ -2,21 +2,24 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-dataset: cifar10
-net: opacus_net
-mode: from_scratch
+dataset: chexpert
+net: vit
+adapter: mlp_adapter
+mode: fine_tuning
+#mode: linear_probing
+#mode: adapter
 
-gpus: [0, 1]
-num_workers: 3
+gpus: [0]
+num_workers: 8
 
 num_epochs: 100
 warmup_steps: 500
 batch_size: 512
-lr: 0.1
+lr: 1e-2
 momentum: 0.9
 wd: 1e-4
 
-dp: True
+dp: False
 augment: True
 sigma: 1.5
 c: 10
