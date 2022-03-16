@@ -30,6 +30,10 @@ class CheXpert(VisionDataset):
     self.transform = transform
     self.target_transform = target_transform
 
+  @classmethod
+  def exists(cls, root):
+    return os.path.isdir(os.path.join(root, 'CheXpert-v1.0-small'))
+
   def __len__(self) -> int:
     return len(self.paths)
 
@@ -53,7 +57,8 @@ class CheXpertDataModule(LightningDataModule):
     self.cfg = cfg
 
   def prepare_data(self):
-    print('Please download the dataset on https://stanfordmlgroup.github.io/competitions/chexpert/')
+    if not CheXpert.exists(self.cfg.dir_data):
+      raise Exception('Please download the dataset on https://stanfordmlgroup.github.io/competitions/chexpert/.')
 
   def setup(self, stage=None):
     transforms_train, transforms_val, transforms_test = get_transforms(self.cfg.net, self.cfg.augment)
