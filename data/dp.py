@@ -7,7 +7,7 @@ from types import MethodType
 # Reference: https://github.com/pytorch/opacus/blob/main/opacus/privacy_engine.py#L153
 def train_dataloader(self) -> DPDataLoader:
   dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=len(self.cfg.gpus) > 1)
-  print(f'Dataloader: {type(dataloader)}')
+  print(f'Dataloader: type={type(dataloader)}, len_dataloader={len(dataloader)}, len_dataset={len(dataloader.dataset)}')
   return dataloader
 
 

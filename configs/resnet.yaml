@@ -3,20 +3,23 @@ dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
 dataset: cifar10
-net: dpsgd_net
-mode: from_scratch
+net: resnet
+adapter: mlp_adapter
+mode: fine_tuning
+#mode: linear_probing
+#mode: adapter
 
 gpus: [0, 1]
-num_workers: 3
+num_workers: 4
 
 num_epochs: 100
-warmup_steps: 100
-batch_size: 512
-lr: 0.1
+warmup_steps: 500
+batch_size: 128
+lr: 3e-3
 momentum: 0.9
-wd: 1e-4
+wd: 0
 
-dp: True
+dp: False
 augment: False
 sigma: 1.5
 c: 10

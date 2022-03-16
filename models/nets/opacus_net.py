@@ -6,9 +6,8 @@ import torch.nn.functional as F
 
 
 class OpacusNet(nn.Module):
-  def __init__(self, num_classes, pretrained):
+  def __init__(self, num_classes):
     super(OpacusNet, self).__init__()
-    assert pretrained is False, 'Pre-trained weights not available'
 
     self.conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1)
     self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
@@ -34,5 +33,5 @@ class OpacusNet(nn.Module):
     return self.fc1
 
 
-def get_opacus_net(num_classes, pretrained):
-  return OpacusNet(num_classes, pretrained)
+def get_opacus_net(num_classes):
+  return OpacusNet(num_classes)
