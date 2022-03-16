@@ -1,12 +1,10 @@
-from .cifar import CIFAR10DataModule, CIFAR100DataModule
+from .cifar import CIFARDataModule
 from .dp import make_private
 
 
 def get_data(cfg):
-  if cfg.dataset == 'cifar10':
-    data = CIFAR10DataModule(cfg)
-  elif cfg.dataset == 'cifar100':
-    data = CIFAR100DataModule(cfg)
+  if cfg.dataset == 'cifar10' or cfg.dataset == 'cifar100':
+    data = CIFARDataModule(cfg)
   else:
     raise NotImplementedError
 
