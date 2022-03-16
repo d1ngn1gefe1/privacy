@@ -2,11 +2,11 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-dataset: cifar10
+dataset: cifar100
 net: vit
 #mode: fine_tuning
-#mode: linear_probing
-mode: adapter
+mode: linear_probing
+#mode: adapter
 
 gpus: [0]
 num_workers: 4
@@ -14,11 +14,13 @@ num_workers: 4
 num_epochs: 100
 warmup_steps: 500
 batch_size: 512
-lr: 3e-3
+#lr: 3e-3
+lr: 1e-3
 momentum: 0.9
 wd: 0
 
-dp: False
+dp: True
+#dp: False
 augment: False
 sigma: 1.5
 c: 10
