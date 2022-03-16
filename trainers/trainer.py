@@ -3,7 +3,7 @@ import os
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.strategies.ddp import DDPStrategy
 
 
 def get_trainer(cfg):
@@ -31,7 +31,7 @@ def get_trainer(cfg):
     gpus=cfg.gpus,
     **(
       {
-        'strategy': DDPPlugin(find_unused_parameters=False)
+        'strategy': DDPStrategy(find_unused_parameters=False)
       } if len(cfg.gpus) > 1 else {}
     )
   )

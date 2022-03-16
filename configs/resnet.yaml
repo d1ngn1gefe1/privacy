@@ -19,7 +19,7 @@ lr: 3e-3
 momentum: 0.9
 wd: 0
 
-dp: False
+dp: True
 augment: False
 sigma: 1.5
 c: 10
