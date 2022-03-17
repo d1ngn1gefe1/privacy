@@ -12,6 +12,8 @@ def get_classifier(self):
 def get_resnet(num_classes, pretrained, dir_weights):
   model = models.__dict__['resnet50'](pretrained=False, num_classes=num_classes,
                                       norm_layer=(lambda x: nn.GroupNorm(32, x)))
+  model.get_classifier = MethodType(get_classifier, model)
+
   if pretrained:
     # Download: https://github.com/ppwwyyxx/GroupNorm-reproduce/releases/download/v0.1/ImageNet-ResNet50-GN.pth
     state_dict = torch.load(os.path.join(dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth'))['state_dict']
@@ -20,7 +22,5 @@ def get_resnet(num_classes, pretrained, dir_weights):
     state_dict.pop('fc.bias', None)
     print(f'{list(set(model.state_dict())-set(state_dict.keys()))} will be trained from scratch')
     model.load_state_dict(state_dict, strict=False)
-
-    model.get_classifier = MethodType(get_classifier, model)
 
   return model
