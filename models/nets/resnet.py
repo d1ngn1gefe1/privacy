@@ -21,6 +21,6 @@ def get_resnet(num_classes, pretrained, dir_weights):
     print(f'{list(set(model.state_dict())-set(state_dict.keys()))} will be trained from scratch')
     model.load_state_dict(state_dict, strict=False)
 
-    model.get_classifier = MethodType(get_classifier, model)
+  model.get_classifier = MethodType(get_classifier, model)
 
   return model
