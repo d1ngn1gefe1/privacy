@@ -11,7 +11,7 @@ class MedMNISTDataModule(LightningDataModule):
     super().__init__()
 
     info = INFO[cfg.dataset]
-    task = info['task']
+    task = info['task'].split(',')[0]
     num_classes = len(info['label'])
     DataClass = getattr(medmnist, info['python_class'])
     assert task in ['multi-class', 'multi-label'], f'Task {task} not supported'
@@ -20,6 +20,7 @@ class MedMNISTDataModule(LightningDataModule):
     cfg.task = task
     self.cfg = cfg
     self.DataClass = DataClass
+    self.target_transform = (lambda x: x[0]) if task == 'multi-class' else None
 
   def prepare_data(self):
     self.DataClass(root=self.cfg.dir_data, split='train', as_rgb=True, download=True)
@@ -29,11 +30,11 @@ class MedMNISTDataModule(LightningDataModule):
   def setup(self, stage=None):
     transform_train, transform_val, transform_test = get_transforms(self.cfg.net, self.cfg.augment)
     self.dataset_train = self.DataClass(root=self.cfg.dir_data, split='train', as_rgb=True,
-                                        transform=transform_train, target_transform=lambda x: x[0])
+                                        transform=transform_train, target_transform=self.target_transform)
     self.dataset_val = self.DataClass(root=self.cfg.dir_data, split='val', as_rgb=True,
-                                      transform=transform_val, target_transform=lambda x: x[0])
+                                      transform=transform_val, target_transform=self.target_transform)
     self.dataset_test = self.DataClass(root=self.cfg.dir_data, split='test', as_rgb=True,
-                                       transform=transform_test, target_transform=lambda x: x[0])
+                                       transform=transform_test, target_transform=self.target_transform)
 
   def train_dataloader(self):
     num_gpus = len(self.cfg.gpus)

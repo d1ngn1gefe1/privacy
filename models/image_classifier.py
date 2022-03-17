@@ -23,16 +23,17 @@ class ImageClassifierModule(LightningModule):
         param.requires_grad = True
     
     # set task-specific variables
-    assert cfg.task in ['multi-class', 'multi-label']
     if cfg.task == 'multi-class':
       self.get_loss = F.cross_entropy
-      self.get_pred = torch.sigmoid
-      self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='micro')})
-    else:
-      self.get_loss = F.multilabel_soft_margin_loss
       self.get_pred = lambda x: F.softmax(x, dim=-1)
-      self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='macro'),
-                                    'roc': torchmetrics.AUROC(cfg.num_classes)})
+      self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='micro')})
+    elif cfg.task == 'multi-label':
+      self.get_loss = F.multilabel_soft_margin_loss
+      self.get_pred = torch.sigmoid
+      self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='macro', num_classes=cfg.num_classes),
+                                    'roc': torchmetrics.AUROC(num_classes=cfg.num_classes)})
+    else:
+      raise NotImplementedError
 
   def forward(self, x):
     return self.net(x)
