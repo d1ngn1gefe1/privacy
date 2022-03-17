@@ -3,6 +3,7 @@ dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
 dataset: pathmnist
+#dataset: chestmnist
 net: vit
 adapter: mlp_adapter
 mode: fine_tuning

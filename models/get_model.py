@@ -5,6 +5,7 @@ from .image_classifier import ImageClassifierModule
 
 def get_model(cfg):
   assert cfg.mode in ['from_scratch', 'fine_tuning', 'linear_probing', 'adapter']
+  assert cfg.task in ['multi-class', 'multi-label']
   model = ImageClassifierModule(cfg)
   if cfg.mode == 'adapter':
     adapter = get_adapter(cfg)
