@@ -54,7 +54,7 @@ class CheXpertDataModule(LightningDataModule):
   def __init__(self, cfg):
     super().__init__()
     cfg.num_classes = 14
-    cfg.metrics = ['auc']
+    cfg.task = 'multi-label'
     self.cfg = cfg
 
   def prepare_data(self):

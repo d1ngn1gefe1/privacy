@@ -1,4 +1,5 @@
 from pytorch_lightning import LightningModule
+import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import SGD
 from torch.optim.lr_scheduler import CosineAnnealingLR
@@ -20,15 +21,17 @@ class ImageClassifierModule(LightningModule):
       for param in self.net.get_classifier().parameters():
         param.requires_grad = True
     
-    # multi-label vs single-label
-    if cfg.dataset == 'chexpert':
-      self.metric = torchmetrics.AUROC(cfg.num_classes)
-      self.name_stat = 'roc'
-      self.get_loss = F.multilabel_soft_margin_loss
-    else: 
-      self.metric = torchmetrics.Accuracy(top_k=1)
-      self.name_stat = 'acc1'
+    # set task-specific variables
+    assert cfg.task in ['multi-class', 'multi-label']
+    if cfg.task == 'multi-class':
       self.get_loss = F.cross_entropy
+      self.get_pred = F.sigmoid
+      self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='micro')})
+    else:
+      self.get_loss = F.multilabel_soft_margin_loss
+      self.get_pred = lambda x: F.softmax(x, dim=-1)
+      self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='macro'),
+                                    'roc': torchmetrics.AUROC(cfg.num_classes)})
 
   def forward(self, x):
     return self.net(x)
@@ -36,23 +39,26 @@ class ImageClassifierModule(LightningModule):
   def training_step(self, batch, batch_idx):
     x, y = batch
     y_hat = self.net(x)
-    loss = self.get_loss(y_hat, y)
-    pred = F.softmax(y_hat, dim=-1)
-    stat = self.metric(pred, y)
 
+    loss = self.get_loss(y_hat, y)
     self.log('train/loss', loss, prog_bar=True)
-    self.log(f'train/{self.name_stat}', stat, prog_bar=True)
+
+    pred = self.get_pred(y_hat)
+    for name, get_stat in self.metrics.items():
+      self.log(f'train/{name}', get_stat(pred, y), prog_bar=True)
+
     return loss
 
   def validation_step(self, batch, batch_idx):
     x, y = batch
     y_hat = self.net(x)
-    loss = self.get_loss(y_hat, y)   
-    pred = F.softmax(y_hat, dim=-1)
-    stat = self.metric(pred, y)
 
+    loss = self.get_loss(y_hat, y)
     self.log('val/loss', loss, sync_dist=True, prog_bar=True)
-    self.log(f'val/{self.name_stat}', stat, sync_dist=True, prog_bar=True)
+
+    pred = self.get_pred(y_hat)
+    for name, get_stat in self.metrics.items():
+      self.log(f'val/{name}', get_stat(pred, y), sync_dist=True, prog_bar=True)
 
   def configure_optimizers(self):
     optimizer = SGD(self.net.parameters(), lr=self.cfg.lr, momentum=self.cfg.momentum, weight_decay=self.cfg.wd)

@@ -9,7 +9,7 @@ mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 
-gpus: [0]
+gpus: [1]
 num_workers: 8
 
 num_epochs: 100

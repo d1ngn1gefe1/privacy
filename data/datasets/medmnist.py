@@ -12,13 +12,12 @@ class MedMNISTDataModule(LightningDataModule):
 
     info = INFO[cfg.dataset]
     task = info['task']
-    num_channels = info['n_channels']
     num_classes = len(info['label'])
     DataClass = getattr(medmnist, info['python_class'])
-    assert task == 'multi-class' and num_channels == 3
+    assert task in ['multi-class', 'multi-label'], f'Task {task} not supported'
 
     cfg.num_classes = num_classes
-    cfg.metrics = ['acc1', 'auc']
+    cfg.task = task
     self.cfg = cfg
     self.DataClass = DataClass
 

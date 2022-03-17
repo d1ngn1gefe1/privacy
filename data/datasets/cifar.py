@@ -13,7 +13,7 @@ class CIFARDataModule(LightningDataModule):
   def __init__(self, cfg):
     super().__init__()
     cfg.num_classes = num_classes[cfg.dataset]
-    cfg.metrics = ['acc1']
+    cfg.task = 'multi-class'
     self.cfg = cfg
 
   def prepare_data(self):
