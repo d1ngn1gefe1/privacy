@@ -6,7 +6,7 @@ from trainers import get_trainer
 
 
 def main():
-  cfg = OmegaConf.load('configs/medmnist/vit.yaml')
+  cfg = OmegaConf.load('configs/cifar100/convnext.yaml')
 
   data = get_data(cfg)
   model = get_model(cfg)

@@ -2,6 +2,7 @@ from .dpsgd_net import get_dpsgd_net
 from .opacus_net import get_opacus_net
 from .vit import get_vit
 from .resnet import get_resnet
+from .convnext import get_convnext
 
 
 def get_net(net, num_classes, pretrained, dir_weights):
@@ -15,6 +16,8 @@ def get_net(net, num_classes, pretrained, dir_weights):
     net = get_vit(num_classes, pretrained)
   elif net == 'resnet':
     net = get_resnet(num_classes, pretrained, dir_weights)
+  elif net == 'convnext':
+    net = get_convnext(num_classes, pretrained)
   else:
     raise NotImplementedError
 
