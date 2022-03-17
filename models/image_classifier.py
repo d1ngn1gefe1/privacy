@@ -1,4 +1,5 @@
 from pytorch_lightning import LightningModule
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import SGD
@@ -25,7 +26,7 @@ class ImageClassifierModule(LightningModule):
     assert cfg.task in ['multi-class', 'multi-label']
     if cfg.task == 'multi-class':
       self.get_loss = F.cross_entropy
-      self.get_pred = F.sigmoid
+      self.get_pred = torch.sigmoid
       self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='micro')})
     else:
       self.get_loss = F.multilabel_soft_margin_loss
