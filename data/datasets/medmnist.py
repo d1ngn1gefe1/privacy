@@ -14,7 +14,9 @@ class MedMNISTDataModule(LightningDataModule):
     task = info['task']
     num_classes = len(info['label'])
     DataClass = getattr(medmnist, info['python_class'])
-    assert task in ['multi-class', 'multi-label'], f'Task {task} not supported'
+    assert task in ['multi-class', 'multi-label', 'ordinal-regression'], f'Task {task} not supported'
+    if task == 'ordinal-regression':
+      task = 'multi-class'
 
     cfg.num_classes = num_classes
     cfg.task = task
