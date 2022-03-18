@@ -17,24 +17,24 @@ def compute_layer_norm_grad_sample(
     activations: torch.Tensor,
     backprops: torch.Tensor,
 ) -> Dict[nn.Parameter, torch.Tensor]:
+  # fixme
+  N, C, H, W = activations.shape
+  temp = activations.permute(0, 2, 3, 1).reshape(-1, C)
+  x_norm = F.layer_norm(temp, layer.normalized_shape, eps=layer.eps)
+  x_norm = torch.sum(x_norm.reshape(N, H, W, C), dim=(1, 2))
   return {
-    # fixme
-    layer.weight: sum_over_all_but_batch_and_last_n(
-      F.layer_norm(activations, layer.normalized_shape, eps=layer.eps)
-      *backprops,
-      layer.weight.dim(),
-    ),
-    layer.bias: sum_over_all_but_batch_and_last_n(backprops, layer.bias.dim()),
+    layer.weight: x_norm * torch.sum(backprops, dim=(2, 3)),
+    layer.bias: torch.sum(backprops, dim=(2, 3))
   }
 
 
 class GammaEmbed(nn.Module):
   def __init__(self, dim, ls_init_value):
     super().__init__()
-    self.gamma = nn.Parameter(ls_init_value*torch.ones(dim)).reshape(1, -1, 1, 1)
+    self.gamma = nn.Parameter(ls_init_value*torch.ones(dim))
 
   def forward(self, x):
-    x = x.mul(self.gamma)
+    x = x.mul(self.gamma.reshape(1, -1, 1, 1))
     return x
 
 
@@ -43,8 +43,7 @@ def compute_param_embed_grad_sample(
     layer: GammaEmbed, activations: torch.Tensor, backprops: torch.Tensor
 ) -> Dict[nn.Parameter, torch.Tensor]:
   ret = {
-    # fixme
-    layer.gamma: backprops
+    layer.gamma: torch.einsum('nijk,nijk->ni', backprops, activations)
   }
   return ret
 
