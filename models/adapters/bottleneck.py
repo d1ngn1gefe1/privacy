@@ -10,8 +10,8 @@ class BottleneckAdapter(Bottleneck):
     super().__init__(*args, **kargs)
     out_features = self.bn3.weight.shape[0]//self.expansion
 
-    self.adapter_conv1 = nn.Conv2d(out_features, out_features//16, kernel_size=1, stride=1, bias=True)
-    self.adapter_conv2 = nn.Conv2d(out_features//16, out_features, kernel_size=1, stride=1, bias=True)
+    self.adapter_conv1 = nn.Conv2d(out_features, out_features//32, kernel_size=1, stride=1, bias=True)
+    self.adapter_conv2 = nn.Conv2d(out_features//32, out_features, kernel_size=1, stride=1, bias=True)
     self.act = nn.GELU()
 
   def forward(self, x):
