@@ -5,9 +5,15 @@ from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies.ddp import DDPStrategy
 
+from ray.tune.integration.pytorch_lightning import TuneReportCallback
+
 
 def get_trainer(cfg):
-  name = f"{cfg.dataset}_{cfg.net}_{'dp' if cfg.dp else 'non_dp'}"
+  name = f'{cfg.dataset}_{cfg.net}_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}'
+  if cfg.dp:
+    name += f'_dp_sigma{cfg.sigma}_c{cfg.c}'
+  else:
+    name += f'_non_dp'
   logger = WandbLogger(
     project='cifar10',
     name=name,
@@ -16,15 +22,19 @@ def get_trainer(cfg):
   )
   logger.log_hyperparams(cfg)
 
+  callbacks = [
+    LearningRateMonitor(logging_interval='step'),
+    ModelCheckpoint(every_n_epochs=5,
+                    save_last=True,
+                    dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{name}'))
+  ]
+  if cfg.tune:
+    metrics = {'acc': 'val/acc'}
+    callbacks.append(TuneReportCallback(metrics, on='validation_end'))
   trainer = Trainer(
     max_epochs=cfg.num_epochs,
     logger=logger,
-    callbacks=[
-      LearningRateMonitor(logging_interval='step'),
-      ModelCheckpoint(every_n_epochs=5,
-                      save_last=True,
-                      dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{name}'))
-    ],
+    callbacks=callbacks,
     check_val_every_n_epoch=1,
     num_sanity_val_steps=2,
     log_every_n_steps=50,
