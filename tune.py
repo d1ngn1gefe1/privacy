@@ -26,10 +26,10 @@ def main():
       'cpu': 1,
       'gpu': len(cfg.gpus)
     },
-    metric='acc',
+    metric='acc-div-log_epsilon',
     mode='max',
     config=cfg_tune,
-    num_samples=10,  # number of trials
+    num_samples=20,  # number of trials
     scheduler=scheduler,
     progress_reporter=reporter,
     name=cfg.name

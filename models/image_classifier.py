@@ -1,3 +1,4 @@
+import numpy as np
 from pytorch_lightning import LightningModule
 import torch
 import torch.nn as nn
@@ -60,7 +61,12 @@ class ImageClassifierModule(LightningModule):
 
     pred = self.get_pred(y_hat)
     for name, get_stat in self.metrics.items():
-      self.log(f'val/{name}', get_stat(pred, y), sync_dist=True, prog_bar=True)
+      stat = get_stat(pred, y)
+      self.log(f'val/{name}', stat, sync_dist=True, prog_bar=True)
+
+      if self.cfg.dp:
+        epsilon = self.privacy_engine.get_epsilon(self.cfg.delta)
+        self.log(f'val/{name}-div-log_epsilon', stat/np.log(epsilon), sync_dist=True, prog_bar=True)
 
   def configure_optimizers(self):
     optimizer = SGD(self.net.parameters(), lr=self.cfg.lr, momentum=self.cfg.momentum, weight_decay=self.cfg.wd)

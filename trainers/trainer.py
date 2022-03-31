@@ -24,7 +24,7 @@ def get_trainer(cfg):
                     dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}'))
   ]
   if cfg.phase == 'tune':
-    callbacks.append(TuneReportCallback({'acc': 'val/acc'}, on='validation_end'))
+    callbacks.append(TuneReportCallback({'acc': 'val/acc', 'acc-div-log_epsilon': 'val/acc-div-log_epsilon'}, on='validation_end'))
 
   kwargs = {
     'max_epochs': cfg.num_epochs,
