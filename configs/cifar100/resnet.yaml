@@ -1,6 +1,7 @@
 dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
+relpath_ckpt: ckpt_ylzou/cifar100_resnet_non_dp/last.ckpt
 
 dataset: cifar100
 net: resnet

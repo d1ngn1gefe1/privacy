@@ -45,7 +45,7 @@ def train(cfg_tune, cfg):
   model = get_model(cfg)
   trainer = get_trainer(cfg)
 
-  trainer.fit(model, data)
+  trainer.fit(model, datamodule=data)
 
 
 if __name__ == '__main__':

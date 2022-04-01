@@ -68,6 +68,18 @@ class ImageClassifierModule(LightningModule):
         epsilon = self.privacy_engine.get_epsilon(self.cfg.delta)
         self.log(f'val/{name}-div-log_epsilon', stat/np.log(epsilon), sync_dist=True, prog_bar=True)
 
+  def test_step(self, batch, batch_idx):
+    x, y = batch
+    y_hat = self.net(x)
+
+    loss = self.get_loss(y_hat, y)
+    self.log('test/loss', loss, sync_dist=True, prog_bar=True)
+
+    pred = self.get_pred(y_hat)
+    for name, get_stat in self.metrics.items():
+      stat = get_stat(pred, y)
+      self.log(f'test/{name}', stat, sync_dist=True, prog_bar=True)
+
   def configure_optimizers(self):
     optimizer = SGD(self.net.parameters(), lr=self.cfg.lr, momentum=self.cfg.momentum, weight_decay=self.cfg.wd)
     scheduler = CosineAnnealingLR(optimizer, T_max=self.cfg.num_epochs)
