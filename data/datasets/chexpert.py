@@ -79,8 +79,15 @@ class CheXpertDataModule(LightningDataModule):
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 
-  def test_loader(self):
+  def test_dataloader(self):
     num_gpus = len(self.cfg.gpus)
     dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//num_gpus,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
+
+  def predict_dataloader(self):
+    num_gpus = len(self.cfg.gpus)
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
+

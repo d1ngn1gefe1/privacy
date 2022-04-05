@@ -25,6 +25,7 @@ class CIFARDataModule(LightningDataModule):
     self.dataset_train = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=True, transform=transform_train)
     self.dataset_val = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_val)
     self.dataset_test = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_test)
+    self.dataset_predict = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_test)
 
   def train_dataloader(self):
     num_gpus = len(self.cfg.gpus)
@@ -43,3 +44,10 @@ class CIFARDataModule(LightningDataModule):
     dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//num_gpus,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
+
+  def predict_dataloader(self):
+    num_gpus = len(self.cfg.gpus)
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//num_gpus,
+                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
+    return dataloader
+

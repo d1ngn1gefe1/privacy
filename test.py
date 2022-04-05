@@ -8,7 +8,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
+  cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
   cfg.phase = 'test'
   cfg.name = utils.get_name(cfg)
 
@@ -17,8 +17,7 @@ def main():
   trainer = get_trainer(cfg)
 
   path_ckpt = os.path.join(cfg.dir_weights, cfg.relpath_ckpt)
-  # trainer.test(model, datamodule=data, ckpt_path=path_ckpt)
-  trainer.test(model, datamodule=data)
+  trainer.test(model, datamodule=data, ckpt_path=path_ckpt)
 
 
 if __name__ == '__main__':

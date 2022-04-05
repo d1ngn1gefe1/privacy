@@ -80,6 +80,10 @@ class ImageClassifierModule(LightningModule):
       stat = get_stat(pred, y)
       self.log(f'test/{name}', stat, sync_dist=True, prog_bar=True)
 
+  def predict_step(self, batch, batch_idx):
+    # A placeholder
+    pass
+
   def configure_optimizers(self):
     optimizer = SGD(self.net.parameters(), lr=self.cfg.lr, momentum=self.cfg.momentum, weight_decay=self.cfg.wd)
     scheduler = CosineAnnealingLR(optimizer, T_max=self.cfg.num_epochs)
