@@ -1,6 +1,8 @@
 dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
+relpath_ckpt: ckpt_ylzou/cifar100_opacus_net_from_scratch_epoch100_bs512_lr0.1/last.ckpt
+relpath_predict: ckpt_ylzou/cifar100_opacus_net_from_scratch_epoch100_bs512_lr0.1/last
 
 dataset: cifar100
 net: opacus_net
@@ -16,8 +18,10 @@ lr: 0.1
 momentum: 0.9
 wd: 1e-4
 
-dp: True
+dp: False
 augment: True
 sigma: 1.5
-c: 10
+c: 1
 delta: 1e-5
+
+attacker: black_box
