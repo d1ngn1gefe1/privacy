@@ -2,6 +2,7 @@ import numpy as np
 from omegaconf import OmegaConf
 import os
 import torch
+from tqdm import tqdm
 
 from data import get_data
 from models import get_model
@@ -12,10 +13,11 @@ import utils
 def inference(model, dataloader):
   preds = []
   gts = []
-  for batch in dataloader:
+  for batch in tqdm(dataloader):
     x, y = batch
     with torch.no_grad():
       y_hat = model(x)
+      y_hat = model.get_pred(y_hat)
     preds.append(y_hat.cpu().numpy())
     gts.append(y.cpu().numpy())
 
@@ -26,7 +28,8 @@ def inference(model, dataloader):
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
+  #cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
+  cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
   cfg.phase = 'test'
   cfg.name = utils.get_name(cfg)
 
