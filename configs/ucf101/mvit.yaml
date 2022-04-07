@@ -1,0 +1,26 @@
+dir_data: /home/ssd/data
+dir_log: /home/ssd/log
+dir_weights: /home/ssd/weights
+
+dataset: ucf101
+net: mvit
+adapter: mlp_adapter
+mode: fine_tuning
+#mode: linear_probing
+#mode: adapter
+
+gpus: [1]
+num_workers: 8
+
+num_epochs: 100
+warmup_steps: 500
+batch_size: 100
+lr: 1e-2
+momentum: 0.9
+wd: 1e-4
+
+dp: False
+augment: True
+sigma: 1.5
+c: 10
+delta: 1e-5
