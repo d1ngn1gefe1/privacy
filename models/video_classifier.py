@@ -42,8 +42,7 @@ class VideoClassifierModule(LightningModule):
      - https://pytorch.org/docs/master/data.html#torch.utils.data.distributed.DistributedSampler
     """
     if torch.distributed.is_available() and torch.distributed.is_initialized():
-      for level in self.cfg.levels:
-        self.trainer.datamodule.datasets_train[level].video_sampler.set_epoch(self.trainer.current_epoch)
+      self.trainer.datamodule.dataset_train.video_sampler.set_epoch(self.trainer.current_epoch)
 
   def forward(self, x):
     return self.net(x)
@@ -58,11 +57,7 @@ class VideoClassifierModule(LightningModule):
 
     pred = self.get_pred(y_hat)
     for name, get_stat in self.metrics.items():
-      try:
-        self.log(f'train/{name}', get_stat(pred, y), batch_size=batch_size, prog_bar=True)
-      except:
-        print(pred, y)
-        assert False
+      self.log(f'train/{name}', get_stat(pred, y), batch_size=batch_size, prog_bar=True)
 
     return loss
 
