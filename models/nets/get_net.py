@@ -20,7 +20,7 @@ def get_net(net, num_classes, pretrained, dir_weights):
   elif net == 'convnext':
     net = get_convnext(num_classes, pretrained)
   elif net == 'mvit':
-    net = get_mvit(num_classes, pretrained)
+    net = get_mvit(num_classes, pretrained, dir_weights)
   else:
     raise NotImplementedError
 
