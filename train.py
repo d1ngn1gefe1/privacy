@@ -7,7 +7,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/ucf101/mvit.yaml')
+  cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
   cfg.phase = 'train'
   cfg.name = utils.get_name(cfg)
 
