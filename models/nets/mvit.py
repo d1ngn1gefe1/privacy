@@ -2,6 +2,11 @@ import os
 from pytorchvideo.models.head import create_vit_basic_head
 from pytorchvideo.models.vision_transformers import create_multiscale_vision_transformers
 import torch
+from types import MethodType
+
+
+def get_classifier(self):
+  return self.head.proj
 
 
 def get_mvit(num_classes, pretrained, dir_weights):
@@ -46,5 +51,6 @@ def get_mvit(num_classes, pretrained, dir_weights):
     weights.pop('head.proj.bias', None)
     print(f'{list(set(net.state_dict().keys())-set(weights.keys()))} will be trained from scratch')
     net.load_state_dict(weights, strict=False)
+    net.get_classifier = MethodType(get_classifier, net)
 
   return net

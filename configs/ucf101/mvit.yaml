@@ -4,12 +4,12 @@ dir_weights: /home/ssd/weights
 
 dataset: ucf101
 net: mvit
-adapter: mlp_adapter
-mode: fine_tuning
+adapter: video_mlp_adapter
+#mode: fine_tuning
 #mode: linear_probing
-#mode: adapter
+mode: adapter
 
-gpus: [0, 1]
+gpus: [0]
 num_workers: 4
 
 num_epochs: 30
