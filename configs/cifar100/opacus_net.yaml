@@ -18,7 +18,7 @@ lr: 0.1
 momentum: 0.9
 wd: 1e-4
 
-dp: False
+dp: True
 augment: True
 sigma: 1.5
 c: 1

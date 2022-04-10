@@ -10,7 +10,7 @@ from ray.tune.integration.pytorch_lightning import TuneReportCallback
 
 def get_trainer(cfg):
   logger = WandbLogger(
-    project='cifar10',
+    project=cfg.dataset,
     name=cfg.name,
     log_model='all',
     save_dir=cfg.dir_log+f'_{os.getlogin()}'

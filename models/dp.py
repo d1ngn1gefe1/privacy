@@ -7,17 +7,9 @@ from types import MethodType
 
 
 def on_train_epoch_end(self):
-  epsilon = self.privacy_engine.get_epsilon(self.cfg.delta)
+  epsilon = self.privacy_engine.get_epsilon(delta=self.cfg.delta)
   self.log('epsilon', epsilon, on_epoch=True, sync_dist=False, prog_bar=True)  # same across all devices, no sync
 
-  dataloader = self.trainer._data_connector._train_dataloader_source.dataloader()
-  sample_rate = 1/len(dataloader)
-  alphas = [1+x/10.0 for x in range(1, 100)]+list(range(12, 64))
-  rdp = compute_rdp(q=sample_rate, noise_multiplier=self.cfg.sigma,
-                    steps=self.trainer.current_epoch*math.ceil(1/sample_rate),
-                    orders=alphas)
-  epsilon2, _ = get_privacy_spent(orders=alphas, rdp=rdp, delta=self.cfg.delta)
-  self.log('epsilon2', epsilon2, on_epoch=True, sync_dist=False, prog_bar=True)
 
 def configure_optimizers(self):
   dataloader = self.trainer._data_connector._train_dataloader_source.dataloader()

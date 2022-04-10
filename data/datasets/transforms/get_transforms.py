@@ -3,6 +3,7 @@ from .opacus_net import get_opacus_net_transforms
 from .vit import get_vit_transforms
 from .resnet import get_resnet_transforms
 from .convnext import get_convnext_transforms
+from .mvit import get_mvit_transforms
 
 
 def get_transforms(net, augment):
@@ -16,5 +17,7 @@ def get_transforms(net, augment):
     return get_resnet_transforms(augment)
   elif net == 'convnext':
     return get_convnext_transforms(augment)
+  elif net == 'mvit':
+    return get_mvit_transforms()
   else:
     raise NotImplementedError
