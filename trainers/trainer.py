@@ -33,7 +33,8 @@ def get_trainer(cfg):
     'check_val_every_n_epoch': 1,
     'num_sanity_val_steps': 2,
     'log_every_n_steps': 50,
-    'gpus': cfg.gpus
+    'gpus': cfg.gpus,
+    'replace_sampler_ddp': False
   }
   if len(cfg.gpus) > 1:
     kwargs['strategy'] = DDPStrategy(find_unused_parameters=False)

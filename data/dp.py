@@ -13,9 +13,6 @@ def train_dataloader(self) -> DPDataLoader:
 
 # Reference: https://github.com/pytorch/opacus/blob/main/examples/mnist_lightning.py
 def make_private(data: LightningDataModule) -> LightningDataModule:
-  # distributed sampler is handled by Opacus already
-  TrainerDataLoadingMixin._requires_distributed_sampler = lambda x, y: False
-
   # replace dataloader
   data.train_dataloader_old = data.train_dataloader
   data.train_dataloader = MethodType(train_dataloader, data)
