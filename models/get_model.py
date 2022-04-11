@@ -19,7 +19,7 @@ def get_model(cfg):
     adapter = get_adapter(cfg)
     model = adapter.convert_adapter(model)
 
-  if cfg.dp and len(cfg.gpus) == 1:
-    model = make_private(model, cfg)
+  if cfg.dp:
+    model = make_private(model)
 
   return model
