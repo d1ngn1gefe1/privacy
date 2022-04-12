@@ -5,6 +5,8 @@ from pytorch_lightning.callbacks.base import Callback
 import torch
 from types import MethodType
 
+import utils
+
 
 def on_train_epoch_end(self):
   epsilon = self.privacy_engine.get_epsilon(delta=self.cfg.delta)
@@ -50,18 +52,11 @@ class DPCallback(Callback):
   def setup(self, trainer, pl_module, stage):
     pl_module.privacy_engine = PrivacyEngine()
     pl_module.on_train_epoch_end = MethodType(on_train_epoch_end, pl_module)
+
     # make optimizer private
     pl_module.configure_optimizers_old = pl_module.configure_optimizers
     pl_module.configure_optimizers = MethodType(configure_optimizers, pl_module)
 
     # make net private
-    #pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
-    #pl_module.net.get_classifier = pl_module.net._module.get_classifier
-    # model.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO 2: uncomment this line
-
-  def on_fit_start(self, trainer, pl_module):
-    # Make it private here. After _setup_model() in utils/lightning
-    # trainer.strategy.model is DPDDP
-    trainer.strategy.model = pl_module.privacy_engine._prepare_model(trainer.strategy.model)
-    print(f'Type: {type(pl_module)}')
-
+    pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
+    # pl_module.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO: fix me

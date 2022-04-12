@@ -1,5 +1,4 @@
 from .adapters import get_adapter
-#from .dp import make_private
 from .image_classifier import ImageClassifierModule
 from .video_classifier import VideoClassifierModule
 
@@ -18,8 +17,5 @@ def get_model(cfg):
   if cfg.mode == 'adapter':
     adapter = get_adapter(cfg)
     model = adapter.convert_adapter(model)
-
-  #if cfg.dp:
-  #  model = make_private(model)
 
   return model

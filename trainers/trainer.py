@@ -6,7 +6,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 
-from .dp import DPCallback
+from .dp_callback import DPCallback
 
 
 def get_trainer(cfg):
@@ -34,7 +34,7 @@ def get_trainer(cfg):
     'logger': logger,
     'callbacks': callbacks,
     'check_val_every_n_epoch': 1,
-    'num_sanity_val_steps': 2,
+    'num_sanity_val_steps': 0,
     'log_every_n_steps': 50,
     'gpus': cfg.gpus,
     'replace_sampler_ddp': False
