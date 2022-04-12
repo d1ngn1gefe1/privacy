@@ -28,22 +28,22 @@ class CIFARDataModule(LightningDataModule):
     self.dataset_predict = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_test)
 
   def train_dataloader(self):
-    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 
   def val_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 
   def test_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 
   def predict_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 

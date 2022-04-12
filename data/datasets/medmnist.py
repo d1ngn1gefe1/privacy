@@ -39,21 +39,21 @@ class MedMNISTDataModule(LightningDataModule):
                                        transform=transform_test, target_transform=self.target_transform)
 
   def train_dataloader(self):
-    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 
   def val_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 
   def test_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
 
   def predict_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size,
                             num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
     return dataloader
