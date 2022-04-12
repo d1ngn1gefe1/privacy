@@ -55,6 +55,13 @@ class DPCallback(Callback):
     pl_module.configure_optimizers = MethodType(configure_optimizers, pl_module)
 
     # make net private
-    pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
-    pl_module.net.get_classifier = pl_module.net._module.get_classifier
+    #pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
+    #pl_module.net.get_classifier = pl_module.net._module.get_classifier
     # model.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO 2: uncomment this line
+
+  def on_fit_start(self, trainer, pl_module):
+    # Make it private here. After _setup_model() in utils/lightning
+    # trainer.strategy.model is DPDDP
+    trainer.strategy.model = pl_module.privacy_engine._prepare_model(trainer.strategy.model)
+    print(f'Type: {type(pl_module)}')
+
