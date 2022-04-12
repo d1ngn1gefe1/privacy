@@ -47,30 +47,31 @@ def configure_optimizers(self):
   return {'optimizer': optimizer, 'lr_scheduler': scheduler}
 
 
-# TODO 1
 @property
 def lightning_module(self):
-  return unwrap_lightning_module(self.model) if self.model is not None else None
+  return unwrap_lightning_module(self.model.module if isinstance(self.model, DPDDP) else self.model) \
+      if self.model is not None else None
 
 
 def tmp(model):
-  privacy_engine = PrivacyEngine()
-
+  # attach privacy engine
+  model.privacy_engine = PrivacyEngine()
+  model.on_train_epoch_end = MethodType(on_train_epoch_end, model)
   # make optimizer private
   model.configure_optimizers_old = model.configure_optimizers
   model.configure_optimizers = MethodType(configure_optimizers, model)
 
   # make net private
-  model.net = privacy_engine._prepare_model(model.net)
+  model.net = model.privacy_engine._prepare_model(model.net)
   model.net.get_classifier = model.net._module.get_classifier
-  # model.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO 3
+  # model.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO 2: uncomment this line
 
-  # attach privacy engine
-  model.privacy_engine = PrivacyEngine()
-  model.on_train_epoch_end = MethodType(on_train_epoch_end, model)
+  return model
 
 
 def _setup_model(self, model):
+  tmp(model.module)
+
   device_ids = self.determine_ddp_device_ids()
   if model.module.cfg.dp:
     log.detail(f'setting up DPDDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
@@ -79,16 +80,13 @@ def _setup_model(self, model):
     log.detail(f'setting up DDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
     model = DDP(module=model, device_ids=device_ids, **self._ddp_kwargs)
 
-  tmp(model.module.module)  # TODO 2
-
   return model
 
 
 def make_private(model):
   # make lightning compatible
-  ParallelStrategy.lightning_module = lightning_module  # TODO 1
+  ParallelStrategy.lightning_module = lightning_module
   DDPStrategy._setup_model = _setup_model
 
-  # tmp(model)  # TODO 2
-
+  # model = tmp(model)  # TODO 1: remove tmp in _setup_model
   return model
