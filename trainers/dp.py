@@ -1,12 +1,8 @@
 import inspect
 from opacus import PrivacyEngine
-from opacus.distributed import DifferentiallyPrivateDistributedDataParallel as DPDDP
 from opacus.privacy_engine import forbid_accumulation_hook
-from pytorch_lightning.overrides.base import unwrap_lightning_module
-from pytorch_lightning.strategies.ddp import DDPStrategy, log
-from pytorch_lightning.strategies.parallel import ParallelStrategy
+from pytorch_lightning.callbacks.base import Callback
 import torch
-from torch.nn.parallel import DistributedDataParallel as DDP
 from types import MethodType
 
 
@@ -47,46 +43,18 @@ def configure_optimizers(self):
   return {'optimizer': optimizer, 'lr_scheduler': scheduler}
 
 
-@property
-def lightning_module(self):
-  return unwrap_lightning_module(self.model.module if isinstance(self.model, DPDDP) else self.model) \
-      if self.model is not None else None
+class DPCallback(Callback):
+  def __init__(self):
+    pass
 
+  def setup(self, trainer, pl_module, stage):
+    pl_module.privacy_engine = PrivacyEngine()
+    pl_module.on_train_epoch_end = MethodType(on_train_epoch_end, pl_module)
+    # make optimizer private
+    pl_module.configure_optimizers_old = pl_module.configure_optimizers
+    pl_module.configure_optimizers = MethodType(configure_optimizers, pl_module)
 
-def tmp(model):
-  # attach privacy engine
-  model.privacy_engine = PrivacyEngine()
-  model.on_train_epoch_end = MethodType(on_train_epoch_end, model)
-  # make optimizer private
-  model.configure_optimizers_old = model.configure_optimizers
-  model.configure_optimizers = MethodType(configure_optimizers, model)
-
-  # make net private
-  model.net = model.privacy_engine._prepare_model(model.net)
-  model.net.get_classifier = model.net._module.get_classifier
-  # model.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO 2: uncomment this line
-
-  return model
-
-
-def _setup_model(self, model):
-  tmp(model.module)
-
-  device_ids = self.determine_ddp_device_ids()
-  if model.module.cfg.dp:
-    log.detail(f'setting up DPDDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
-    model = DPDDP(model)
-  else:
-    log.detail(f'setting up DDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
-    model = DDP(module=model, device_ids=device_ids, **self._ddp_kwargs)
-
-  return model
-
-
-def make_private(model):
-  # make lightning compatible
-  ParallelStrategy.lightning_module = lightning_module
-  DDPStrategy._setup_model = _setup_model
-
-  # model = tmp(model)  # TODO 1: remove tmp in _setup_model
-  return model
+    # make net private
+    pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
+    pl_module.net.get_classifier = pl_module.net._module.get_classifier
+    # model.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO 2: uncomment this line

@@ -4,8 +4,9 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies.ddp import DDPStrategy
-
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
+
+from .dp import DPCallback
 
 
 def get_trainer(cfg):
@@ -25,6 +26,8 @@ def get_trainer(cfg):
   ]
   if cfg.phase == 'tune':
     callbacks.append(TuneReportCallback({'acc': 'val/acc', 'acc-div-log_epsilon': 'val/acc-div-log_epsilon'}, on='validation_end'))
+  if cfg.dp:
+    callbacks.append(DPCallback())
 
   kwargs = {
     'max_epochs': cfg.num_epochs,

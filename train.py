@@ -11,6 +11,8 @@ def main():
   cfg.phase = 'train'
   cfg.name = utils.get_name(cfg)
 
+  utils.patch_lightning()
+
   data = get_data(cfg)
   model = get_model(cfg)
   trainer = get_trainer(cfg)
