@@ -1,5 +1,4 @@
 from .datasets import CIFARDataModule, CheXpertDataModule, MedMNISTDataModule, UCF101DataModule
-from .dp import make_private
 
 
 def get_data(cfg):
@@ -13,8 +12,5 @@ def get_data(cfg):
     data = UCF101DataModule(cfg)
   else:
     raise NotImplementedError
-
-  if cfg.dp:
-    data = make_private(data)
 
   return data

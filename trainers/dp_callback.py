@@ -1,11 +1,10 @@
 import inspect
 from opacus import PrivacyEngine
+from opacus.data_loader import DPDataLoader
 from opacus.privacy_engine import forbid_accumulation_hook
 from pytorch_lightning.callbacks.base import Callback
 import torch
 from types import MethodType
-
-import utils
 
 
 def on_train_epoch_end(self):
@@ -45,6 +44,12 @@ def configure_optimizers(self):
   return {'optimizer': optimizer, 'lr_scheduler': scheduler}
 
 
+def train_dataloader(self):
+  dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=len(self.cfg.gpus) > 1)
+  print(f'Dataloader: type={type(dataloader)}')
+  return dataloader
+
+
 class DPCallback(Callback):
   def __init__(self):
     pass
@@ -53,10 +58,14 @@ class DPCallback(Callback):
     pl_module.privacy_engine = PrivacyEngine()
     pl_module.on_train_epoch_end = MethodType(on_train_epoch_end, pl_module)
 
-    # make optimizer private
-    pl_module.configure_optimizers_old = pl_module.configure_optimizers
-    pl_module.configure_optimizers = MethodType(configure_optimizers, pl_module)
-
     # make net private
     pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
     # pl_module.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO: fix me
+
+    # make dataloader private
+    trainer.datamodule.train_dataloader_old = trainer.datamodule.train_dataloader
+    trainer.datamodule.train_dataloader = MethodType(train_dataloader, trainer.datamodule)
+
+    # make optimizer private
+    pl_module.configure_optimizers_old = pl_module.configure_optimizers
+    pl_module.configure_optimizers = MethodType(configure_optimizers, pl_module)
