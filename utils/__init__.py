@@ -1,2 +1,3 @@
 from .utils import *
-from .lightning import patch_lightning
+from .patch_lightning import patch_lightning
+from .patch_opacus import patch_opacus

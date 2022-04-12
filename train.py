@@ -12,6 +12,7 @@ def main():
   cfg.name = utils.get_name(cfg)
 
   utils.patch_lightning()
+  utils.patch_opacus()
 
   data = get_data(cfg)
   model = get_model(cfg)
