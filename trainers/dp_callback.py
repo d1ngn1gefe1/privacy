@@ -12,7 +12,8 @@ from types import MethodType
 
 def on_train_epoch_end(self):
   epsilon = self.privacy_engine.get_epsilon(delta=self.cfg.delta)
-  self.log('epsilon', epsilon, on_epoch=True, sync_dist=False, prog_bar=True)  # same across all devices, no sync
+  # same across all devices, no need to sync
+  self.log('epsilon', epsilon, on_epoch=True, sync_dist=False, prog_bar=True)
 
 
 def configure_optimizers(self):
@@ -33,7 +34,7 @@ def configure_optimizers(self):
                                                      clipping='flat')
   sample_rate = 1/len(dataloader)
   optimizer.attach_step_hook(self.privacy_engine.accountant.get_optimizer_hook_fn(sample_rate=sample_rate))
-  print(f'configure optimizers: {expected_batch_size}, sample_rate={sample_rate}')
+  print(f'configure optimizers: {len(dataloader)}, {len(dataloader.dataset)}, {expected_batch_size}, {sample_rate}')
 
   # new lr scheduler
   kwargs = {key:scheduler_old.__dict__[key]
