@@ -14,27 +14,22 @@ def on_train_epoch_end(self):
 
 def configure_optimizers(self):
   dataloader = self.trainer._data_connector._train_dataloader_source.dataloader()
-  sample_rate = 1/len(dataloader)
-  if len(self.cfg.gpus) > 1:
-    distributed = True
-    batch_size = int(len(dataloader.dataset)*sample_rate)/torch.distributed.get_world_size()
-  else:
-    distributed = False
-    batch_size = int(len(dataloader.dataset)*sample_rate)
 
+  # old optimizer and lr scheduler
   dict_optimizers = self.configure_optimizers_old()
   optimizer_old, scheduler_old = dict_optimizers['optimizer'], dict_optimizers['lr_scheduler']
 
-  # optimizer
+  # new optimizer
   optimizer = self.privacy_engine._prepare_optimizer(optimizer_old,
-                                                     distributed=distributed,
+                                                     distributed=len(self.cfg.gpus) > 1,
                                                      noise_multiplier=self.cfg.sigma,
                                                      max_grad_norm=self.cfg.c,
-                                                     expected_batch_size=batch_size,
+                                                     expected_batch_size=int(len(dataloader.dataset)/len(dataloader)),
                                                      clipping='flat')
+  sample_rate = len(self.cfg.gpus)/len(dataloader)
   optimizer.attach_step_hook(self.privacy_engine.accountant.get_optimizer_hook_fn(sample_rate=sample_rate))
 
-  # lr scheduler
+  # new lr scheduler
   kwargs = {key:scheduler_old.__dict__[key]
             for key in inspect.signature(scheduler_old.__class__.__init__).parameters.keys()
             if key not in ['self', 'optimizer']}
@@ -46,7 +41,7 @@ def configure_optimizers(self):
 
 def train_dataloader(self):
   dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=len(self.cfg.gpus) > 1)
-  print(f'Dataloader: type={type(dataloader)}')
+  print(f'Dataloader: type={type(dataloader)}, {len(self.train_dataloader_old())} -> {len(dataloader)}')
   return dataloader
 
 

@@ -64,6 +64,7 @@ class ImageClassifierModule(LightningModule):
       stat = get_stat(pred, y)
       self.log(f'val/{name}', stat, sync_dist=True, prog_bar=True)
 
+      # TODO: move to dp callback
       if self.cfg.dp:
         epsilon = self.privacy_engine.get_epsilon(self.cfg.delta)
         self.log(f'val/{name}-div-log_epsilon', stat/np.log(epsilon), sync_dist=True, prog_bar=True)

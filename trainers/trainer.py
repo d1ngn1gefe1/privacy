@@ -10,6 +10,7 @@ from .dp_callback import DPCallback
 
 
 def get_trainer(cfg):
+  # logger
   logger = WandbLogger(
     project=cfg.dataset,
     name=cfg.name,
@@ -18,6 +19,7 @@ def get_trainer(cfg):
   )
   logger.log_hyperparams(cfg)
 
+  # callbacks
   callbacks = [
     LearningRateMonitor(logging_interval='step'),
     ModelCheckpoint(every_n_epochs=5,
@@ -29,6 +31,7 @@ def get_trainer(cfg):
   if cfg.dp:
     callbacks.append(DPCallback())
 
+  # all other kwargs
   kwargs = {
     'max_epochs': cfg.num_epochs,
     'logger': logger,
@@ -37,7 +40,7 @@ def get_trainer(cfg):
     'num_sanity_val_steps': 0,
     'log_every_n_steps': 50,
     'gpus': cfg.gpus,
-    'replace_sampler_ddp': False
+    'replace_sampler_ddp': not cfg.dp
   }
   if len(cfg.gpus) > 1:
     kwargs['strategy'] = DDPStrategy(find_unused_parameters=False)
