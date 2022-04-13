@@ -26,7 +26,7 @@ def configure_optimizers(self):
                                                      max_grad_norm=self.cfg.c,
                                                      expected_batch_size=int(len(dataloader.dataset)/len(dataloader)),
                                                      clipping='flat')
-  sample_rate = len(self.cfg.gpus)/len(dataloader)
+  sample_rate = 1./len(dataloader)
   optimizer.attach_step_hook(self.privacy_engine.accountant.get_optimizer_hook_fn(sample_rate=sample_rate))
 
   # new lr scheduler
