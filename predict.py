@@ -48,10 +48,10 @@ def main():
   train_save_dict = inference(model, train_dataloader)
 
   path_predict = os.path.join(cfg.dir_weights, cfg.relpath_predict)
-  np.savez(path_predict, train_preds=train_save_dict['preds'],
-    train_gts=train_save_dict['gts'], test_preds=predict_save_dict['preds'],
-    test_gts=predict_save_dict['gts'])
+  np.savez(path_predict,
+           train_preds=train_save_dict['preds'], train_gts=train_save_dict['gts'],
+           test_preds=predict_save_dict['preds'], test_gts=predict_save_dict['gts'])
+
 
 if __name__ == '__main__':
   main()
-

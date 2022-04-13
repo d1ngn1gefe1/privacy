@@ -40,7 +40,6 @@ def get_trainer(cfg):
     'num_sanity_val_steps': 0,
     'log_every_n_steps': 50,
     'gpus': cfg.gpus,
-    'replace_sampler_ddp': not cfg.dp,
     'strategy': DDPStrategy(find_unused_parameters=False) if len(cfg.gpus) > 1 else None
   }
 
