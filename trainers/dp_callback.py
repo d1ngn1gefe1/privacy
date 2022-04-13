@@ -5,6 +5,7 @@ from opacus import PrivacyEngine
 from opacus.data_loader import DPDataLoader
 from opacus.privacy_engine import forbid_accumulation_hook
 from pytorch_lightning.callbacks.base import Callback
+from pytorch_lightning.trainer.states import RunningStage
 from pytorch_lightning.utilities.data import _update_dataloader
 from torch.utils.data import DistributedSampler
 from types import MethodType
@@ -49,26 +50,31 @@ def configure_optimizers(self):
 def train_dataloader(self):
   distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
   dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=distributed)
-  print(f'Dataloader: type={type(dataloader)}, {len(self.train_dataloader_old())} -> {len(dataloader)}')
   return dataloader
 
 
 def val_dataloader(self):
   distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
-  # if distributed:
-  #   sampler = DistributedSampler
-  #   dataloader = _update_dataloader(self.val_dataloader_old(), )
-  # else:
-  return self.val_dataloader_old()
+  dataloader_old = self.val_dataloader_old()
+
+  if distributed:
+    sampler = DistributedSampler(dataloader_old.dataset, shuffle=False, drop_last=False)
+    dataloader = _update_dataloader(self.val_dataloader_old(), sampler, RunningStage.VALIDATING)
+    return dataloader
+  else:
+    return dataloader_old
 
 
 def test_dataloader(self):
   distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
-  # if distributed:
-  #   sampler = DistributedSampler
-  #   dataloader = _update_dataloader(self.val_dataloader_old(), )
-  # else:
-  return self.test_dataloader_old()
+  dataloader_old = self.test_dataloader_old()
+
+  if distributed:
+    sampler = DistributedSampler(dataloader_old.dataset, shuffle=False, drop_last=False)
+    dataloader = _update_dataloader(self.val_dataloader_old(), sampler, RunningStage.TESTING)
+    return dataloader
+  else:
+    return dataloader_old
 
 
 class DPCallback(Callback):
@@ -81,15 +87,15 @@ class DPCallback(Callback):
 
     # make net private
     pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
-    # pl_module.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO: fix me
+    # pl_module.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO
 
     # make dataloader private
     trainer.datamodule.train_dataloader_old = trainer.datamodule.train_dataloader
     trainer.datamodule.train_dataloader = MethodType(train_dataloader, trainer.datamodule)
-    trainer.datamodule.val_dataloader_old = trainer.datamodule.val_dataloader
-    trainer.datamodule.val_dataloader = MethodType(val_dataloader, trainer.datamodule)
-    trainer.datamodule.test_dataloader_old = trainer.datamodule.test_dataloader
-    trainer.datamodule.test_dataloader = MethodType(test_dataloader, trainer.datamodule)
+    # trainer.datamodule.val_dataloader_old = trainer.datamodule.val_dataloader
+    # trainer.datamodule.val_dataloader = MethodType(val_dataloader, trainer.datamodule)
+    # trainer.datamodule.test_dataloader_old = trainer.datamodule.test_dataloader
+    # trainer.datamodule.test_dataloader = MethodType(test_dataloader, trainer.datamodule)
 
     # make optimizer private
     pl_module.configure_optimizers_old = pl_module.configure_optimizers
