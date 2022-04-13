@@ -1,11 +1,18 @@
 from colorama import Fore, Back, init
 
+from .patches import *
+
 
 init(autoreset=True)
 
 
+def patch():
+  patch_lightning()
+  patch_opacus()
+
+
 def get_name(cfg):
-  name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}'
+  name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}_gpu{len(cfg.gpus)}'
 
   if cfg.dp:
     name += f'_sigma{cfg.sigma}_c{cfg.c}'

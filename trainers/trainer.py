@@ -6,13 +6,13 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 
-from .dp_callback import DPCallback
+from .callbacks import DPCallback
 
 
 def get_trainer(cfg):
   # logger
   logger = WandbLogger(
-    project=cfg.dataset,
+    project='ddp',#cfg.dataset,
     name=cfg.name,
     log_model='all',
     save_dir=cfg.dir_log+f'_{os.getlogin()}'
