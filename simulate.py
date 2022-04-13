@@ -23,7 +23,7 @@ def main():
 
 def get_privacy_spent(epoch, data, model, sigma, delta, world_size):
   dataloader = data.train_dataloader()
-  alphas = [1 + x / 10.0 for x in range(1, 100)] + list(range(12, 64))
+  alphas = [1+x/10.0 for x in range(1, 100)]+list(range(12, 64))
   sample_rate = world_size/len(dataloader)
 
   num_steps = (epoch+1)*len(dataloader)/world_size

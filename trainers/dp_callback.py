@@ -24,7 +24,7 @@ def configure_optimizers(self):
 
   # new optimizer
   distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
-  expected_batch_size = int(len(dataloader.dataset)/len(dataloader))
+  expected_batch_size = int(len(dataloader.dataset)/len(dataloader)/len(self.cfg.gpus))
   optimizer = self.privacy_engine._prepare_optimizer(optimizer_old,
                                                      distributed=distributed,
                                                      noise_multiplier=self.cfg.sigma,
