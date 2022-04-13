@@ -9,7 +9,7 @@ net: opacus_net
 mode: from_scratch
 
 gpus: [0]
-num_workers: 4
+num_workers: 3
 
 num_epochs: 90
 warmup_steps: 50

@@ -1,5 +1,5 @@
 from opacus.data_loader import DPDataLoader
-from opacus.optimizers import DPOptimizer, DistributedDPOptimizer
+from opacus.optimizers import DistributedDPOptimizer
 import torch
 from torch.utils.data import IterableDataset
 
@@ -28,9 +28,21 @@ def from_data_loader(cls, data_loader, *, distributed=False, generator=None):
   )
 
 
+def step(self, closure=None):
+  if closure is not None:
+    with torch.enable_grad():
+      closure()
+
+  if self.pre_step():
+    self.reduce_gradients()
+    return self.original_optimizer.step()
+  else:
+    return None
+
+
 def patch_opacus():
   # make closure compatible with lightning
-  DistributedDPOptimizer.step = DPOptimizer.step
+  DistributedDPOptimizer.step = step
 
   # make number of steps per epoch consistent with PyTorch DDP
   DPDataLoader.from_data_loader = from_data_loader
