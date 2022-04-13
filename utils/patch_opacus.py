@@ -22,9 +22,11 @@ def from_data_loader(cls, data_loader, *, distributed=False, generator=None):
     raise ValueError('Uniform sampling is not supported for IterableDataset')
 
   world_size = torch.distributed.get_world_size() if distributed else 1
+  sample_rate = world_size/len(data_loader)
+  print(f'from_data_loader: {sample_rate}, {len(data_loader)}')
   return cls(
     dataset=data_loader.dataset,
-    sample_rate=world_size/len(data_loader),
+    sample_rate=sample_rate,
     num_workers=data_loader.num_workers,
     collate_fn=data_loader.collate_fn,
     pin_memory=data_loader.pin_memory,

@@ -1,9 +1,12 @@
 import inspect
+
+import torch.distributed
 from opacus import PrivacyEngine
 from opacus.data_loader import DPDataLoader
 from opacus.privacy_engine import forbid_accumulation_hook
 from pytorch_lightning.callbacks.base import Callback
-import torch
+from pytorch_lightning.utilities.data import _update_dataloader
+from torch.utils.data import DistributedSampler
 from types import MethodType
 
 
@@ -20,14 +23,17 @@ def configure_optimizers(self):
   optimizer_old, scheduler_old = dict_optimizers['optimizer'], dict_optimizers['lr_scheduler']
 
   # new optimizer
+  distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
+  expected_batch_size = int(len(dataloader.dataset)/len(dataloader))
   optimizer = self.privacy_engine._prepare_optimizer(optimizer_old,
-                                                     distributed=len(self.cfg.gpus) > 1,
+                                                     distributed=distributed,
                                                      noise_multiplier=self.cfg.sigma,
                                                      max_grad_norm=self.cfg.c,
-                                                     expected_batch_size=int(len(dataloader.dataset)/len(dataloader)),
+                                                     expected_batch_size=expected_batch_size,
                                                      clipping='flat')
-  sample_rate = len(self.cfg.gpus)/len(dataloader)
+  sample_rate = 1/len(dataloader)
   optimizer.attach_step_hook(self.privacy_engine.accountant.get_optimizer_hook_fn(sample_rate=sample_rate))
+  print(f'configure optimizers: {expected_batch_size}, sample_rate={sample_rate}')
 
   # new lr scheduler
   kwargs = {key:scheduler_old.__dict__[key]
@@ -40,9 +46,28 @@ def configure_optimizers(self):
 
 
 def train_dataloader(self):
-  dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=len(self.cfg.gpus) > 1)
+  distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
+  dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=distributed)
   print(f'Dataloader: type={type(dataloader)}, {len(self.train_dataloader_old())} -> {len(dataloader)}')
   return dataloader
+
+
+def val_dataloader(self):
+  distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
+  # if distributed:
+  #   sampler = DistributedSampler
+  #   dataloader = _update_dataloader(self.val_dataloader_old(), )
+  # else:
+  return self.val_dataloader_old()
+
+
+def test_dataloader(self):
+  distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
+  # if distributed:
+  #   sampler = DistributedSampler
+  #   dataloader = _update_dataloader(self.val_dataloader_old(), )
+  # else:
+  return self.test_dataloader_old()
 
 
 class DPCallback(Callback):
@@ -60,6 +85,10 @@ class DPCallback(Callback):
     # make dataloader private
     trainer.datamodule.train_dataloader_old = trainer.datamodule.train_dataloader
     trainer.datamodule.train_dataloader = MethodType(train_dataloader, trainer.datamodule)
+    trainer.datamodule.val_dataloader_old = trainer.datamodule.val_dataloader
+    trainer.datamodule.val_dataloader = MethodType(val_dataloader, trainer.datamodule)
+    trainer.datamodule.test_dataloader_old = trainer.datamodule.test_dataloader
+    trainer.datamodule.test_dataloader = MethodType(test_dataloader, trainer.datamodule)
 
     # make optimizer private
     pl_module.configure_optimizers_old = pl_module.configure_optimizers
