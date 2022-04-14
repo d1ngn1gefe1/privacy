@@ -9,6 +9,7 @@ import torchvision.datasets.utils
 from torchvision.datasets.utils import download_and_extract_archive, _ARCHIVE_EXTRACTORS
 
 from .base_datamodule import BaseDataModule
+from .labeled_video_map_dataset import LabeledVideoMapDataset
 from .transforms import get_transforms
 
 
@@ -83,6 +84,7 @@ class UCF101DataModule(BaseDataModule):
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
     )
+    self.dataset_train = LabeledVideoMapDataset(self.dataset_train)
 
     self.dataset_val = Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'testlist01.csv'),
@@ -92,6 +94,7 @@ class UCF101DataModule(BaseDataModule):
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
     )
+    self.dataset_val = LabeledVideoMapDataset(self.dataset_val)
 
     self.dataset_test = Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'testlist01.csv'),
@@ -101,3 +104,4 @@ class UCF101DataModule(BaseDataModule):
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
     )
+    self.dataset_test = LabeledVideoMapDataset(self.dataset_test)

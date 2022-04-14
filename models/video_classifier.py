@@ -42,7 +42,7 @@ class VideoClassifierModule(LightningModule):
      - https://pytorch.org/docs/master/data.html#torch.utils.data.distributed.DistributedSampler
     """
     if torch.distributed.is_available() and torch.distributed.is_initialized():
-      self.trainer.datamodule.dataset_train.video_sampler.set_epoch(self.trainer.current_epoch)
+      self.trainer.datamodule.dataset_train.dataset.video_sampler.set_epoch(self.trainer.current_epoch)
 
   def forward(self, x):
     return self.net(x)
