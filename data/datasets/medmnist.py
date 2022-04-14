@@ -1,14 +1,13 @@
 import medmnist
 from medmnist import INFO
-from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader
 
+from .base_datamodule import BaseDataModule
 from .transforms import get_transforms
 
 
-class MedMNISTDataModule(LightningDataModule):
+class MedMNISTDataModule(BaseDataModule):
   def __init__(self, cfg):
-    super().__init__()
+    super().__init__(cfg)
 
     info = INFO[cfg.dataset]
     task = info['task'].split(',')[0]
@@ -18,9 +17,8 @@ class MedMNISTDataModule(LightningDataModule):
     if task == 'ordinal-regression':
       task = 'multi-class'
 
-    cfg.num_classes = num_classes
-    cfg.task = task
-    self.cfg = cfg
+    self.cfg.num_classes = num_classes
+    self.cfg.task = task
     self.DataClass = DataClass
     self.target_transform = (lambda x: x[0]) if task == 'multi-class' else None
 
@@ -37,23 +35,3 @@ class MedMNISTDataModule(LightningDataModule):
                                       transform=transform_val, target_transform=self.target_transform)
     self.dataset_test = self.DataClass(root=self.cfg.dir_data, split='test', as_rgb=True,
                                        transform=transform_test, target_transform=self.target_transform)
-
-  def train_dataloader(self):
-    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def val_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def test_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def predict_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader

@@ -1,14 +1,14 @@
 import csv
 import os
 from pytorchvideo.data import Ucf101, make_clip_sampler
-from pytorch_lightning import LightningDataModule
 import rarfile
 import ssl
 import torch
-from torch.utils.data import DistributedSampler, RandomSampler, DataLoader
+from torch.utils.data import DistributedSampler, RandomSampler
 import torchvision.datasets.utils
 from torchvision.datasets.utils import download_and_extract_archive, _ARCHIVE_EXTRACTORS
 
+from .base_datamodule import BaseDataModule
 from .transforms import get_transforms
 
 
@@ -21,7 +21,7 @@ _ARCHIVE_EXTRACTORS['.rar'] = _extract_rar
 torchvision.datasets.utils._ARCHIVE_EXTRACTORS = _ARCHIVE_EXTRACTORS
 
 
-class UCF101DataModule(LightningDataModule):
+class UCF101DataModule(BaseDataModule):
   url_video = 'https://www.crcv.ucf.edu/data/UCF101/UCF101.rar'
   md5_video = '6463accf4bbc20fa6418ab7f159e6149'
   dname_video = 'UCF-101'
@@ -31,10 +31,10 @@ class UCF101DataModule(LightningDataModule):
   dname_metadata = 'ucfTrainTestlist'
 
   def __init__(self, cfg):
-    super().__init__()
-    cfg.num_classes = 101
-    cfg.task = 'multi-class'
-    self.cfg = cfg
+    super().__init__(cfg)
+
+    self.cfg.num_classes = 101
+    self.cfg.task = 'multi-class'
 
   def prepare_data(self):
     # download and extract
@@ -101,24 +101,3 @@ class UCF101DataModule(LightningDataModule):
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
     )
-
-  def train_dataloader(self):
-    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=True)
-    return dataloader
-
-  def val_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def test_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def predict_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-

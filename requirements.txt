@@ -1,7 +1,10 @@
 medmnist
 opacus==v1.1.1
 pytorch-lightning==1.6.1
+pytorchvideo
 rarfile
 ray
 timm
+torch
+torchvision
 wandb

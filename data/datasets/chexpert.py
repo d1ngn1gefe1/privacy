@@ -2,11 +2,10 @@ import numpy as np
 import os
 import pandas as pd
 from PIL import Image
-from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader
 from torchvision.datasets import VisionDataset
 from typing import Any, Callable, Optional, Tuple
 
+from .base_datamodule import BaseDataModule
 from .transforms import get_transforms
 
 
@@ -50,12 +49,12 @@ class CheXpert(VisionDataset):
     return image, target
 
 
-class CheXpertDataModule(LightningDataModule):
+class CheXpertDataModule(BaseDataModule):
   def __init__(self, cfg):
-    super().__init__()
-    cfg.num_classes = 14
-    cfg.task = 'multi-label'
-    self.cfg = cfg
+    super().__init__(cfg)
+
+    self.cfg.num_classes = 14
+    self.cfg.task = 'multi-label'
 
   def prepare_data(self):
     if not CheXpert.exists(self.cfg.dir_data):
@@ -66,23 +65,3 @@ class CheXpertDataModule(LightningDataModule):
     self.dataset_train = CheXpert(self.cfg.dir_data, train=True, transform=transform_train)
     self.dataset_val = CheXpert(self.cfg.dir_data, train=False, transform=transform_val)
     self.dataset_test = CheXpert(self.cfg.dir_data, train=False, transform=transform_test)
-
-  def train_dataloader(self):
-    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def val_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def test_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
-
-  def predict_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=False)
-    return dataloader
