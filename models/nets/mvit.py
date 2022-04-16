@@ -1,9 +1,34 @@
+from opacus.grad_sample import register_grad_sampler
 import os
+from pytorchvideo.layers import SpatioTemporalClsPositionalEncoding
 from pytorchvideo.models.head import create_vit_basic_head
 from pytorchvideo.models.vision_transformers import create_multiscale_vision_transformers
 import torch
+import torch.nn as nn
 from torchvision.datasets.utils import download_url
 from types import MethodType
+from typing import Dict
+
+
+@register_grad_sampler(SpatioTemporalClsPositionalEncoding)
+def compute_grad_sample(
+    layer: SpatioTemporalClsPositionalEncoding, activations: torch.Tensor, backprops: torch.Tensor
+) -> Dict[nn.Parameter, torch.Tensor]:
+  ret = {}
+
+  if layer.cls_embed_on:
+    ret[layer.cls_token] = backprops  # TODO: replace the following
+
+  if layer.sep_pos_embed:
+    ret[layer.pos_embed_spatial] = backprops  # TODO: replace the following
+    ret[layer.pos_embed_temporal] = backprops  # TODO: replace the following
+    if layer.cls_embed_on:
+      ret[layer.pos_embed_class] = backprops  # TODO: replace the following
+
+  else:
+    ret[layer.pos_embed] = backprops  # TODO: replace the following
+
+  return ret
 
 
 def get_classifier(self):

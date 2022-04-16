@@ -5,16 +5,16 @@ dir_weights: /home/ssd/weights
 dataset: ucf101
 net: mvit
 adapter: video_mlp_adapter
-#mode: fine_tuning
+mode: fine_tuning
 #mode: linear_probing
-mode: adapter
+#mode: adapter
 
 gpus: [0]
 num_workers: 4
 
 num_epochs: 30
 warmup_steps: 500
-batch_size: 16
+batch_size: 8
 lr: 3e-2
 momentum: 0.9
 wd: 1e-4
@@ -23,7 +23,7 @@ T: 16
 tau: 4
 fps: 30
 
-dp: False
+dp: True
 augment: True
 sigma: 1.5
 c: 10

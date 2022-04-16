@@ -32,7 +32,7 @@ class ParamEmbed(nn.Module):
 
 
 @register_grad_sampler(ParamEmbed)
-def compute_param_embed_grad_sample(
+def compute_grad_sample(
     layer: ParamEmbed, activations: torch.Tensor, backprops: torch.Tensor
 ) -> Dict[nn.Parameter, torch.Tensor]:
   ret = {

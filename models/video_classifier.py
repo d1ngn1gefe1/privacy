@@ -51,6 +51,7 @@ class VideoClassifierModule(LightningModule):
   def training_step(self, batch, batch_idx):
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
+    # TODO: remove print
     utils.info(self.current_epoch, self.global_step, batch_idx, y[:5])
     y_hat = self.net(x)
 
