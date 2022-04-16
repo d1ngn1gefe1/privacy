@@ -1,3 +1,11 @@
+"""
+Reference: https://github.com/facebookresearch/pytorchvideo/blob/main/pytorchvideo/layers/positional_encoding.py
+Examples of register_grad_sampler :
+  - https://opacus.ai/tutorials/guide_to_grad_sampler
+  - https://github.com/pytorch/opacus/blob/main/opacus/layers/dp_multihead_attention.py#L24
+  - https://github.com/pytorch/opacus/blob/main/opacus/grad_sample/dp_multihead_attention.py
+"""
+
 from opacus.grad_sample import register_grad_sampler
 import os
 from pytorchvideo.layers import SpatioTemporalClsPositionalEncoding
@@ -17,16 +25,16 @@ def compute_grad_sample(
   ret = {}
 
   if layer.cls_embed_on:
-    ret[layer.cls_token] = backprops  # TODO: replace the following
+    ret[layer.cls_token] = backprops  # TODO: replace me
 
   if layer.sep_pos_embed:
-    ret[layer.pos_embed_spatial] = backprops  # TODO: replace the following
-    ret[layer.pos_embed_temporal] = backprops  # TODO: replace the following
+    ret[layer.pos_embed_spatial] = backprops  # TODO: replace me
+    ret[layer.pos_embed_temporal] = backprops  # TODO: replace me
     if layer.cls_embed_on:
-      ret[layer.pos_embed_class] = backprops  # TODO: replace the following
+      ret[layer.pos_embed_class] = backprops  # TODO: replace me
 
   else:
-    ret[layer.pos_embed] = backprops  # TODO: replace the following
+    ret[layer.pos_embed] = backprops  # TODO: replace me
 
   return ret
 
