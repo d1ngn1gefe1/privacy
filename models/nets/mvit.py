@@ -2,6 +2,7 @@ import os
 from pytorchvideo.models.head import create_vit_basic_head
 from pytorchvideo.models.vision_transformers import create_multiscale_vision_transformers
 import torch
+from torchvision.datasets.utils import download_url
 from types import MethodType
 
 
@@ -46,7 +47,11 @@ def get_mvit(num_classes, pretrained, dir_weights):
   )
 
   if pretrained:
-    weights = torch.load(os.path.join(dir_weights, 'pretrain/MVIT_B_16x4.pyth'))['model_state']
+    dir_pretrain = os.path.join(dir_weights, 'pretrain')
+    fname_pretrain = 'MVIT_B_16x4.pyth'
+    if not os.path.exists(os.path.join(dir_pretrain, fname_pretrain)):
+      download_url(f'https://dl.fbaipublicfiles.com/pytorchvideo/model_zoo/kinetics/{fname_pretrain}', dir_pretrain)
+    weights = torch.load(os.path.join(dir_pretrain, fname_pretrain))['model_state']
     weights.pop('head.proj.weight', None)
     weights.pop('head.proj.bias', None)
     print(f'{list(set(net.state_dict().keys())-set(weights.keys()))} will be trained from scratch')
