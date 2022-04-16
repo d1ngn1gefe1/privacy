@@ -7,6 +7,8 @@ from opacus.privacy_engine import forbid_accumulation_hook
 from pytorch_lightning.callbacks.base import Callback
 from types import MethodType
 
+import utils
+
 
 def on_train_epoch_end(self):
   epsilon = self.privacy_engine.get_epsilon(delta=self.cfg.delta)
@@ -22,10 +24,9 @@ def configure_optimizers(self):
   optimizer_old, scheduler_old = dict_optimizers['optimizer'], dict_optimizers['lr_scheduler']
 
   # new optimizer
-  distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
   expected_batch_size = int(len(dataloader.dataset)/len(dataloader)/len(self.cfg.gpus))
   optimizer = self.privacy_engine._prepare_optimizer(optimizer_old,
-                                                     distributed=distributed,
+                                                     distributed=utils.is_ddp(),
                                                      noise_multiplier=self.cfg.sigma,
                                                      max_grad_norm=self.cfg.c,
                                                      expected_batch_size=expected_batch_size,
@@ -44,8 +45,7 @@ def configure_optimizers(self):
 
 
 def train_dataloader(self):
-  distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
-  dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=distributed)
+  dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=utils.is_ddp())
   return dataloader
 
 

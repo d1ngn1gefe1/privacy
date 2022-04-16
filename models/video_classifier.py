@@ -7,6 +7,7 @@ from torch.optim import SGD
 import torchmetrics
 
 from .nets import get_net
+import utils
 
 
 class VideoClassifierModule(LightningModule):
@@ -41,7 +42,7 @@ class VideoClassifierModule(LightningModule):
      - https://github.com/facebookresearch/pytorchvideo/blob/main/tutorials/video_classification_example/train.py#L96
      - https://pytorch.org/docs/master/data.html#torch.utils.data.distributed.DistributedSampler
     """
-    if torch.distributed.is_available() and torch.distributed.is_initialized():
+    if utils.is_ddp():
       self.trainer.datamodule.dataset_train.dataset.video_sampler.set_epoch(self.trainer.current_epoch)
 
   def forward(self, x):
@@ -50,6 +51,7 @@ class VideoClassifierModule(LightningModule):
   def training_step(self, batch, batch_idx):
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
+    utils.info(self.current_epoch, self.global_step, batch_idx, y[:5])
     y_hat = self.net(x)
 
     loss = self.get_loss(y_hat, y)

@@ -3,14 +3,14 @@ import os
 from pytorchvideo.data import Ucf101, make_clip_sampler
 import rarfile
 import ssl
-import torch
 from torch.utils.data import DistributedSampler, RandomSampler
 import torchvision.datasets.utils
 from torchvision.datasets.utils import download_and_extract_archive, _ARCHIVE_EXTRACTORS
 
 from .base_datamodule import BaseDataModule
-from .labeled_video_map_dataset import LabeledVideoMapDataset
+from .map_style_dataset import MapStyleDataset
 from .transforms import get_transforms
+import utils
 
 
 def _extract_rar(from_path, to_path, compression):
@@ -41,8 +41,10 @@ class UCF101DataModule(BaseDataModule):
     # download and extract
     ssl._create_default_https_context = ssl._create_unverified_context
     if not os.path.isdir(os.path.join(self.cfg.dir_data, self.dname_video)):
+      print('Downloading the dataset.')
       download_and_extract_archive(self.url_video, self.cfg.dir_data, md5=self.md5_video)
     if not os.path.isdir(os.path.join(self.cfg.dir_data, self.dname_metadata)):
+      print('Downloading the metadata.')
       download_and_extract_archive(self.url_metadata, self.cfg.dir_data, md5=self.md5_metadata)
 
     if os.path.exists(os.path.join(self.cfg.dir_data, self.dname_metadata, 'trainlist01.csv')) and \
@@ -50,6 +52,7 @@ class UCF101DataModule(BaseDataModule):
       return
 
     # generate labeled video paths
+    print('Generating labeled video paths.')
     with open(os.path.join(self.cfg.dir_data, self.dname_metadata, 'classInd.txt')) as f:
       data = f.readlines()
       data = [x.strip().split(' ') for x in data]
@@ -67,41 +70,35 @@ class UCF101DataModule(BaseDataModule):
         writer.writerows(rows)
 
   def setup(self, stage=None):
-    # pytorch-lightning does not handle iterable datasets
+    # pytorch-lightning does not handle iterable datasets;
     # Reference: https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html#replace-sampler-ddp
-    if torch.distributed.is_available() and torch.distributed.is_initialized():
-      video_sampler = DistributedSampler
-    else:
-      video_sampler = RandomSampler
+    video_sampler = DistributedSampler if utils.is_ddp() else RandomSampler
 
     transform_train, transform_val, transform_test = get_transforms('mvit', True)
 
-    self.dataset_train = Ucf101(
+    self.dataset_train = MapStyleDataset(Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'trainlist01.csv'),
       clip_sampler=make_clip_sampler('random', self.cfg.T*self.cfg.tau/self.cfg.fps),
       video_sampler=video_sampler,
       transform=transform_train,
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
-    )
-    self.dataset_train = LabeledVideoMapDataset(self.dataset_train)
+    ))
 
-    self.dataset_val = Ucf101(
+    self.dataset_val = MapStyleDataset(Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'testlist01.csv'),
-      clip_sampler=make_clip_sampler('constant_clips_per_video', self.cfg.T*self.cfg.tau/self.cfg.fps, 3, 1),
+      clip_sampler=make_clip_sampler('uniform', self.cfg.T*self.cfg.tau/self.cfg.fps),
       video_sampler=video_sampler,
       transform=transform_val,
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
-    )
-    self.dataset_val = LabeledVideoMapDataset(self.dataset_val)
+    ))
 
-    self.dataset_test = Ucf101(
+    self.dataset_test = MapStyleDataset(Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'testlist01.csv'),
-      clip_sampler=make_clip_sampler('constant_clips_per_video', self.cfg.T*self.cfg.tau/self.cfg.fps, 3, 1),
+      clip_sampler=make_clip_sampler('constant_clips_per_video', self.cfg.T*self.cfg.tau/self.cfg.fps, 10, 3),
       video_sampler=video_sampler,
       transform=transform_test,
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
-    )
-    self.dataset_test = LabeledVideoMapDataset(self.dataset_test)
+    ))

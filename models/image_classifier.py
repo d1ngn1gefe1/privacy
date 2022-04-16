@@ -8,6 +8,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import torchmetrics
 
 from .nets import get_net
+import utils
 
 
 class ImageClassifierModule(LightningModule):

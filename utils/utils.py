@@ -1,4 +1,5 @@
 from colorama import Fore, Back, init
+import torch
 
 from .patches import *
 
@@ -23,8 +24,14 @@ def get_name(cfg):
   return name
 
 
-def info(text):
-  print(Fore.WHITE+Back.RED+text)
+def is_ddp():
+  return torch.distributed.is_available() and torch.distributed.is_initialized()
+
+
+def info(*args):
+  if is_ddp():
+    args = [f'Rank {torch.distributed.get_rank()}']+list(args)
+  print(f'{Fore.WHITE}{Back.RED}{", ".join([str(x) for x in args])}')
 
 
 def get_type(module):
