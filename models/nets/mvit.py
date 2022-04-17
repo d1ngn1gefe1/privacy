@@ -57,8 +57,8 @@ def get_mvit(num_classes, pretrained, dir_weights):
   net = create_multiscale_vision_transformers(
     spatial_size=224,
     temporal_size=16,
-    cls_embed_on=False,  # TODO: True
-    sep_pos_embed=False,  # TODO: True
+    cls_embed_on=True,
+    sep_pos_embed=True,
     depth=16,
     norm='layernorm',
     input_channels=3,

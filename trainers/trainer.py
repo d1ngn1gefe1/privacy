@@ -40,9 +40,7 @@ def get_trainer(cfg):
     'num_sanity_val_steps': 0,
     'log_every_n_steps': 50,
     'gpus': cfg.gpus,
-    'strategy': DDPStrategy(find_unused_parameters=False) if len(cfg.gpus) > 1 else None,
-    'limit_train_batches': 10,  # TODO: debug
-    'limit_val_batches': 10  # TODO: debug
+    'strategy': DDPStrategy(find_unused_parameters=False) if len(cfg.gpus) > 1 else None
   }
 
   trainer = Trainer(**kwargs)

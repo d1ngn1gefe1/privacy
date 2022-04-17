@@ -8,7 +8,8 @@ init(autoreset=True)
 
 
 def patch():
-  patch_lightning()
+  patch_pytorch_lightning()
+  patch_pytorchvideo()
   patch_opacus()
 
 

@@ -38,8 +38,8 @@ def _requires_distributed_sampler(self, dataloader):
   )
 
 
-# make lightning compatible with opacus
-def patch_lightning():
+def patch_pytorch_lightning():
+  # make lightning compatible with opacus
   ParallelStrategy.lightning_module = lightning_module
   DDPStrategy._setup_model = _setup_model
   DataConnector._requires_distributed_sampler = _requires_distributed_sampler
