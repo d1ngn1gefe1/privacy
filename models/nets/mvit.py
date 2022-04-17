@@ -24,17 +24,27 @@ def compute_grad_sample(
 ) -> Dict[nn.Parameter, torch.Tensor]:
   ret = {}
 
+  # backprops: B x N x C
   if layer.cls_embed_on:
-    ret[layer.cls_token] = backprops  # TODO: replace me
+    ret[layer.cls_token] = backprops[:, 0, :].unsqueeze(1).unsqueeze(1)  # B x 1 x 1 x C
 
   if layer.sep_pos_embed:
-    ret[layer.pos_embed_spatial] = backprops  # TODO: replace me
-    ret[layer.pos_embed_temporal] = backprops  # TODO: replace me
     if layer.cls_embed_on:
-      ret[layer.pos_embed_class] = backprops  # TODO: replace me
+      ret[layer.pos_embed_class] = backprops[:, 0, :].unsqueeze(1).unsqueeze(1)  # B x 1 x 1 x C
+      temp = backprops[:, 1:, :]
+    else:
+      temp = backprops
+
+    # spatial
+    index_spatial = torch.arange(self.num_spatial_patch).tile(self.num_temporal_patch)
+    ret[layer.pos_embed_spatial] = torch.scatter_reduce(temp, 1, index_spatial, reduce='sum')  # B x (HxW) x C
+
+    # temporal
+    index_temporal = torch.repeat_interleave(torch.arange(self.num_temporal_patch), self.num_spatial_patch)
+    ret[layer.pos_embed_temporal] = torch.scatter_reduce(temp, 1, index_temporal, reduce='sum')  # B x T x C
 
   else:
-    ret[layer.pos_embed] = backprops  # TODO: replace me
+    ret[layer.pos_embed] = backprops.unsqueeze(1)  # B x 1 x N x C
 
   return ret
 
@@ -47,8 +57,8 @@ def get_mvit(num_classes, pretrained, dir_weights):
   net = create_multiscale_vision_transformers(
     spatial_size=224,
     temporal_size=16,
-    cls_embed_on=True,
-    sep_pos_embed=True,
+    cls_embed_on=False,  # default: True
+    sep_pos_embed=False,  # default: True
     depth=16,
     norm='layernorm',
     input_channels=3,
