@@ -1,6 +1,6 @@
 from opacus.data_loader import DPDataLoader
 from opacus.optimizers import DistributedDPOptimizer, DPOptimizer
-from opacus.optimizers.optimizer import _get_flat_grad_sample
+from opacus.optimizers.optimizer import _check_processed_flag, _mark_as_processed
 import torch
 from torch.utils.data import IterableDataset
 
@@ -41,20 +41,15 @@ def step(self, closure=None):
     return None
 
 
-@property
-def grad_samples(self):
-  ret, dims = [], []
-  for p in self.params:
-    grad_sample = _get_flat_grad_sample(p)
-    ret.append(grad_sample)
-    dims.append(grad_sample.shape[0])
-
-  """ Calculate a layer's grad_sample correctly when the batch dimension is merged with another dimension in the forward 
+def clip_and_accumulate(self):
+  """ Calculate a layer's grad_sample correctly when the batch dimension is merged with another dimension in the forward
   pass. For example:
    x = x.reshape(batch_size*m, ...)
    y = layer(x)
    y = y.reshape(batch_size, m, ...)
   """
+  grad_samples = self.grad_samples
+  dims = [grad_sample.shape[0] for grad_sample in grad_samples]
   batch_size = min(dims)
   if any(dim != batch_size for dim in dims):
     quotients = [dim//batch_size for dim in dims]
@@ -62,9 +57,27 @@ def grad_samples(self):
     assert all(remainder == 0 for remainder in remainders), 'Incorrect batch size.'
     for i, quotient in enumerate(quotients):
       if quotient > 1:
-        ret[i] = torch.sum(ret[i].view(batch_size, quotient, *ret[i].shape[1:]), dim=1)
+        grad_samples[i] = torch.sum(grad_samples[i].view(batch_size, quotient, *grad_samples[i].shape[1:]), dim=1)
 
-  return ret
+  per_param_norms = [
+    g.view(len(g), -1).norm(2, dim=-1) for g in grad_samples
+  ]
+  per_sample_norms = torch.stack(per_param_norms, dim=1).norm(2, dim=1)
+  per_sample_clip_factor = (self.max_grad_norm/(per_sample_norms+1e-6)).clamp(
+    max=1.0
+  )
+
+  for p, grad_sample in zip(self.params, grad_samples):
+    _check_processed_flag(p.grad_sample)
+
+    grad = torch.einsum('i,i...', per_sample_clip_factor, grad_sample)
+
+    if p.summed_grad is not None:
+      p.summed_grad += grad
+    else:
+      p.summed_grad = grad
+
+    _mark_as_processed(p.grad_sample)
 
 
 def patch_opacus():
@@ -75,4 +88,4 @@ def patch_opacus():
   DPDataLoader.from_data_loader = from_data_loader
 
   # calculate grad_sample correctly when the batch dimension is merged with another dimension in the forward pass
-  DPOptimizer.grad_samples = grad_samples
+  DPOptimizer.clip_and_accumulate = clip_and_accumulate
