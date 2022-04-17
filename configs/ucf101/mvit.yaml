@@ -5,7 +5,8 @@ dir_weights: /home/ssd/weights
 dataset: ucf101
 net: mvit
 adapter: video_mlp_adapter
-mode: fine_tuning
+mode: from_scratch
+#mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 

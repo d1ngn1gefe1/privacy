@@ -1,5 +1,6 @@
 from opacus.data_loader import DPDataLoader
-from opacus.optimizers import DistributedDPOptimizer
+from opacus.optimizers import DistributedDPOptimizer, DPOptimizer
+from opacus.optimizers.optimizer import _get_flat_grad_sample
 import torch
 from torch.utils.data import IterableDataset
 
@@ -40,9 +41,38 @@ def step(self, closure=None):
     return None
 
 
+@property
+def grad_samples(self):
+  ret, dims = [], []
+  for p in self.params:
+    grad_sample = _get_flat_grad_sample(p)
+    ret.append(grad_sample)
+    dims.append(grad_sample.shape[0])
+
+  """ Calculate a layer's grad_sample correctly when the batch dimension is merged with another dimension in the forward 
+  pass. For example:
+   x = x.reshape(batch_size*m, ...)
+   y = layer(x)
+   y = y.reshape(batch_size, m, ...)
+  """
+  batch_size = min(dims)
+  if any(dim != batch_size for dim in dims):
+    quotients = [dim//batch_size for dim in dims]
+    remainders = [dim%batch_size for dim in dims]
+    assert all(remainder == 0 for remainder in remainders), 'Incorrect batch size.'
+    for i, quotient in enumerate(quotients):
+      if quotient > 1:
+        ret[i] = torch.sum(ret[i].view(batch_size, quotient, *ret[i].shape[1:]), dim=1)
+
+  return ret
+
+
 def patch_opacus():
   # make closure compatible with lightning
   DistributedDPOptimizer.step = step
 
   # make number of steps per epoch consistent with PyTorch DDP
   DPDataLoader.from_data_loader = from_data_loader
+
+  # calculate grad_sample correctly when the batch dimension is merged with another dimension in the forward pass
+  DPOptimizer.grad_samples = grad_samples
