@@ -38,7 +38,7 @@ def get_trainer(cfg):
     'callbacks': callbacks,
     'check_val_every_n_epoch': 1,
     'num_sanity_val_steps': 0,
-    'log_every_n_steps': 50,
+    'log_every_n_steps': 10,
     'gpus': cfg.gpus,
     'strategy': DDPStrategy(find_unused_parameters=False) if len(cfg.gpus) > 1 else None
   }

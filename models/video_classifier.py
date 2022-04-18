@@ -38,10 +38,6 @@ class VideoClassifierModule(LightningModule):
 
     self.ensemble_method = 'sum'  # sum or max
 
-  def on_train_epoch_start(self):
-    if utils.is_ddp():
-      self.trainer.datamodule.train_dataset.dataset.video_sampler.set_epoch(self.trainer.current_epoch)
-
   def forward(self, x):
     return self.net(x)
 
@@ -92,6 +88,14 @@ class VideoClassifierModule(LightningModule):
     pass
 
   def on_train_epoch_start(self):
+    """ Needed for shuffling in distributed training
+    Reference:
+     - https://github.com/facebookresearch/pytorchvideo/blob/main/tutorials/video_classification_example/train.py#L96
+     - https://pytorch.org/docs/master/data.html#torch.utils.data.distributed.DistributedSampler
+    """
+    if utils.is_ddp():
+      self.trainer.datamodule.dataset_train.dataset.video_sampler.set_epoch(self.trainer.current_epoch)
+
     self._prepare_ensemble()
 
   def on_validation_epoch_end(self):
