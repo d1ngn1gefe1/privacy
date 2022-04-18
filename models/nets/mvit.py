@@ -36,8 +36,8 @@ def compute_spatio_temporal_cls_positional_encoding_sample(
       backprops_st = backprops
 
     backprops_st = backprops_st.reshape(B, layer.num_temporal_patch, layer.num_spatial_patch, C)
-    ret[layer.pos_embed_spatial] = backprops_st.sum(dim=1)  # Bx1xSxC
-    ret[layer.pos_embed_temporal] = backprops_st.sum(dim=2)  # Bx1xTxC
+    ret[layer.pos_embed_spatial] = backprops_st.sum(dim=1).unsqueeze(1)  # Bx1xSxC
+    ret[layer.pos_embed_temporal] = backprops_st.sum(dim=2).unsqueeze(1)  # Bx1xTxC
 
   else:
     ret[layer.pos_embed] = backprops.unsqueeze(1)  # Bx1xNxC

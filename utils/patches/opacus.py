@@ -1,6 +1,7 @@
 from opacus.data_loader import DPDataLoader
 from opacus.optimizers import DistributedDPOptimizer, DPOptimizer
 from opacus.optimizers.optimizer import _check_processed_flag, _mark_as_processed
+from opacus.utils.uniform_sampler import UniformWithReplacementSampler
 import torch
 from torch.utils.data import IterableDataset
 
@@ -80,6 +81,20 @@ def clip_and_accumulate(self):
     _mark_as_processed(p.grad_sample)
 
 
+def __iter__(self):
+  num_batches = int(1/self.sample_rate)
+  while num_batches > 0:
+    mask = (
+        torch.rand(self.num_samples, generator=self.generator)
+        < self.sample_rate
+    )
+    indices = mask.nonzero(as_tuple=False).reshape(-1).tolist()
+    if len(indices) > 0:
+      yield indices
+
+    num_batches -= 1
+
+
 def patch_opacus():
   # make closure compatible with lightning
   DistributedDPOptimizer.step = step
@@ -89,3 +104,6 @@ def patch_opacus():
 
   # calculate grad_sample correctly when the batch dimension is merged with another dimension in the forward pass
   DPOptimizer.clip_and_accumulate = clip_and_accumulate
+
+  # sampler handles empty batch
+  UniformWithReplacementSampler.__iter__ = __iter__
