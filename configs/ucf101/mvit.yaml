@@ -24,7 +24,7 @@ T: 16
 tau: 4
 fps: 30
 
-dp: False
+dp: True
 augment: True
 sigma: 1.5
 c: 10

@@ -26,25 +26,25 @@ def compute_spatio_temporal_cls_positional_encoding_sample(
 
   # backprops: B x N x C
   if layer.cls_embed_on:
-    ret[layer.cls_token] = backprops[:, 0].unsqueeze(1).unsqueeze(1)  # B x 1 x 1 x C
+    ret[layer.cls_token] = backprops[:, 0].unsqueeze(1).unsqueeze(1)  # Bx1x1xC
 
   if layer.sep_pos_embed:
     if layer.cls_embed_on:
-      ret[layer.pos_embed_class] = backprops[:, 0, :].unsqueeze(1).unsqueeze(1)  # B x 1 x 1 x C
-      temp = backprops[:, 1:]
+      ret[layer.pos_embed_class] = backprops[:, 0, :].unsqueeze(1).unsqueeze(1)  # Bx1x1xC
+      backprops_st = backprops[:, 1:]
     else:
-      temp = backprops
+      backprops_st = backprops
 
     # spatial
     index_spatial = torch.arange(layer.num_spatial_patch).tile(layer.num_temporal_patch)
-    ret[layer.pos_embed_spatial] = torch.scatter_reduce(temp, 1, index_spatial, reduce='sum')  # B x (H*W) x C
+    ret[layer.pos_embed_spatial] = torch.scatter_reduce(backprops_st, 1, index_spatial, reduce='sum')  # Bx(H*W)xC
 
     # temporal
     index_temporal = torch.repeat_interleave(torch.arange(layer.num_temporal_patch), layer.num_spatial_patch)
-    ret[layer.pos_embed_temporal] = torch.scatter_reduce(temp, 1, index_temporal, reduce='sum')  # B x T x C
+    ret[layer.pos_embed_temporal] = torch.scatter_reduce(backprops_st, 1, index_temporal, reduce='sum')  # BxTxC
 
   else:
-    ret[layer.pos_embed] = backprops.unsqueeze(1)  # B x 1 x N x C
+    ret[layer.pos_embed] = backprops.unsqueeze(1)  # Bx1xNxC
 
   return ret
 
