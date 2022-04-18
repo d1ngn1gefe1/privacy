@@ -38,6 +38,10 @@ class VideoClassifierModule(LightningModule):
 
     self.ensemble_method = 'sum'  # sum or max
 
+  def on_train_epoch_start(self):
+    if utils.is_ddp():
+      self.trainer.datamodule.train_dataset.dataset.video_sampler.set_epoch(self.trainer.current_epoch)
+
   def forward(self, x):
     return self.net(x)
 

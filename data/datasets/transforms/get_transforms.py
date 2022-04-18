@@ -18,6 +18,6 @@ def get_transforms(net, augment):
   elif net == 'convnext':
     return get_convnext_transforms(augment)
   elif net == 'mvit':
-    return get_mvit_transforms()
+    return get_mvit_transforms(augment)
   else:
     raise NotImplementedError

@@ -10,18 +10,12 @@ from .constants import *
 
 
 def get_opacus_net_transforms(augment):
-  if augment:
-    transform_train = Compose([
-      RandomCrop(32, padding=4),
-      RandomHorizontalFlip(),
-      ToTensor(),
-      Normalize(mean=MEAN_CIFAR10, std=STD_CIFAR10)
-    ])
-  else:
-    transform_train = Compose([
-      ToTensor(),
-      Normalize(mean=MEAN_CIFAR10, std=STD_CIFAR10)
-    ])
+  transform_train = Compose([
+    RandomCrop(32, padding=4),
+    RandomHorizontalFlip(),
+    ToTensor(),
+    Normalize(mean=MEAN_CIFAR10, std=STD_CIFAR10)
+  ])
 
   transform_val = Compose([
     ToTensor(),
@@ -32,5 +26,8 @@ def get_opacus_net_transforms(augment):
     ToTensor(),
     Normalize(mean=MEAN_CIFAR10, std=STD_CIFAR10)
   ])
+
+  if not augment:
+    transform_train = transform_val
 
   return transform_train, transform_val, transform_test

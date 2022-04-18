@@ -1,5 +1,6 @@
 from abc import ABC
 from pytorch_lightning import LightningDataModule
+from pytorchvideo_trainer.datamodule.collators import build_collator_from_name
 from torch.utils.data import DataLoader
 
 
@@ -17,8 +18,9 @@ class BaseDataModule(LightningDataModule, ABC):
 
   def train_dataloader(self):
     # TODO: verify shuffle
+    collate_fn = build_collator_from_name('multiple_samples_collate') if self.cfg.dataset == 'ucf101' else None
     dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus), shuffle=True,
-                            num_workers=self.cfg.num_workers, pin_memory=True, drop_last=True)
+                            num_workers=self.cfg.num_workers, collate_fn=collate_fn, pin_memory=True, drop_last=True)
     return dataloader
 
   def val_dataloader(self):
