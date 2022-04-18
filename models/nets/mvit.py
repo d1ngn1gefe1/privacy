@@ -22,26 +22,22 @@ from typing import Dict
 def compute_spatio_temporal_cls_positional_encoding_sample(
     layer: SpatioTemporalClsPositionalEncoding, activations: torch.Tensor, backprops: torch.Tensor
 ) -> Dict[nn.Parameter, torch.Tensor]:
+  B, _, C = backprops.shape  # Bx(S*T)xC or Bx(S*T+1)xC
   ret = {}
 
-  # backprops: B x N x C
   if layer.cls_embed_on:
     ret[layer.cls_token] = backprops[:, 0].unsqueeze(1).unsqueeze(1)  # Bx1x1xC
 
   if layer.sep_pos_embed:
     if layer.cls_embed_on:
-      ret[layer.pos_embed_class] = backprops[:, 0, :].unsqueeze(1).unsqueeze(1)  # Bx1x1xC
+      ret[layer.pos_embed_class] = backprops[:, 0].unsqueeze(1).unsqueeze(1)  # Bx1x1xC
       backprops_st = backprops[:, 1:]
     else:
       backprops_st = backprops
 
-    # spatial
-    index_spatial = torch.arange(layer.num_spatial_patch).tile(layer.num_temporal_patch)
-    ret[layer.pos_embed_spatial] = torch.scatter_reduce(backprops_st, 1, index_spatial, reduce='sum')  # Bx(H*W)xC
-
-    # temporal
-    index_temporal = torch.repeat_interleave(torch.arange(layer.num_temporal_patch), layer.num_spatial_patch)
-    ret[layer.pos_embed_temporal] = torch.scatter_reduce(backprops_st, 1, index_temporal, reduce='sum')  # BxTxC
+    backprops_st = backprops_st.reshape(B, layer.num_temporal_patch, layer.num_spatial_patch, C)
+    ret[layer.pos_embed_spatial] = backprops_st.sum(dim=1)  # Bx1xSxC
+    ret[layer.pos_embed_temporal] = backprops_st.sum(dim=2)  # Bx1xTxC
 
   else:
     ret[layer.pos_embed] = backprops.unsqueeze(1)  # Bx1xNxC
