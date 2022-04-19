@@ -19,13 +19,17 @@ class BaseDataModule(LightningDataModule, ABC):
     # TODO: verify shuffle
     dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus), shuffle=True,
                             num_workers=self.cfg.num_workers, pin_memory=True)
-    print(f'train: {len(dataloader)}, {len(self.dataset_train)}')
+
+    print('\ntrain', len(self.dataset_train), len(dataloader))
+
     return dataloader
 
   def val_dataloader(self):
     dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus), shuffle=False,
                             num_workers=self.cfg.num_workers, pin_memory=True)
-    print(f'val: {len(dataloader)}, {len(self.dataset_val)}')
+
+    print('\nval', len(self.dataset_val), len(dataloader))
+
     return dataloader
 
   def test_dataloader(self):

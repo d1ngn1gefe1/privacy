@@ -34,10 +34,10 @@ def get_trainer(cfg):
   # all other kwargs
   kwargs = {
     'max_epochs': cfg.num_epochs,
-    'logger': logger,
-    'callbacks': callbacks,
+    'logger': None,  #logger,  # TODO
+    'callbacks': None,  #callbacks,  # TODO
     'check_val_every_n_epoch': 1,
-    'num_sanity_val_steps': 0,
+    'num_sanity_val_steps': 0,  # TODO
     'log_every_n_steps': 10,
     'gpus': cfg.gpus,
     'strategy': DDPStrategy(find_unused_parameters=False) if len(cfg.gpus) > 1 else None
