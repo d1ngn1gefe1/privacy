@@ -8,7 +8,7 @@ import torchvision.datasets.utils
 from torchvision.datasets.utils import download_and_extract_archive, _ARCHIVE_EXTRACTORS
 
 from .base_datamodule import BaseDataModule
-from .map_style_dataset import MapStyleDataset
+from .map_dataset import MapDataset
 from .transforms import get_transforms
 import utils
 
@@ -70,35 +70,31 @@ class UCF101DataModule(BaseDataModule):
         writer.writerows(rows)
 
   def setup(self, stage=None):
-    # pytorch-lightning does not handle iterable datasets;
-    # Reference: https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html#replace-sampler-ddp
-    video_sampler = DistributedSampler if utils.is_ddp() else RandomSampler
-
     transform_train, transform_val, transform_test = get_transforms('mvit', True)
 
-    self.dataset_train = MapStyleDataset(Ucf101(
+    self.dataset_train = MapDataset.from_iterable_dataset(Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'trainlist01.csv'),
       clip_sampler=make_clip_sampler('random', self.cfg.T*self.cfg.tau/self.cfg.fps),
-      video_sampler=video_sampler,
+      video_sampler=DistributedSampler if utils.is_ddp() else RandomSampler,  # ignored
       transform=transform_train,
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
     ))
 
-    self.dataset_val = MapStyleDataset(Ucf101(
+    self.dataset_val = Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'testlist01.csv'),
       clip_sampler=make_clip_sampler('uniform', self.cfg.T*self.cfg.tau/self.cfg.fps),
-      video_sampler=video_sampler,
+      video_sampler=DistributedSampler if utils.is_ddp() else RandomSampler,
       transform=transform_val,
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
-    ))
+    )
 
-    self.dataset_test = MapStyleDataset(Ucf101(
+    self.dataset_test = Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'testlist01.csv'),
       clip_sampler=make_clip_sampler('constant_clips_per_video', self.cfg.T*self.cfg.tau/self.cfg.fps, 10, 3),
-      video_sampler=video_sampler,
+      video_sampler=DistributedSampler if utils.is_ddp() else RandomSampler,
       transform=transform_test,
       video_path_prefix=os.path.join(self.cfg.dir_data, self.dname_video),
       decode_audio=False
-    ))
+    )

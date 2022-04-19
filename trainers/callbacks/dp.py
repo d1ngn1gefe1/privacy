@@ -1,6 +1,5 @@
 import inspect
 
-import torch.distributed
 from opacus import PrivacyEngine
 from opacus.data_loader import DPDataLoader
 from opacus.privacy_engine import forbid_accumulation_hook

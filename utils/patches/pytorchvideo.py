@@ -63,6 +63,13 @@ def random_resized_crop(
   return cropped
 
 
+def __len__(self):
+  return self.num_videos
+
+
 def patch_pytorchvideo():
   # suppress the warning in torch.nn.functional.interpolate() by setting align_corners=False
   pytorchvideo.transforms.functional.random_resized_crop = random_resized_crop
+
+  # to properly display the number of train/val/test steps
+  pytorchvideo.data.LabeledVideoDataset.__len__ = __len__
