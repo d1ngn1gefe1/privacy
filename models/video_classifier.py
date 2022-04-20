@@ -45,12 +45,10 @@ class VideoClassifierModule(LightningModule):
   def training_step(self, batch, batch_idx):
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
-    # TODO: remove print
-    # utils.info(self.current_epoch, self.global_step, batch_idx, y[:5])
     y_hat = self.net(x)
 
     loss = self.get_loss(y_hat, y)
-    self.log('train/loss', loss, batch_size=batch_size, prog_bar=True)
+    self.log('train/loss', loss, batch_size=batch_size, prog_bar=True, sync_dist=True)  #TODO
 
     pred = self.get_pred(y_hat)
     for name, get_stat in self.metrics.items():
