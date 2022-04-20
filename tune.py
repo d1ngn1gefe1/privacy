@@ -49,4 +49,5 @@ def train(cfg_tune, cfg):
 
 
 if __name__ == '__main__':
+  utils.setup()
   main()

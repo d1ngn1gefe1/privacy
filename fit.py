@@ -1,5 +1,4 @@
 from omegaconf import OmegaConf
-import os
 
 from data import get_data
 from models import get_model
@@ -20,8 +19,5 @@ def main():
 
 
 if __name__ == '__main__':
-  os.environ['PL_RECONCILE_PROCESS'] = '1'
-  os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
-
-  utils.patch()
+  utils.setup()
   main()

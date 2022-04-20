@@ -1,4 +1,5 @@
 from colorama import Fore, Back, init
+import os
 import torch
 
 from .patches import *
@@ -7,7 +8,9 @@ from .patches import *
 init(autoreset=True)
 
 
-def patch():
+def setup():
+  os.environ['PL_RECONCILE_PROCESS'] = '1'
+
   patch_pytorch_lightning()
   patch_pytorchvideo()
   patch_opacus()

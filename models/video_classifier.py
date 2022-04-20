@@ -48,7 +48,7 @@ class VideoClassifierModule(LightningModule):
     y_hat = self.net(x)
 
     loss = self.get_loss(y_hat, y)
-    self.log('train/loss', loss, batch_size=batch_size, prog_bar=True, sync_dist=True)  #TODO
+    self.log('train/loss', loss, batch_size=batch_size, prog_bar=True)
 
     pred = self.get_pred(y_hat)
     for name, get_stat in self.metrics.items():

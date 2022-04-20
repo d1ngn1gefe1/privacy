@@ -21,5 +21,5 @@ def main():
 
 
 if __name__ == '__main__':
+  utils.setup()
   main()
-

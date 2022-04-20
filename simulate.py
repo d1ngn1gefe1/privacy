@@ -35,4 +35,5 @@ def get_privacy_spent(epoch, data, model, sigma, delta, world_size):
 
 
 if __name__ == '__main__':
+  utils.setup()
   main()
