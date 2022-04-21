@@ -14,6 +14,7 @@ class VideoClassifierModule(BaseClassifierModule):
     return self.net(x)
 
   def training_step(self, batch, batch_idx):
+    # TODO: rename y_hat to logits and pred to y_hat
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
     y_hat = self.net(x)

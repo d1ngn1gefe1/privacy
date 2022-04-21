@@ -9,8 +9,9 @@ adapter: mlp_adapter
 #mode: fine_tuning
 #mode: linear_probing
 mode: adapter
+optimizer: sgd
 
-gpus: [1]
+gpus: [0, 1]
 num_workers: 8
 
 # 100 for 'from_scratch', 50 for others
@@ -20,12 +21,19 @@ batch_size: 512
 # lr setting:
 # non-dp: 3e-3 for 'fine_tuning' and 'adapter', 1e-2 for 'linear_probing', 1e-1 for 'from_scratch'
 # dp: 3e-3 for 'adapter', 'linear_probing', and 'from_scratch', 1e-3 for 'fine_tuning'
-lr: 3e-3
+lr:
+  sgd: 3e-3
+  adamw: 3e-4
+  sgd_dp: 1e-3
+  adamw_dp: 3e-4
 momentum: 0.9
-wd: 1e-4
+wd:
+  sgd: 1e-4
+  adamw: 1e-2
 
-dp: False
+dp: True
 augment: False
 sigma: 1.5
 c: 10
 delta: 1e-5
+ratio_public: 1.0

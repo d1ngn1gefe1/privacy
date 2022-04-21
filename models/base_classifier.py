@@ -43,7 +43,7 @@ class BaseClassifierModule(LightningModule):
     else:
       raise NotImplementedError
     scheduler = CosineAnnealingLR(optimizer, T_max=self.cfg.num_epochs)
-    return {'optimizer': optimizer, 'lr_scheduler': scheduler}
+    return [optimizer], [scheduler]
 
   def optimizer_step(
       self,
