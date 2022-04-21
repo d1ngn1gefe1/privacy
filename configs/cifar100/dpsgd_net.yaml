@@ -5,6 +5,7 @@ dir_weights: /home/ssd/weights
 dataset: cifar100
 net: dpsgd_net
 mode: from_scratch
+optimizer: sgd
 
 gpus: [0]
 num_workers: 3

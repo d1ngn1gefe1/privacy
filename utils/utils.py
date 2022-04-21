@@ -1,4 +1,5 @@
 from colorama import Fore, Back, init
+from omegaconf.dictconfig import DictConfig
 import os
 import torch
 
@@ -8,22 +9,11 @@ from .patches import *
 init(autoreset=True)
 
 
-def setup():
-  os.environ['PL_RECONCILE_PROCESS'] = '1'
-
-  patch_pytorch_lightning()
-  patch_pytorchvideo()
-  patch_opacus()
-
-
 def get_name(cfg):
   name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}_gpu{len(cfg.gpus)}'
 
   if cfg.dp:
     name += f'_sigma{cfg.sigma}_c{cfg.c}'
-
-  if cfg.phase == 'tune':
-    name += '_tune'
 
   return name
 
@@ -49,3 +39,24 @@ def get_type(module):
   if hasattr(module, 'module'):
     text += ' >> [module]'+get_type(module.module)
   return text
+
+
+def setup(cfg, phase):
+  os.environ['PL_RECONCILE_PROCESS'] = '1'
+
+  patch_pytorch_lightning()
+  patch_pytorchvideo()
+  patch_opacus()
+
+  _parse_cfg(cfg, phase)
+
+
+def _parse_cfg(cfg, phase):
+  cfg.phase = phase
+  cfg.name = get_name(cfg)
+
+  if isinstance(cfg.lr, DictConfig):
+    cfg.lr = cfg.lr[cfg.optimizer+('_dp' if cfg.dp else '')]
+
+  if isinstance(cfg.wd, DictConfig):
+    cfg.wd = cfg.wd[cfg.optimizer]

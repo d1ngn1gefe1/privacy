@@ -13,6 +13,7 @@ adapter: bottleneck_adapter
 mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
+optimizer: sgd
 
 gpus: [1]
 num_workers: 8

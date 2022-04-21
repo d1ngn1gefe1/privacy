@@ -9,6 +9,7 @@ adapter: video_mlp_adapter
 mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
+optimizer: adamw
 
 gpus: [0,1,2,3,4,5,6,7]
 num_workers: 4
@@ -16,16 +17,22 @@ num_workers: 4
 num_epochs: 30
 warmup_steps: 50
 batch_size: 64
-lr: 3e-4
+lr:
+  sgd: 3e-4
+  adamw: 4e-4
+  sgd_dp: 3e-4
+  adamw_dp: 3e-4
 momentum: 0.9
-wd: 1e-4
+wd:
+  sgd: 1e-4
+  adamw: 1e-2
 
 T: 16
 tau: 4
 fps: 30
 
 dp: True
-augment: False
-sigma: 1.5
-c: 10
+augment: True
+sigma: 0.00000001
+c: 100000000000
 delta: 1e-5

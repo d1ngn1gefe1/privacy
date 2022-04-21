@@ -8,6 +8,7 @@ adapter: mlp_adapter
 mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
+optimizer: sgd
 
 gpus: [0]
 num_workers: 8

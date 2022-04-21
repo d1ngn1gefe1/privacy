@@ -8,9 +8,7 @@ import utils
 
 def main():
   cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
-
-  utils.patch_lightning()
-  utils.patch_opacus()
+  utils.setup(cfg, 'simulate')
 
   data = get_data(cfg)
   data.setup()
@@ -35,5 +33,4 @@ def get_privacy_spent(epoch, data, model, sigma, delta, world_size):
 
 
 if __name__ == '__main__':
-  utils.setup()
   main()

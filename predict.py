@@ -30,8 +30,7 @@ def inference(model, dataloader):
 def main():
   #cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
   cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
-  cfg.phase = 'test'
-  cfg.name = utils.get_name(cfg)
+  utils.setup(cfg, 'predict')
 
   data = get_data(cfg)
   model = get_model(cfg)
@@ -54,5 +53,4 @@ def main():
 
 
 if __name__ == '__main__':
-  utils.setup()
   main()

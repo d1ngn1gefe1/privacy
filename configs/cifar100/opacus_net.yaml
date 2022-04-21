@@ -7,6 +7,7 @@ relpath_predict: ckpt_ylzou/cifar100_opacus_net_from_scratch_epoch100_bs512_lr0.
 dataset: cifar100
 net: opacus_net
 mode: from_scratch
+optimizer: sgd
 
 gpus: [0, 1]
 num_workers: 4

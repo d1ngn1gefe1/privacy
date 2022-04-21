@@ -8,8 +8,7 @@ import utils
 
 def main():
   cfg = OmegaConf.load('configs/ucf101/mvit.yaml')
-  cfg.phase = 'train'
-  cfg.name = utils.get_name(cfg)
+  utils.setup(cfg, 'fit')
 
   data = get_data(cfg)
   model = get_model(cfg)
@@ -19,5 +18,4 @@ def main():
 
 
 if __name__ == '__main__':
-  utils.setup()
   main()

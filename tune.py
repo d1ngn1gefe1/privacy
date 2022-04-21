@@ -9,8 +9,7 @@ import utils
 
 def main():
   cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
-  cfg.phase = 'tune'
-  cfg.name = utils.get_name(cfg)
+  utils.setup(cfg, 'tune')
 
   cfg_tune = OmegaConf.load('configs/tune.yaml')
   cfg_tune = OmegaConf.to_container(cfg_tune)
@@ -49,5 +48,4 @@ def train(cfg_tune, cfg):
 
 
 if __name__ == '__main__':
-  utils.setup()
   main()

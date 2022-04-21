@@ -8,8 +8,7 @@ import utils
 
 def main():
   cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
-  cfg.phase = 'attack'
-  cfg.name = utils.get_name(cfg)
+  utils.setup(cfg, 'attach')
 
   if cfg.attacker == 'black_box':
     path_result = os.path.join(cfg.dir_weights, cfg.relpath_predict)+'.npz'
@@ -25,6 +24,6 @@ def main():
   else:
     raise NotImplementedError
 
+
 if __name__ == '__main__':
   main()
-
