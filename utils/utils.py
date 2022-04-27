@@ -55,6 +55,7 @@ def _parse_cfg(cfg, phase):
   cfg.phase = phase
   cfg.name = get_name(cfg)
 
+  # TODO: fix partial private
   if isinstance(cfg.lr, DictConfig):
     cfg.lr = cfg.lr[cfg.optimizer+('_dp' if cfg.dp else '')]
 

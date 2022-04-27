@@ -51,7 +51,7 @@ def configure_optimizers(self):
 
 def training_step(self, batch, batch_idx, optimizer_idx):
   x, y = batch[optimizer_idx]
-  y_hat = self.net(x)
+  y_hat = self(x)
 
   loss = self.get_loss(y_hat, y)
   self.log(f'train/loss{optimizer_idx}', loss, prog_bar=True)

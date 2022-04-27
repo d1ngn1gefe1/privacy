@@ -7,12 +7,9 @@ class ImageClassifierModule(BaseClassifierModule):
   def __init__(self, cfg):
     super().__init__(cfg)
 
-  def forward(self, x):
-    return self.net(x)
-
   def training_step(self, batch, batch_idx):
     x, y = batch
-    y_hat = self.net(x)
+    y_hat = self(x)
 
     loss = self.get_loss(y_hat, y)
     self.log('train/loss', loss, prog_bar=True)
@@ -25,7 +22,7 @@ class ImageClassifierModule(BaseClassifierModule):
 
   def validation_step(self, batch, batch_idx):
     x, y = batch
-    y_hat = self.net(x)
+    y_hat = self(x)
 
     loss = self.get_loss(y_hat, y)
     self.log('val/loss', loss, sync_dist=True, prog_bar=True)
@@ -42,7 +39,7 @@ class ImageClassifierModule(BaseClassifierModule):
 
   def test_step(self, batch, batch_idx):
     x, y = batch
-    y_hat = self.net(x)
+    y_hat = self(x)
 
     loss = self.get_loss(y_hat, y)
     self.log('test/loss', loss, sync_dist=True, prog_bar=True)

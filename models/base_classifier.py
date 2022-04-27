@@ -35,6 +35,9 @@ class BaseClassifierModule(LightningModule):
     else:
       raise NotImplementedError
 
+  def forward(self, x):
+    return self.net(x)
+
   def configure_optimizers(self):
     if self.cfg.optimizer == 'sgd':
       optimizer = SGD(self.net.parameters(), lr=self.cfg.lr, momentum=self.cfg.momentum, weight_decay=self.cfg.wd)

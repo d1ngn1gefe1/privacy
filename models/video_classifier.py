@@ -10,14 +10,11 @@ class VideoClassifierModule(BaseClassifierModule):
     self.ensemble_method = 'sum'  # sum or max
     self._prepare_ensemble()
 
-  def forward(self, x):
-    return self.net(x)
-
   def training_step(self, batch, batch_idx):
     # TODO: rename y_hat to logits and pred to y_hat
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
-    y_hat = self.net(x)
+    y_hat = self(x)
 
     loss = self.get_loss(y_hat, y)
     self.log('train/loss', loss, batch_size=batch_size, prog_bar=True)
@@ -31,7 +28,7 @@ class VideoClassifierModule(BaseClassifierModule):
   def validation_step(self, batch, batch_idx):
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
-    y_hat = self.net(x)
+    y_hat = self(x)
 
     loss = self.get_loss(y_hat, y)
     self.log('val/loss', loss, batch_size=batch_size, sync_dist=True, prog_bar=True)
@@ -46,7 +43,7 @@ class VideoClassifierModule(BaseClassifierModule):
   def test_step(self, batch, batch_idx):
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
-    y_hat = self.net(x)
+    y_hat = self(x)
 
     loss = self.get_loss(y_hat, y)
     self.log('test/loss', loss, batch_size=batch_size, sync_dist=True, prog_bar=True)
