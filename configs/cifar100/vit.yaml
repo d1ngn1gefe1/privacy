@@ -6,25 +6,26 @@ dataset: cifar100
 net: vit
 adapter: mlp_adapter
 #mode: from_scratch
-#mode: fine_tuning
+mode: fine_tuning
 #mode: linear_probing
-mode: adapter
+#mode: adapter
 optimizer: sgd
 
 gpus: [0, 1]
-num_workers: 8
+num_workers: 4
 
 # 100 for 'from_scratch', 50 for others
 num_epochs: 50
 warmup_steps: 100
-batch_size: 512
+batch_size: 1000
+max_batch_size: 500
 # lr setting:
 # non-dp: 3e-3 for 'fine_tuning' and 'adapter', 1e-2 for 'linear_probing', 1e-1 for 'from_scratch'
 # dp: 3e-3 for 'adapter', 'linear_probing', and 'from_scratch', 1e-3 for 'fine_tuning'
 lr:
   sgd: 3e-3
   adamw: 3e-4
-  sgd_dp: 1e-3
+  sgd_dp: 3e-3
   adamw_dp: 3e-4
 momentum: 0.9
 wd:

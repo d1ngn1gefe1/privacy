@@ -2,7 +2,7 @@ import inspect
 
 from opacus import PrivacyEngine
 from opacus.data_loader import DPDataLoader
-from opacus.privacy_engine import forbid_accumulation_hook
+from opacus.utils.batch_memory_manager import BatchSplittingSampler, wrap_data_loader
 from pytorch_lightning.callbacks.base import Callback
 from torch.utils.data import DataLoader
 from types import MethodType
@@ -65,6 +65,11 @@ def training_step(self, batch, batch_idx, optimizer_idx):
 
 def train_dataloader(self):
   dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=utils.is_ddp())
+  if hasattr(self.cfg, 'max_batch_size') and len(self.trainer.optimizers) > 0:
+    delattr(BatchSplittingSampler, '__len__')
+    dataloader = wrap_data_loader(data_loader=dataloader,
+                                  max_batch_size=self.cfg.max_batch_size,
+                                  optimizer=self.trainer.optimizers[0])
 
   if 'ratio_public' in self.cfg:
     dataset_subsample = SubsampleDataset(self.dataset_train, self.cfg['ratio_public'])
@@ -88,7 +93,8 @@ class DPCallback(Callback):
 
     # make net private
     pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
-    # pl_module.net.register_forward_pre_hook(forbid_accumulation_hook)  # TODO
+    # Not supported by Lightning because Lightning has the following order: training_step -> zero_grad -> backward
+    # pl_module.register_forward_pre_hook(forbid_accumulation_hook)
 
     # make dataloader private
     trainer.datamodule.train_dataloader_old = trainer.datamodule.train_dataloader

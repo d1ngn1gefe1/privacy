@@ -1,5 +1,6 @@
 from opacus.distributed import DifferentiallyPrivateDistributedDataParallel as DPDDP
 from opacus.utils.uniform_sampler import DistributedUniformWithReplacementSampler
+from opacus.utils.batch_memory_manager import BatchSplittingSampler
 from pytorch_lightning.accelerators.ipu import IPUAccelerator
 from pytorch_lightning.overrides.base import unwrap_lightning_module
 from pytorch_lightning.strategies.ddp import DDPStrategy, log
@@ -33,6 +34,7 @@ def _requires_distributed_sampler(self, dataloader):
       and self.trainer._accelerator_connector.is_distributed
       and not isinstance(dataloader.sampler, DistributedSampler)
       and not isinstance(dataloader.batch_sampler, DistributedUniformWithReplacementSampler)
+      and not isinstance(dataloader.batch_sampler, BatchSplittingSampler)
       and not has_iterable_dataset(dataloader)
       and not isinstance(self.trainer.accelerator, IPUAccelerator)
   )
