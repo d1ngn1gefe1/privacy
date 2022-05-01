@@ -10,7 +10,7 @@ init(autoreset=True)
 
 
 def get_name(cfg):
-  name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_{cfg.optimizer}_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}_gpu{len(cfg.gpus)}'
+  name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_{cfg.optimizer}_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr[cfg.optimizer]}_gpu{len(cfg.gpus)}'
 
   if cfg.dp:
     name += f'_sigma{cfg.sigma}_c{cfg.c}'
