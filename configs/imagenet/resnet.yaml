@@ -1,37 +1,33 @@
 dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
-#relpath_ckpt: ckpt_ylzou/cifar100_resnet_fine_tuning_epoch50_bs128_lr0.01/last.ckpt
-#relpath_predict: ckpt_ylzou/cifar100_resnet_fine_tuning_epoch50_bs128_lr0.01/last
-relpath_ckpt: ckpt_ylzou/cifar100_resnet_fine_tuning_epoch50_bs128_lr0.0001_sigma1.5_c10/last.ckpt
-relpath_predict: ckpt_ylzou/cifar100_resnet_fine_tuning_epoch50_bs128_lr0.0001_sigma1.5_c10/last
 
-dataset: cifar100
+dataset: imagenet
 net: resnet
 adapter: bottleneck_adapter
-#mode: from_scratch
-mode: fine_tuning
+mode: from_scratch
+#mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: sgd
 attacker: black_box
 
-gpus: [1]
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]
 num_workers: 8
 
 # 100 for 'from_scratch', 50 for others
-num_epochs: 50
+num_epochs: 90
 warmup_steps: 100
-batch_size: 128
+batch_size: 1024
 # lr setting:
 # non-dp: 1e-2 for 'fine_tuning' and 'linear_probing', 3e-2 for 'from_scratch' and 'adapter'
 # dp: 1e-4 for 'fine_tuning', 3e-4 for 'linear_probing' and 'adapter', 1e-3 for 'from_scratch'
-lr: 1e-4
+lr: 0.4
 momentum: 0.9
 wd: 1e-4
 
-dp: True
-augment: False
+dp: False
+augment: True
 sigma: 1.5
 c: 10
 delta: 1e-5

@@ -27,7 +27,7 @@ def get_resnet_transforms(augment):
   ])
 
   transform_test = Compose([
-    Resize(224),
+    Resize(256),
     CenterCrop(224),
     ToTensor(),
     Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)

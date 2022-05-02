@@ -1,4 +1,4 @@
-from .datasets import CIFARDataModule, CheXpertDataModule, MedMNISTDataModule, UCF101DataModule
+from .datasets import CIFARDataModule, CheXpertDataModule, MedMNISTDataModule, ImageNetDataModule, UCF101DataModule
 
 
 def get_data(cfg):
@@ -8,6 +8,8 @@ def get_data(cfg):
     data = CheXpertDataModule(cfg)
   elif cfg.dataset.endswith('mnist'):
     data = MedMNISTDataModule(cfg)
+  elif cfg.dataset == 'imagenet':
+    data = ImageNetDataModule(cfg)
   elif cfg.dataset == 'ucf101':
     data = UCF101DataModule(cfg)
   else:
