@@ -3,26 +3,23 @@ import torch.nn.functional as F
 import torchmetrics
 
 
-class MultiLabelLossWithUncertainty(nn.Module):
-  """ Multi-label loss with uncertainty handle """
-  def __init__(self, uncertainty_approach='u_zeros'):
-    super().__init__()
-    self.loss = F.multilabel_soft_margin_loss
-    self.uncertainty_approach = uncertainty_approach
+def multilabel_loss_with_uncertainty(
+  logits,
+  labels,
+  uncertainty_approach='u_zeros'
+):
+  if uncertainty_approach == 'u_zeros':
+    labels[labels == -1] = 0
+  elif uncertainty_approach == 'u_ones':
+    labels[labels == -1] = 1
+  elif uncertainty_approach == 'ignore':
+    mask = labels != -1
+    logits = logits[mask]
+    labels = labels[mask]
 
-  def forward(self, logits, labels):
-    if self.uncertainty_approach == 'u_zeros':
-      labels[labels == -1] = 0
-    elif self.uncertainty_approach == 'u_ones':
-      labels[labels == -1] = 1
-    elif self.uncertainty_approach == 'ignore':
-      mask = labels != -1
-      logits = logits[mask]
-      labels = labels[mask]
-
-    labels = labels.int()
-    loss = self.loss(logits, labels)
-    return loss
+  labels = labels.int()
+  loss = F.multilabel_soft_margin_loss(logits, labels)
+  return loss
 
 
 class MaskedAUROC(nn.Module):

@@ -7,7 +7,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import torchmetrics
 
 from .nets import get_net
-from .utils import MultiLabelLossWithUncertainty, MaskedAUROC
+from .utils import MaskedAUROC, multilabel_loss_with_uncertainty
 
 
 class BaseClassifierModule(LightningModule):
@@ -29,13 +29,14 @@ class BaseClassifierModule(LightningModule):
       self.get_pred = lambda x: F.softmax(x, dim=-1)
       self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='micro')})
     elif cfg.task == 'multi-label':
-      #self.get_loss = F.multilabel_soft_margin_loss
-      loss_ins = MultiLabelLossWithUncertainty(cfg.uncertainty)
-      self.get_loss = loss_ins.forward
+      if hasattr(cfg, 'uncertainty'):
+        self.get_loss = lambda x, y: multilabel_loss_with_uncertainty(x, y, cfg.uncertainty)
+        self.metrics = nn.ModuleDict({'roc': MaskedAUROC(num_classes=cfg.num_classes)})
+      else:
+        self.get_loss = F.multilabel_soft_margin_loss
+        self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='macro', num_classes=cfg.num_classes),
+                                     'roc': torchmetrics.AUROC(num_classes=cfg.num_classes)})
       self.get_pred = torch.sigmoid
-      #self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='macro', num_classes=cfg.num_classes),
-      #                              'roc': torchmetrics.AUROC(num_classes=cfg.num_classes)})
-      self.metrics = nn.ModuleDict({'roc': MaskedAUROC(num_classes=cfg.num_classes)})
     else:
       raise NotImplementedError
 
