@@ -66,7 +66,8 @@ class BaseClassifierModule(LightningModule):
     optimizer.step(closure=optimizer_closure)
 
     # linear warmup
-    if self.trainer.global_step < self.cfg.warmup_steps:
-      lr_scale = min(1.0, float(self.trainer.global_step+1)/self.cfg.warmup_steps)
+    warmup_steps = self.cfg.warmup_epochs*len(self.trainer.train_dataloader)
+    if self.trainer.global_step < warmup_steps:
+      lr_scale = min(1.0, float(self.trainer.global_step+1)/warmup_steps)
       for pg in optimizer.param_groups:
         pg['lr'] = lr_scale*self.cfg.lr

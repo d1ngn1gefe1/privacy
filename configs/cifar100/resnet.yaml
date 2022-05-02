@@ -21,7 +21,7 @@ num_workers: 8
 
 # 100 for 'from_scratch', 50 for others
 num_epochs: 50
-warmup_steps: 100
+warmup_epochs: 5
 batch_size: 128
 # lr setting:
 # non-dp: 1e-2 for 'fine_tuning' and 'linear_probing', 3e-2 for 'from_scratch' and 'adapter'

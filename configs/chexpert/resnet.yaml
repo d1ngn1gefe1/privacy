@@ -16,7 +16,7 @@ gpus: [0, 1]
 num_workers: 4
 
 num_epochs: 18
-warmup_steps: 100
+warmup_epochs: 5
 batch_size: 16
 #max_batch_size: 512
 lr:
