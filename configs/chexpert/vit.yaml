@@ -10,18 +10,20 @@ mode: fine_tuning
 #mode: adapter
 optimizer: sgd
 
-gpus: [0]
+gpus: [0, 1]
 num_workers: 8
 
 num_epochs: 100
 warmup_steps: 500
 batch_size: 512
+#max_batch_size: 512
 lr: 1e-2
 momentum: 0.9
 wd: 1e-4
 
-dp: False
-augment: True
-sigma: 1.5
+dp: True
+augment: False
+#sigma: 1.5
 c: 10
+epsilon: 5
 delta: 1e-5

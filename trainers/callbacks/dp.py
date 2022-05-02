@@ -2,6 +2,7 @@ import inspect
 
 from opacus import PrivacyEngine
 from opacus.data_loader import DPDataLoader
+from opacus.accountants.utils import get_noise_multiplier
 from opacus.utils.batch_memory_manager import BatchSplittingSampler, wrap_data_loader
 from pytorch_lightning.callbacks.base import Callback
 from torch.utils.data import DataLoader
@@ -20,21 +21,29 @@ def on_train_epoch_end(self):
 def configure_optimizers(self):
   dataloader = self.trainer._data_connector._train_dataloader_source.dataloader()
 
+  len_dataloader = len(dataloader[0]) if isinstance(dataloader, list) else len(dataloader)
+  len_dataset = len(dataloader[0].dataset) if isinstance(dataloader, list) else len(dataloader.dataset)
+  expected_batch_size = int(len_dataset/len_dataloader/len(self.cfg.gpus))
+  sample_rate = 1/len_dataloader
+
+  # get privacy budgets
+  assert sum([hasattr(self.cfg, 'sigma'), hasattr(self.cfg, 'epsilon')]) == 1
+  if hasattr(self.cfg, 'epsilon'):
+    self.cfg.sigma = get_noise_multiplier(target_epsilon=self.cfg.epsilon, target_delta=self.cfg.delta,
+                                          sample_rate=sample_rate, epochs=self.cfg.num_epochs,
+                                          accountant=self.privacy_engine.accountant.mechanism())
+
   # old optimizer and lr scheduler
   optimizer_old, scheduler_old = self.configure_optimizers_old()
   optimizer_old, scheduler_old = optimizer_old[0], scheduler_old[0]
 
   # new optimizer
-  len_dataloader = len(dataloader[0]) if isinstance(dataloader, list) else len(dataloader)
-  len_dataset = len(dataloader[0].dataset) if isinstance(dataloader, list) else len(dataloader.dataset)
-  expected_batch_size = int(len_dataset/len_dataloader/len(self.cfg.gpus))
   optimizer = self.privacy_engine._prepare_optimizer(optimizer_old,
                                                      distributed=utils.is_ddp(),
                                                      noise_multiplier=self.cfg.sigma,
                                                      max_grad_norm=self.cfg.c,
                                                      expected_batch_size=expected_batch_size,
                                                      clipping='flat')
-  sample_rate = 1/len_dataloader
   optimizer.attach_step_hook(self.privacy_engine.accountant.get_optimizer_hook_fn(sample_rate=sample_rate))
 
   # new lr scheduler
@@ -65,6 +74,8 @@ def training_step(self, batch, batch_idx, optimizer_idx):
 
 def train_dataloader(self):
   dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=utils.is_ddp())
+
+  # batch memory manager
   if hasattr(self.cfg, 'max_batch_size') and len(self.trainer.optimizers) > 0:
     delattr(BatchSplittingSampler, '__len__')
     dataloader = wrap_data_loader(data_loader=dataloader,

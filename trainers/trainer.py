@@ -3,7 +3,7 @@ import os
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.strategies.ddp import DDPStrategy
+from pytorch_lightning.strategies import DDPStrategy
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 
 from .callbacks import DPCallback
@@ -39,11 +39,11 @@ def get_trainer(cfg):
     'check_val_every_n_epoch': 1,
     'num_sanity_val_steps': 2,
     'log_every_n_steps': 10,
-    'gpus': cfg.gpus,
-    'strategy': DDPStrategy(find_unused_parameters=False) if len(cfg.gpus) > 1 else None,
+    'accelerator': 'gpu',
+    'devices': cfg.gpus,
+    'strategy': DDPStrategy() if len(cfg.gpus) > 1 else None,
     'detect_anomaly': True
   }
 
   trainer = Trainer(**kwargs)
-
   return trainer

@@ -2,6 +2,7 @@ import os
 import torch
 import torch.nn as nn
 from torchvision import models
+from torchvision.datasets.utils import download_url
 from types import MethodType
 
 
@@ -15,8 +16,11 @@ def get_resnet(num_classes, pretrained, dir_weights):
   model.get_classifier = MethodType(get_classifier, model)
 
   if pretrained:
-    # Download: https://github.com/ppwwyyxx/GroupNorm-reproduce/releases/download/v0.1/ImageNet-ResNet50-GN.pth
-    state_dict = torch.load(os.path.join(dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth'))['state_dict']
+    path_pretrain = os.path.join(dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
+    if not os.path.isfile(path_pretrain):
+      url = 'https://github.com/ppwwyyxx/GroupNorm-reproduce/releases/download/v0.1/ImageNet-ResNet50-GN.pth'
+      download_url(url, os.path.join(dir_weights, 'pretrain'))
+    state_dict = torch.load(path_pretrain)['state_dict']
     state_dict = {k.replace('module.', ''):v for k, v in state_dict.items()}
     state_dict.pop('fc.weight', None)
     state_dict.pop('fc.bias', None)
