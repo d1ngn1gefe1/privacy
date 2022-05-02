@@ -25,7 +25,7 @@ def main():
       'cpu': 1,
       'gpu': len(cfg.gpus)
     },
-    metric='acc-div-log_epsilon',
+    metric='acc',
     mode='max',
     config=cfg_tune,
     num_samples=20,  # number of trials

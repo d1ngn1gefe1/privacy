@@ -11,7 +11,7 @@ mode: fine_tuning
 #mode: adapter
 optimizer: sgd
 
-gpus: [0, 1]
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]
 num_workers: 4
 
 # 100 for 'from_scratch', 50 for others
@@ -34,7 +34,8 @@ wd:
 
 dp: True
 augment: False
-sigma: 1.5
+#sigma: 1.5
 c: 10
+epsilon: 5
 delta: 1e-5
-ratio_public: 1.0
+#ratio_public: 1.0

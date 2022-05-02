@@ -1,11 +1,10 @@
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchmetrics
 
 
 class MultiLabelLossWithUncertainty(nn.Module):
-  """Multi-label loss with uncertainty handle"""
+  """ Multi-label loss with uncertainty handle """
   def __init__(self, uncertainty_approach='u_zeros'):
     super().__init__()
     self.loss = F.multilabel_soft_margin_loss
@@ -27,7 +26,7 @@ class MultiLabelLossWithUncertainty(nn.Module):
 
 
 class MaskedAUROC(nn.Module):
-  """AUROC with handle for uncertain labels"""
+  """ AUROC with handle for uncertain labels """
   def __init__(self, num_classes=5):
     super().__init__()
     self.num_classes = num_classes
@@ -49,4 +48,3 @@ class MaskedAUROC(nn.Module):
       stats.append(stat)
 
     return sum(stats)/len(stats)
-
