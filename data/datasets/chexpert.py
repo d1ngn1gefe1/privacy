@@ -10,8 +10,9 @@ from .transforms import get_transforms
 
 
 class CheXpert(VisionDataset):
-  def __init__(self, root: str, train: bool = True,
-               transform: Optional[Callable] = None, target_transform: Optional[Callable] = None) -> None:
+  observations = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Pleural Effusion']
+
+  def __init__(self, root, train=True, transform=None, target_transform=None, uncertainty_approach='u-zeros') -> None:
     super().__init__(root, transform=transform, target_transform=target_transform)
 
     data = pd.read_csv(os.path.join(root, 'CheXpert-v1.0-small', 'train.csv' if train else 'valid.csv'))
@@ -19,9 +20,15 @@ class CheXpert(VisionDataset):
     paths = [os.path.join(root, x) for x in data.Path.values]
     assert all(os.path.exists(path) for path in paths), 'Dataset not found or corrupted'
 
-    targets = data.iloc[:, 5:].values
-    targets = np.nan_to_num(targets).astype(int)
-    targets[targets == -1] = 0
+    targets = data[self.observations].values
+    targets[np.isnan(targets)] = -1  # NaN and -1 are both stated as unknowns in the dataset
+    # TODO: move this to model
+    if uncertainty_approach == 'u-zeros':
+      targets[targets == -1] = 0  # map all unknowns to negatives
+    elif uncertainty_approach == 'u-ones':
+      targets[targets == -1] = 1  # map all unknowns to positives
+    else:
+      raise NotImplementedError
     assert len(paths) == len(targets), 'Dataset not found or corrupted'
 
     self.paths = paths
