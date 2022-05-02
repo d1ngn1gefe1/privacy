@@ -60,8 +60,8 @@ class CheXpertDataModule(BaseDataModule):
   def __init__(self, cfg):
     super().__init__(cfg)
 
-    self.cfg.num_classes = 14
-    self.cfg.task = 'multi-label'
+    self.cfg.num_classes = 5
+    self.cfg.task = len(CheXpert.observations)
 
   def prepare_data(self):
     if not CheXpert.exists(self.cfg.dir_data):
