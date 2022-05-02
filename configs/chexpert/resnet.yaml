@@ -4,21 +4,20 @@ dir_weights: /home/ssd/weights
 
 dataset: chexpert
 uncertainty: u_zeros  # u_zeros or u_ones
-net: vit
-adapter: mlp_adapter
+net: resnet
+adapter: bottleneck_adapter
 #mode: from_scratch
 mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: adamw
 
-gpus: [1]
+gpus: [0, 1]
 num_workers: 4
 
 num_epochs: 18
 warmup_steps: 100
-batch_size: 256
-#batch_size: 16
+batch_size: 16
 #max_batch_size: 512
 lr:
   sgd: 1e-4

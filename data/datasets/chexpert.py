@@ -12,7 +12,7 @@ from .transforms import get_transforms
 class CheXpert(VisionDataset):
   observations = ['Atelectasis', 'Cardiomegaly', 'Consolidation', 'Edema', 'Pleural Effusion']
 
-  def __init__(self, root, train=True, transform=None, target_transform=None, uncertainty_approach='u-zeros') -> None:
+  def __init__(self, root, train=True, transform=None, target_transform=None) -> None:
     super().__init__(root, transform=transform, target_transform=target_transform)
 
     data = pd.read_csv(os.path.join(root, 'CheXpert-v1.0-small', 'train.csv' if train else 'valid.csv'))
@@ -22,13 +22,6 @@ class CheXpert(VisionDataset):
 
     targets = data[self.observations].values
     targets[np.isnan(targets)] = -1  # NaN and -1 are both stated as unknowns in the dataset
-    # TODO: move this to model
-    if uncertainty_approach == 'u-zeros':
-      targets[targets == -1] = 0  # map all unknowns to negatives
-    elif uncertainty_approach == 'u-ones':
-      targets[targets == -1] = 1  # map all unknowns to positives
-    else:
-      raise NotImplementedError
     assert len(paths) == len(targets), 'Dataset not found or corrupted'
 
     self.paths = paths
@@ -45,7 +38,7 @@ class CheXpert(VisionDataset):
 
   def __getitem__(self, index: int) -> Tuple[Any, Any]:
     image = Image.open(self.paths[index]).convert('RGB')
-    target = self.targets[index]
+    target = self.targets[index].astype(np.int32)
 
     if self.transform is not None:
       image = self.transform(image)
@@ -60,8 +53,8 @@ class CheXpertDataModule(BaseDataModule):
   def __init__(self, cfg):
     super().__init__(cfg)
 
-    self.cfg.num_classes = 5
-    self.cfg.task = len(CheXpert.observations)
+    self.cfg.num_classes = len(CheXpert.observations)
+    self.cfg.task = 'multi-label'
 
   def prepare_data(self):
     if not CheXpert.exists(self.cfg.dir_data):
