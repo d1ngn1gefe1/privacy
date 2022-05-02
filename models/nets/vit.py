@@ -73,7 +73,8 @@ class VisionTransformer(vision_transformer.VisionTransformer):
 
 def get_vit(num_classes, pretrained):
   vision_transformer.VisionTransformer = VisionTransformer
-  net = timm.create_model('vit_tiny_patch16_224_in21k', pretrained=pretrained, num_classes=num_classes)
+  #net = timm.create_model('vit_tiny_patch16_224_in21k', pretrained=pretrained, num_classes=num_classes)
+  net = timm.create_model('vit_tiny_patch16_224', pretrained=pretrained, num_classes=num_classes)
   delattr(net, 'cls_token')
   delattr(net, 'dist_token')
   delattr(net, 'pos_embed')
