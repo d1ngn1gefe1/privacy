@@ -1,16 +1,17 @@
 import os
 
+from optuna.integration import PyTorchLightningPruningCallback
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies import DDPStrategy
-from ray_lightning import RayPlugin
-from ray_lightning.tune import TuneReportCallback
+#from ray_lightning import RayPlugin
+#from ray_lightning.tune import TuneReportCallback
 
 from .callbacks import DPCallback
 
 
-def get_trainer(cfg):
+def get_trainer(cfg, trial=None):
   # logger
   logger = WandbLogger(
     project=cfg.dataset,
@@ -29,8 +30,9 @@ def get_trainer(cfg):
   ]
   plugins = None
   if cfg.phase == 'tune':
-    callbacks.append(TuneReportCallback(metrics={'acc': 'val/acc'}, on='validation_end'))
-    plugins = [RayPlugin(num_workers=2, num_cpus_per_worker=cfg.num_workers, use_gpu=True)]
+    #callbacks.append(TuneReportCallback(metrics={'acc': 'val/acc'}, on='validation_end'))
+    #plugins = [RayPlugin(num_workers=2, num_cpus_per_worker=cfg.num_workers, use_gpu=True)]
+    callbacks.append(PyTorchLightningPruningCallback(trial, monitor='val/acc'))
   if cfg.dp:
     callbacks.append(DPCallback())
 
