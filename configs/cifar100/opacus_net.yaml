@@ -13,7 +13,7 @@ gpus: [0, 1]
 num_workers: 4
 
 num_epochs: 90
-warmup_epochs: 5
+warmup_steps: 500
 batch_size: 2000
 lr: 0.1
 momentum: 0.9

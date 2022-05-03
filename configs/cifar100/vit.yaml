@@ -16,7 +16,7 @@ num_workers: 4
 
 # 100 for 'from_scratch', 50 for others
 num_epochs: 50
-warmup_epochs: 5
+warmup_steps: 500
 batch_size: 1000
 max_batch_size: 500
 # lr setting:
