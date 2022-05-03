@@ -25,7 +25,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import random_split
 from torchvision import datasets
 from torchvision import transforms
-from pytorch_lightning.strategies import DDPStrategy
+from pytorch_lightning.strategies import DDPStrategy, DDPSpawnStrategy
 from optuna.storages._cached_storage import _CachedStorage
 from optuna.storages._rdb.storage import RDBStorage
 from optuna.integration.pytorch_lightning import PyTorchLightningPruningCallback
@@ -135,10 +135,9 @@ def objective(trial: optuna.trial.Trial) -> float:
         limit_val_batches=PERCENT_VALID_EXAMPLES,
         enable_checkpointing=False,
         max_epochs=EPOCHS,
-        # accelerator='gpu',
-        # devices=[1, 2],
-        # strategy=DDPStrategy(find_unused_parameters=False),
-        gpus=-1,
+        accelerator='gpu',
+        devices=[0, 1],
+        strategy=DDPSpawnStrategy(),
         callbacks=[PyTorchLightningPruningCallback(trial, monitor="val_acc")],
     )
     hyperparameters = dict(n_layers=n_layers, dropout=dropout, output_dims=output_dims)
