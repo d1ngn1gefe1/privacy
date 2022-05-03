@@ -51,6 +51,7 @@ def setup(cfg, phase):
   patch_pytorch_lightning()
   patch_pytorchvideo()
   patch_opacus()
+  patch_optuna()
 
   _parse_cfg(cfg, phase)
 

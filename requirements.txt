@@ -1,6 +1,6 @@
 medmnist
 opacus==v1.1.1
-pytorch-lightning==1.6.1
+pytorch-lightning==1.7.0
 pytorchvideo
 rarfile
 ray
