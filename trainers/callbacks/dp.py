@@ -93,9 +93,6 @@ def train_dataloader(self):
 
 
 class DPCallback(Callback):
-  def __init__(self):
-    pass
-
   def setup(self, trainer, pl_module, stage):
     pl_module.privacy_engine = PrivacyEngine()
     pl_module.on_train_epoch_end = MethodType(on_train_epoch_end, pl_module)

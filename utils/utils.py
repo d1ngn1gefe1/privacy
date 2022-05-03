@@ -50,20 +50,16 @@ def get_type(module):
   return text
 
 
-def setup(cfg, phase):
-  os.environ['PL_RECONCILE_PROCESS'] = '1'
-
+def patch():
   patch_pytorch_lightning()
   patch_pytorchvideo()
   patch_opacus()
   patch_optuna()
 
-  _parse_cfg(cfg, phase)
 
-
-def _parse_cfg(cfg, phase):
-  cfg.phase = phase
-  cfg.name = get_name(cfg)
+def setup(cfg, phase):
+  os.environ['PL_RECONCILE_PROCESS'] = '1'
+  patch()
 
   # TODO: fix partial private
   if isinstance(cfg.lr, DictConfig):
@@ -71,3 +67,6 @@ def _parse_cfg(cfg, phase):
 
   if isinstance(cfg.wd, DictConfig):
     cfg.wd = cfg.wd[cfg.optimizer]
+
+  cfg.phase = phase
+  cfg.name = get_name(cfg)

@@ -6,7 +6,7 @@ from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies import DDPStrategy, DDPSpawnStrategy
 
-from .callbacks import DPCallback
+from .callbacks import DPCallback, PatchCallback
 
 
 def get_trainer(cfg, trial=None):
@@ -24,7 +24,8 @@ def get_trainer(cfg, trial=None):
     LearningRateMonitor(logging_interval='step'),
     ModelCheckpoint(every_n_epochs=5,
                     save_last=True,
-                    dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}'))
+                    dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}')),
+    PatchCallback()
   ]
   if cfg.phase == 'tune':
     callbacks.append(PyTorchLightningPruningCallback(trial, monitor='val/acc'))
