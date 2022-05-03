@@ -7,7 +7,6 @@ Reference:
 
 from functools import partial
 from opacus.grad_sample import register_grad_sampler
-from opacus.utils.tensor_utils import sum_over_all_but_batch_and_last_n
 import timm
 from timm.models import convnext
 from timm.models.convnext import LayerNorm2d, _is_contiguous
@@ -24,26 +23,19 @@ def compute_layer_norm_2d_grad_sample(
     activations: torch.Tensor,
     backprops: torch.Tensor,
 ) -> Dict[nn.Parameter, torch.Tensor]:
-  # if _is_contiguous(activations):
-  x = F.layer_norm(activations.permute(0, 2, 3, 1), layer.normalized_shape, layer.weight, layer.bias, layer.eps)
-  ret1 = {
+  if _is_contiguous(activations):
+    x = F.layer_norm(activations.permute(0, 2, 3, 1), layer.normalized_shape, layer.weight, layer.bias,
+                     layer.eps).permute(0, 3, 1, 2)
+  else:
+    s, u = torch.var_mean(activations, dim=1, unbiased=False, keepdim=True)
+    x = (activations-u)*torch.rsqrt(s+layer.eps)
+
+  ret = {
     layer.weight: torch.sum(x*backprops, dim=(2, 3)),
     layer.bias: torch.sum(backprops, dim=(2, 3))
   }
-  # else:
-  N, C, H, W = activations.shape
-  temp = activations.permute(0, 2, 3, 1).reshape(-1, C)
-  x_norm = F.layer_norm(temp, layer.normalized_shape, eps=layer.eps)
-  x_norm = torch.sum(x_norm.reshape(N, H, W, C), dim=(1, 2))
-  ret2 = {
-    layer.weight: x_norm*torch.sum(backprops, dim=(2, 3)),
-    layer.bias: torch.sum(backprops, dim=(2, 3))
-  }
 
-  print('register', torch.sum(torch.abs(ret1[layer.weight]-ret2[layer.weight])))
-  assert False
-
-  return ret1
+  return ret
 
 
 class GammaEmbed(nn.Module):
