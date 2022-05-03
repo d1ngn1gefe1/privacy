@@ -11,7 +11,12 @@ init(autoreset=True)
 
 def get_name(cfg):
   name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_{cfg.optimizer}'
-  name += f'_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}_gpu{len(cfg.gpus)}'
+
+  if isinstance(cfg.lr, float):
+    lr = cfg.lr
+  else:
+    lr = cfg.lr[cfg.optimizer]
+  name += f'_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{lr}_gpu{len(cfg.gpus)}'
 
   if cfg.dp:
     if hasattr(cfg, 'sigma'):
