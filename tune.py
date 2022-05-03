@@ -27,7 +27,7 @@ def main():
     metric='acc',
     mode='max',
     config=cfg_tune,
-    num_samples=20,
+    num_samples=3,
     scheduler=scheduler,
     progress_reporter=reporter,
     name=cfg.name

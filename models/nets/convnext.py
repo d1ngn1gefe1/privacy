@@ -80,6 +80,6 @@ class ConvNeXtBlock(nn.Module):
 
 def get_convnext(num_classes, pretrained):
   convnext.ConvNeXtBlock = ConvNeXtBlock
-  #net = timm.create_model('convnext_base_in22ft1k', pretrained=pretrained, num_classes=num_classes)
-  net = timm.create_model('convnext_tiny', pretrained=pretrained, num_classes=num_classes)
+  # convnext_tiny_in22ft1k: in21k -> in1k, 29.5M parameters
+  net = timm.create_model('convnext_tiny_in22ft1k', pretrained=pretrained, num_classes=num_classes)
   return net

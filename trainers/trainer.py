@@ -20,20 +20,19 @@ def get_trainer(cfg):
   )
   logger.log_hyperparams(cfg)
 
-  # callbacks
+  # callbacks and plugins
   callbacks = [
     LearningRateMonitor(logging_interval='step'),
     ModelCheckpoint(every_n_epochs=5,
                     save_last=True,
                     dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}'))
   ]
+  plugins = None
   if cfg.phase == 'tune':
     callbacks.append(TuneReportCallback(metrics={'acc': 'val/acc'}, on='validation_end'))
+    plugins = [RayPlugin(num_workers=2, num_cpus_per_worker=cfg.num_workers, use_gpu=True)]
   if cfg.dp:
     callbacks.append(DPCallback())
-
-  # plugins
-  plugins = [RayPlugin(num_workers=2, num_cpus_per_worker=cfg.num_workers, use_gpu=True)]
 
   # all other kwargs
   kwargs = {
@@ -46,7 +45,7 @@ def get_trainer(cfg):
     'log_every_n_steps': 10,
     'accelerator': 'gpu',
     'devices': cfg.gpus,
-    'strategy': DDPStrategy() if len(cfg.gpus) > 1 else None,
+    'strategy': DDPStrategy(find_unused_parameters=False) if len(cfg.gpus) > 1 else None,
     'detect_anomaly': True
   }
 

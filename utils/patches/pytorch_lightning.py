@@ -20,10 +20,10 @@ def lightning_module(self):
 def _setup_model(self, model):
   device_ids = self.determine_ddp_device_ids()
   if hasattr(unwrap_lightning_module(model), 'privacy_engine'):
-    log.detail(f'setting up DPDDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
+    log.detail(f'Setting up DPDDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
     model = DPDDP(model)
   else:
-    log.detail(f'setting up DDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
+    log.detail(f'Setting up DDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
     model = DDP(module=model, device_ids=device_ids, **self._ddp_kwargs)
   return model
 
