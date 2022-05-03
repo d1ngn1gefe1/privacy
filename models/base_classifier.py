@@ -1,3 +1,4 @@
+from functools import partial
 from pytorch_lightning import LightningModule
 import torch
 import torch.nn as nn
@@ -26,11 +27,11 @@ class BaseClassifierModule(LightningModule):
     # set task-specific variables
     if cfg.task == 'multi-class':
       self.get_loss = F.cross_entropy
-      self.get_pred = lambda x: F.softmax(x, dim=-1)
+      self.get_pred = partial(F.softmax, dim=-1)  # avoid using lambda because it cannot be pickled
       self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='micro')})
     elif cfg.task == 'multi-label':
       if hasattr(cfg, 'uncertainty'):
-        self.get_loss = lambda x, y: multilabel_loss_with_uncertainty(x, y, cfg.uncertainty)
+        self.get_loss = partial(multilabel_loss_with_uncertainty, uncertainty_approach=cfg.uncertainty)
         self.metrics = nn.ModuleDict({'roc': MaskedAUROC(num_classes=cfg.num_classes)})
       else:
         self.get_loss = F.multilabel_soft_margin_loss

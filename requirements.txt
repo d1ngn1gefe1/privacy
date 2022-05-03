@@ -1,9 +1,9 @@
 medmnist
 opacus==v1.1.1
+optuna
 pytorch-lightning==1.7.0
 pytorchvideo
 rarfile
-ray
 timm
 torch
 torchvision

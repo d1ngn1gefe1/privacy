@@ -3,7 +3,10 @@ from opacus.utils.uniform_sampler import DistributedUniformWithReplacementSample
 from opacus.utils.batch_memory_manager import BatchSplittingSampler
 from pytorch_lightning.accelerators.ipu import IPUAccelerator
 from pytorch_lightning.overrides.base import unwrap_lightning_module
-from pytorch_lightning.strategies.ddp import DDPStrategy, log
+from pytorch_lightning.strategies.ddp import DDPStrategy
+from pytorch_lightning.strategies.ddp import log as log_ddp
+from pytorch_lightning.strategies.ddp_spawn import DDPSpawnStrategy
+from pytorch_lightning.strategies.ddp_spawn import log as log_ddp_spawn
 from pytorch_lightning.strategies.parallel import ParallelStrategy
 from pytorch_lightning.trainer.connectors.data_connector import DataConnector
 from pytorch_lightning.utilities.data import has_iterable_dataset
@@ -17,18 +20,30 @@ def lightning_module(self):
       if self.model is not None else None
 
 
-def _setup_model(self, model):
+def _setup_model_ddp(self, model):
   device_ids = self.determine_ddp_device_ids()
   if hasattr(unwrap_lightning_module(model), 'privacy_engine'):
-    log.detail(f'Setting up DPDDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
+    log_ddp_spawn.detail(f'Setting up DPDDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
     model = DPDDP(model)
   else:
-    log.detail(f'Setting up DDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
+    log_ddp_spawn.detail(f'Setting up DDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
+    model = DDP(module=model, device_ids=device_ids, **self._ddp_kwargs)
+  return model
+
+
+def _setup_model_ddp_spawn(self, model):
+  device_ids = self.determine_ddp_device_ids()
+  if hasattr(unwrap_lightning_module(model), 'privacy_engine'):
+    log_ddp.detail(f'Setting up DPDDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
+    model = DPDDP(model)
+  else:
+    log_ddp.detail(f'Setting up DDP model with device ids: {device_ids}, kwargs: {self._ddp_kwargs}')
     model = DDP(module=model, device_ids=device_ids, **self._ddp_kwargs)
   return model
 
 
 def _requires_distributed_sampler(self, dataloader):
+  print('_requires_distributed_sampler!!!')
   return (
       self.trainer._accelerator_connector.replace_sampler_ddp
       and self.trainer._accelerator_connector.is_distributed
@@ -43,5 +58,6 @@ def _requires_distributed_sampler(self, dataloader):
 def patch_pytorch_lightning():
   # make lightning compatible with opacus
   ParallelStrategy.lightning_module = lightning_module
-  DDPStrategy._setup_model = _setup_model
+  DDPStrategy._setup_model = _setup_model_ddp
+  DDPSpawnStrategy._setup_model = _setup_model_ddp_spawn
   DataConnector._requires_distributed_sampler = _requires_distributed_sampler

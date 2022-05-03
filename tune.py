@@ -8,16 +8,16 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar10/opacus_net.yaml')
+  cfg = OmegaConf.load('configs/cifar100/vit.yaml')
   utils.setup(cfg, 'tune')
 
   cfg_tune = OmegaConf.load('configs/tune.yaml')
 
-  storage = 'sqlite:///example.db'
+  storage = 'sqlite:///optuna.db'
   pruner = optuna.pruners.MedianPruner()
   study = optuna.create_study(study_name=cfg.name, storage=storage, direction='maximize', pruner=pruner,
                               load_if_exists=True)
-  objective = lambda x: train(x, cfg_tune, cfg)
+  objective = lambda x: train(x, cfg, cfg_tune)
   study.optimize(objective, n_trials=3, timeout=600)
 
   print(f'Number of finished trials: {len(study.trials)}')
@@ -32,10 +32,10 @@ def main():
     print(f'    {key}: {value}')
 
 
-def train(trial, cfg_tune, cfg):
+def train(trial, cfg, cfg_tune):
   cfg_tune = OmegaConf.to_container(cfg_tune)
   cfg_tune = {k: trial.suggest_categorical(k, v) for k, v in cfg_tune.items()}
-  cfg.update(cfg_tune)  # overwrite cfg
+  cfg.update(cfg_tune)
 
   print(cfg)
   data = get_data(cfg)
