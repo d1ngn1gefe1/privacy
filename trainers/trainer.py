@@ -4,7 +4,8 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.strategies import DDPStrategy
-from ray.tune.integration.pytorch_lightning import TuneReportCallback
+from ray_lightning import RayPlugin
+from ray_lightning.tune import TuneReportCallback
 
 from .callbacks import DPCallback
 
@@ -27,15 +28,19 @@ def get_trainer(cfg):
                     dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}'))
   ]
   if cfg.phase == 'tune':
-    callbacks.append(TuneReportCallback({'acc': 'val/acc', 'acc-div-log_epsilon': 'val/acc-div-log_epsilon'}, on='validation_end'))
+    callbacks.append(TuneReportCallback(metrics={'acc': 'val/acc'}, on='validation_end'))
   if cfg.dp:
     callbacks.append(DPCallback())
+
+  # plugins
+  plugins = [RayPlugin(num_workers=2, num_cpus_per_worker=cfg.num_workers, use_gpu=True)]
 
   # all other kwargs
   kwargs = {
     'max_epochs': cfg.num_epochs,
     'logger': logger,
     'callbacks': callbacks,
+    'plugins': plugins,
     'check_val_every_n_epoch': 1,
     'num_sanity_val_steps': 2,
     'log_every_n_steps': 10,

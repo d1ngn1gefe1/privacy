@@ -1,6 +1,8 @@
 from omegaconf import OmegaConf
 from ray import tune
 
+from ray_lightning.tune import TuneReportCallback, get_tune_resources
+
 from data import get_data
 from models import get_model
 from trainers import get_trainer
@@ -21,14 +23,11 @@ def main():
 
   analysis = tune.run(
     trainable,
-    resources_per_trial={
-      'cpu': 1,
-      'gpu': len(cfg.gpus)
-    },
+    resources_per_trial=get_tune_resources(num_workers=2),
     metric='acc',
     mode='max',
     config=cfg_tune,
-    num_samples=20,  # number of trials
+    num_samples=20,
     scheduler=scheduler,
     progress_reporter=reporter,
     name=cfg.name

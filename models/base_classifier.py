@@ -35,7 +35,7 @@ class BaseClassifierModule(LightningModule):
       else:
         self.get_loss = F.multilabel_soft_margin_loss
         self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='macro', num_classes=cfg.num_classes),
-                                     'roc': torchmetrics.AUROC(num_classes=cfg.num_classes)})
+                                      'roc': torchmetrics.AUROC(num_classes=cfg.num_classes)})
       self.get_pred = torch.sigmoid
     else:
       raise NotImplementedError

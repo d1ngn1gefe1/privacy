@@ -3,11 +3,7 @@ import torch.nn.functional as F
 import torchmetrics
 
 
-def multilabel_loss_with_uncertainty(
-  logits,
-  labels,
-  uncertainty_approach='u_zeros'
-):
+def multilabel_loss_with_uncertainty(logits, labels, uncertainty_approach='u_zeros'):
   if uncertainty_approach == 'u_zeros':
     labels[labels == -1] = 0
   elif uncertainty_approach == 'u_ones':
