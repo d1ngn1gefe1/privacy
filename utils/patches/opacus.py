@@ -1,3 +1,5 @@
+from functools import partial
+import opacus.data_loader
 from opacus.data_loader import DPDataLoader
 from opacus.optimizers import DistributedDPOptimizer, DPOptimizer
 from opacus.optimizers.optimizer import _check_processed_flag, _mark_as_processed
@@ -117,6 +119,17 @@ def __iter_ddp_sampler__(self):
       num_batches -= 1
 
 
+def _collate(batch, collate_fn, sample_empty_shapes):
+  if len(batch) > 0:
+    return collate_fn(batch)
+  else:
+    return [torch.zeros(x) for x in sample_empty_shapes]
+
+
+def wrap_collate_with_empty(collate_fn, sample_empty_shapes):
+  return partial(_collate, collate_fn=collate_fn, sample_empty_shapes=sample_empty_shapes)
+
+
 def patch_opacus():
   # make closure compatible with lightning
   DistributedDPOptimizer.step = step
@@ -130,3 +143,6 @@ def patch_opacus():
   # sampler handles empty batch
   UniformWithReplacementSampler.__iter__ = __iter_sampler__
   DistributedUniformWithReplacementSampler.__iter__ = __iter_ddp_sampler__
+
+  # make it pickle-able
+  opacus.data_loader.wrap_collate_with_empty = wrap_collate_with_empty

@@ -43,7 +43,6 @@ def _setup_model_ddp_spawn(self, model):
 
 
 def _requires_distributed_sampler(self, dataloader):
-  print('_requires_distributed_sampler!!!')
   return (
       self.trainer._accelerator_connector.replace_sampler_ddp
       and self.trainer._accelerator_connector.is_distributed
