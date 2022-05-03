@@ -25,11 +25,10 @@ def compute_layer_norm_2d_grad_sample(
     backprops: torch.Tensor,
 ) -> Dict[nn.Parameter, torch.Tensor]:
   # if _is_contiguous(activations):
-  x = F.layer_norm(activations.permute(0, 2, 3, 1), layer.normalized_shape, layer.weight, layer.bias,
-                   layer.eps).permute(0, 3, 1, 2)
+  x = F.layer_norm(activations.permute(0, 2, 3, 1), layer.normalized_shape, layer.weight, layer.bias, layer.eps)
   ret1 = {
-    layer.weight: sum_over_all_but_batch_and_last_n(x*backprops, layer.weight.dim()),
-    layer.bias: sum_over_all_but_batch_and_last_n(backprops, layer.bias.dim())
+    layer.weight: torch.sum(x*backprops, dim=(2, 3)),
+    layer.bias: torch.sum(backprops, dim=(2, 3))
   }
   # else:
   N, C, H, W = activations.shape
@@ -41,7 +40,7 @@ def compute_layer_norm_2d_grad_sample(
     layer.bias: torch.sum(backprops, dim=(2, 3))
   }
 
-  print('register', ret1[layer.weight].shape, ret2[layer.weight].shape, ret1[layer.bias].shape, ret2[layer.bias].shape)
+  print('register', torch.sum(torch.abs(ret1[layer.weight]-ret2[layer.weight])))
   assert False
 
   return ret1
