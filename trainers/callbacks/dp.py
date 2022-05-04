@@ -3,6 +3,7 @@ import inspect
 from opacus import PrivacyEngine
 from opacus.data_loader import DPDataLoader
 from opacus.accountants.utils import get_noise_multiplier
+from opacus.privacy_engine import forbid_accumulation_hook
 from opacus.utils.batch_memory_manager import BatchSplittingSampler, wrap_data_loader
 from pytorch_lightning.callbacks.base import Callback
 from torch.utils.data import DataLoader
@@ -101,8 +102,7 @@ class DPCallback(Callback):
 
     # make net private
     pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
-    # Not supported by Lightning because Lightning has the following order: training_step -> zero_grad -> backward
-    # pl_module.register_forward_pre_hook(forbid_accumulation_hook)
+    pl_module.register_full_backward_hook(forbid_accumulation_hook)
 
     # make dataloader private
     trainer.datamodule.train_dataloader_old = trainer.datamodule.train_dataloader
