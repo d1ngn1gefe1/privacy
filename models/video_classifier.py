@@ -11,46 +11,45 @@ class VideoClassifierModule(BaseClassifierModule):
     self._prepare_ensemble()
 
   def training_step(self, batch, batch_idx):
-    # TODO: rename y_hat to logits and pred to y_hat
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
-    y_hat = self(x)
+    logits = self(x)
 
-    loss = self.get_loss(y_hat, y)
+    loss = self.get_loss(logits, y)
     self.log('train/loss', loss, batch_size=batch_size, prog_bar=True)
 
-    pred = self.get_pred(y_hat)
+    y_hat = self.get_pred(logits)
     for name, get_stat in self.metrics.items():
-      self.log(f'train/{name}', get_stat(pred, y), batch_size=batch_size, prog_bar=True)
+      self.log(f'train/{name}', get_stat(y_hat, y), batch_size=batch_size, prog_bar=True)
 
     return loss
 
   def validation_step(self, batch, batch_idx):
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
-    y_hat = self(x)
+    logits = self(x)
 
-    loss = self.get_loss(y_hat, y)
+    loss = self.get_loss(logits, y)
     self.log('val/loss', loss, batch_size=batch_size, sync_dist=True, prog_bar=True)
 
-    pred = self.get_pred(y_hat)
+    y_hat = self.get_pred(logits)
     #for name, get_stat in self.metrics.items():
     #  self.log(f'val/{name}', get_stat(pred, y), batch_size=batch_size, sync_dist=True, prog_bar=True)
 
     video_ids = batch['video_index'].clone()
-    self._ensemble_at_video_level(pred, y, video_ids)
+    self._ensemble_at_video_level(y_hat, y, video_ids)
 
   def test_step(self, batch, batch_idx):
     batch_size = batch['video'][0].shape[0] if isinstance(batch['video'], list) else batch['video'].shape[0]
     x, y = batch['video'], batch['label']
-    y_hat = self(x)
+    logits = self(x)
 
-    loss = self.get_loss(y_hat, y)
+    loss = self.get_loss(logits, y)
     self.log('test/loss', loss, batch_size=batch_size, sync_dist=True, prog_bar=True)
 
-    pred = self.get_pred(y_hat)
+    y_hat = self.get_pred(logits)
     video_ids = batch['video_index'].clone()
-    self._ensemble_at_video_level(pred, y, video_ids)
+    self._ensemble_at_video_level(y_hat, y, video_ids)
 
   def predict_step(self, batch, batch_idx):
     pass
