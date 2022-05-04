@@ -1,6 +1,7 @@
 from functools import partial
 from omegaconf import OmegaConf
 import optuna
+import os
 
 from data import get_data
 from models import get_model
@@ -10,13 +11,16 @@ import utils
 
 def main():
   cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
-  utils.setup(cfg, 'tune')
   cfg_tune = OmegaConf.load('configs/tune.yaml')
+  utils.setup(cfg, 'tune')
 
-  storage = 'sqlite:///optuna.db'
+  if os.path.exists(cfg_tune.db):
+    os.remove(cfg_tune.db)
+
+  storage = f'sqlite:///{cfg_tune.db}'
   pruner = optuna.pruners.HyperbandPruner()
   sampler = optuna.samplers.TPESampler()
-  study = optuna.create_study(study_name=cfg.name, storage=storage, direction='maximize', load_if_exists=True,
+  study = optuna.create_study(study_name=f'{cfg.dataset}_{cfg.net}', storage=storage, direction='maximize',
                               pruner=pruner, sampler=sampler)
   study.optimize(partial(objective, cfg=cfg, cfg_tune=cfg_tune), n_trials=100, timeout=600)
 
@@ -33,19 +37,19 @@ def main():
 
 
 def objective(trial, cfg, cfg_tune):
+  # update cfg
   cfg_tune = OmegaConf.to_container(cfg_tune)
+  cfg_tune.pop('db')
 
-  cfg_sampled = {}
-  # for k, v in cfg_tune.items():
-  #   kind = v.pop('kind')
-  #   cfg_sampled[k] = getattr(trial, f'suggest_{kind}')(k, **v)
+  cfg_sample = {}
+  for k, v in cfg_tune.items():
+    kind = v.pop('kind')
+    cfg_sample[k] = getattr(trial, f'suggest_{kind}')(k, **v)
 
-  a = trial.suggest_int('batch_size', 512, 2048)  # todo: debug this line
-  assert False
+  utils.update(cfg, cfg_sample)
+  print(cfg.name)
 
-  cfg.update(cfg_sampled)
-
-  print(cfg)
+  # fit
   data = get_data(cfg)
   model = get_model(cfg)
   trainer = get_trainer(cfg, trial)

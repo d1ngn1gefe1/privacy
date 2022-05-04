@@ -13,16 +13,17 @@ adapter: bottleneck_adapter
 mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
-optimizer: sgd
+optimizer: adamw
 attacker: black_box
 
-gpus: [1]
-num_workers: 8
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+num_workers: 4
 
 # 100 for 'from_scratch', 50 for others
 num_epochs: 50
 warmup_steps: 500
 batch_size: 128
+max_batch_size: 500
 # lr setting:
 # non-dp: 1e-2 for 'fine_tuning' and 'linear_probing', 3e-2 for 'from_scratch' and 'adapter'
 # dp: 1e-4 for 'fine_tuning', 3e-4 for 'linear_probing' and 'adapter', 1e-3 for 'from_scratch'

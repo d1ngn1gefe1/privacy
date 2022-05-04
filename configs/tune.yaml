@@ -1,3 +1,4 @@
+db: optuna.db
 num_epochs:
   kind: categorical
   choices: [5, 10]
