@@ -1,10 +1,12 @@
 medmnist
+omegaconf
 opacus==v1.1.1
 optuna==3.0.0b0
 pytorch-lightning==1.7.0
-pytorchvideo
+pytorchvideo==0.1.5
+pytorchvideo_trainer
 rarfile
-timm
+timm==0.6.1
 torch
 torchvision
 wandb
