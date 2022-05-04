@@ -8,7 +8,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar100/vit.yaml')
+  cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
   utils.setup(cfg, 'tune')
 
   cfg_tune = OmegaConf.load('configs/tune.yaml')

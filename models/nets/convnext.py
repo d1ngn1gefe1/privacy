@@ -18,7 +18,7 @@ from typing import Dict
 
 
 @register_grad_sampler(LayerNorm2d)
-def compute_layer_norm_2d_grad_sample(
+def compute_layer_norm_timm_grad_sample(
     layer: LayerNorm2d,
     activations: torch.Tensor,
     backprops: torch.Tensor,

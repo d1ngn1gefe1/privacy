@@ -1,10 +1,26 @@
+from opacus.grad_sample import register_grad_sampler
 import os
 import timm
+from timm.models.layers.norm import GroupNorm
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torchvision import models
 from torchvision.datasets.utils import download_url
 from types import MethodType
+from typing import Dict
+
+
+@register_grad_sampler(GroupNorm)
+def compute_group_norm_timm_grad_sample(
+    layer: GroupNorm, activations: torch.Tensor, backprops: torch.Tensor
+) -> Dict[nn.Parameter, torch.Tensor]:
+  gs = F.group_norm(activations, layer.num_groups, layer.weight, layer.bias, eps=layer.eps)*backprops
+  ret = {
+    layer.weight: torch.einsum('ni...->ni', gs),
+    layer.bias: torch.einsum('ni...->ni', backprops)
+  }
+  return ret
 
 
 def get_classifier(self):
