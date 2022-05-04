@@ -1,3 +1,4 @@
+from functools import partial
 from opacus.grad_sample import register_grad_sampler
 import os
 import timm
@@ -27,13 +28,13 @@ def get_classifier(self):
   return self.fc
 
 
-def get_resnet(num_classes, pretrained, dir_weights, implementation='timm'):
+def get_resnet(num_classes, pretrained, dir_weights, implementation='ppwwyyxx'):
   assert implementation in ['ppwwyyxx', 'timm']
   if implementation == 'ppwwyyxx':
     net = models.__dict__['resnet50'](pretrained=False, num_classes=num_classes,
-                                      norm_layer=(lambda x: nn.GroupNorm(32, x)))
+                                      norm_layer=partial(nn.GroupNorm, 32))
 
-    net.get_classifier = MethodType(get_classifier, net)
+    net.get_classifier = get_classifier
 
     if pretrained:
       path_pretrain = os.path.join(dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
