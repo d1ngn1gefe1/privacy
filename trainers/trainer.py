@@ -44,6 +44,7 @@ def get_trainer(cfg, trial=None):
     'max_epochs': cfg.num_epochs,
     'logger': logger,
     'callbacks': callbacks,
+    'enable_checkpointing': cfg.phase != 'tune',
     'check_val_every_n_epoch': 1,
     'num_sanity_val_steps': 2,
     'log_every_n_steps': 10,
