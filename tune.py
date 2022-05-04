@@ -1,3 +1,4 @@
+from functools import partial
 from omegaconf import OmegaConf
 import optuna
 
@@ -10,15 +11,14 @@ import utils
 def main():
   cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
   utils.setup(cfg, 'tune')
-
   cfg_tune = OmegaConf.load('configs/tune.yaml')
 
   storage = 'sqlite:///optuna.db'
-  pruner = optuna.pruners.MedianPruner()
-  study = optuna.create_study(study_name=cfg.name, storage=storage, direction='maximize', pruner=pruner,
-                              load_if_exists=True)
-  objective = lambda x: train(x, cfg, cfg_tune)
-  study.optimize(objective, n_trials=3, timeout=600)
+  pruner = optuna.pruners.HyperbandPruner()
+  sampler = optuna.samplers.TPESampler()
+  study = optuna.create_study(study_name=cfg.name, storage=storage, direction='maximize', load_if_exists=True,
+                              pruner=pruner, sampler=sampler)
+  study.optimize(partial(objective, cfg=cfg, cfg_tune=cfg_tune), n_trials=100, timeout=600)
 
   print(f'Number of finished trials: {len(study.trials)}')
 
@@ -32,10 +32,18 @@ def main():
     print(f'    {key}: {value}')
 
 
-def train(trial, cfg, cfg_tune):
+def objective(trial, cfg, cfg_tune):
   cfg_tune = OmegaConf.to_container(cfg_tune)
-  cfg_tune = {k: trial.suggest_categorical(k, v) for k, v in cfg_tune.items()}
-  cfg.update(cfg_tune)
+
+  cfg_sampled = {}
+  # for k, v in cfg_tune.items():
+  #   kind = v.pop('kind')
+  #   cfg_sampled[k] = getattr(trial, f'suggest_{kind}')(k, **v)
+
+  a = trial.suggest_int('batch_size', 512, 2048)  # todo: debug this line
+  assert False
+
+  cfg.update(cfg_sampled)
 
   print(cfg)
   data = get_data(cfg)
