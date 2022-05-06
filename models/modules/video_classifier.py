@@ -1,6 +1,6 @@
 import torch
 
-from .base_classifier import BaseClassifierModule
+from models.modules.base_classifier import BaseClassifierModule
 
 
 class VideoClassifierModule(BaseClassifierModule):

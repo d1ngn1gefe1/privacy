@@ -1,1 +1,1 @@
-from .get_data import get_data
+from .datamodules import get_data

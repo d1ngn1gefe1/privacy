@@ -2,7 +2,7 @@ import os
 from torchvision.datasets import ImageFolder
 
 from .base_datamodule import BaseDataModule
-from .transforms import get_transforms
+from data.transforms import get_transform
 
 
 class ImageNetDataModule(BaseDataModule):
@@ -18,7 +18,7 @@ class ImageNetDataModule(BaseDataModule):
            os.path.isdir(os.path.join(self.cfg.dir_data, 'imagenet/val'))
 
   def setup(self, stage=None):
-    transform_train, transform_val, transform_test = get_transforms(self.cfg.net, self.cfg.augment)
+    transform_train, transform_val, transform_test = get_transform(self.cfg.net, self.cfg.augment)
     self.dataset_train = ImageFolder(os.path.join(self.cfg.dir_data, 'imagenet/train'), transform=transform_train)
     self.dataset_val = ImageFolder(os.path.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_val)
     self.dataset_test = ImageFolder(os.path.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_test)

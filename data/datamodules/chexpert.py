@@ -3,10 +3,10 @@ import os
 import pandas as pd
 from PIL import Image
 from torchvision.datasets import VisionDataset
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Tuple
 
 from .base_datamodule import BaseDataModule
-from .transforms import get_transforms
+from data.transforms import get_transform
 
 
 class CheXpert(VisionDataset):
@@ -61,7 +61,7 @@ class CheXpertDataModule(BaseDataModule):
       raise RuntimeError('Please download the dataset on https://stanfordmlgroup.github.io/competitions/chexpert/.')
 
   def setup(self, stage=None):
-    transform_train, transform_val, transform_test = get_transforms(self.cfg.net, self.cfg.augment)
+    transform_train, transform_val, transform_test = get_transform(self.cfg.net, self.cfg.augment)
     self.dataset_train = CheXpert(self.cfg.dir_data, train=True, transform=transform_train)
     self.dataset_val = CheXpert(self.cfg.dir_data, train=False, transform=transform_val)
     self.dataset_test = CheXpert(self.cfg.dir_data, train=False, transform=transform_test)

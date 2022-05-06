@@ -9,7 +9,7 @@ from torchvision.datasets.utils import download_and_extract_archive, _ARCHIVE_EX
 
 from .base_datamodule import BaseDataModule
 from .map_dataset import MapDataset
-from .transforms import get_transforms
+from data.transforms import get_transform
 import utils
 
 
@@ -70,7 +70,7 @@ class UCF101DataModule(BaseDataModule):
         writer.writerows(rows)
 
   def setup(self, stage=None):
-    transform_train, transform_val, transform_test = get_transforms('mvit', True)
+    transform_train, transform_val, transform_test = get_transform('mvit', True)
 
     self.dataset_train = MapDataset.from_iterable_dataset(Ucf101(
       data_path=os.path.join(self.cfg.dir_data, self.dname_metadata, 'trainlist01.csv'),

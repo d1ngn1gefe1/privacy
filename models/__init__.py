@@ -1,1 +1,1 @@
-from .get_model import get_model
+from .modules import get_model

@@ -7,7 +7,7 @@ from torch.optim import SGD, AdamW
 from torch.optim.lr_scheduler import CosineAnnealingLR
 import torchmetrics
 
-from .nets import get_net
+from models.nets import get_net
 from .utils import MaskedAUROC, multilabel_loss_with_uncertainty
 
 

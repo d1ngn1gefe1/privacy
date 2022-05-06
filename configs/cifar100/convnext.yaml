@@ -10,7 +10,7 @@ mode: fine_tuning
 #mode: adapter
 optimizer: adamw
 
-gpus: [7]
+gpus: [0]
 num_workers: 4
 
 num_epochs: 50
@@ -29,7 +29,7 @@ wd:
   sgd: 1e-4
   adamw: 0.05
 
-dp: True
+dp: False
 augment: False
 sigma: 0.01
 c: 10

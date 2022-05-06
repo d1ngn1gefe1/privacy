@@ -1,6 +1,6 @@
-from .adapters import get_adapter
-from .image_classifier import ImageClassifierModule
-from .video_classifier import VideoClassifierModule
+from models.adapters import get_adapter
+from models.modules.image_classifier import ImageClassifierModule
+from models.modules.video_classifier import VideoClassifierModule
 
 
 def get_model(cfg):

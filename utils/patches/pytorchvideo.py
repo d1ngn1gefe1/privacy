@@ -1,5 +1,6 @@
 import pytorchvideo.transforms.functional
 from pytorchvideo.transforms.functional import _get_param_spatial_crop
+import pytorchvideo.data
 import torch
 from typing import Tuple
 

@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from types import MethodType
 
 import utils
-from data.datasets.subsample_dataset import SubsampleDataset
+from data.datamodules.subsample_dataset import SubsampleDataset
 
 
 def on_train_epoch_end(self):
