@@ -28,7 +28,8 @@ class BaseClassifierModule(LightningModule):
     if cfg.task == 'multi-class':
       self.get_loss = F.cross_entropy
       self.get_pred = partial(F.softmax, dim=-1)  # avoid using lambda because it cannot be pickled
-      self.metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='micro')})
+      self.metrics = nn.ModuleDict({'acc1': torchmetrics.Accuracy(average='micro', top_k=1),
+                                    'acc5': torchmetrics.Accuracy(average='micro', top_k=5)})
     elif cfg.task == 'multi-label':
       if hasattr(cfg, 'uncertainty'):
         self.get_loss = partial(multilabel_loss_with_uncertainty, uncertainty_approach=cfg.uncertainty)
