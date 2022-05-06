@@ -2,7 +2,7 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-dataset: cifar10
+dataset: cifar100
 net: convnext
 adapter: mlp_adapter
 mode: fine_tuning
