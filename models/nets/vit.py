@@ -63,4 +63,7 @@ def get_vit(num_classes, pretrained):
   vision_transformer.VisionTransformer = VisionTransformer
   # vit_tiny_patch16_224: in21k -> in1k, 21.7M parameters
   net = timm.create_model('vit_small_patch16_224', pretrained=pretrained, num_classes=num_classes)
+  delattr(net, 'cls_token')
+  delattr(net, 'pos_embed')
+
   return net
