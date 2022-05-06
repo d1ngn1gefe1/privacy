@@ -60,22 +60,7 @@ def get_mvit_transforms(augment, T=16):
     RemoveKey(key='audio')]
   )
 
-  transform_test = Compose(transforms=[
-    ApplyTransformToKey(
-      key='video',
-      transform=Compose(
-        transforms=[
-          UniformTemporalSubsample(num_samples=T),
-          Div255(),
-          Normalize(mean=MEAN_KINETICS, std=STD_KINETICS),
-          ShortSideScale(224),
-          UniformCropVideo(224)
-        ]
-      )
-    ),
-    RemoveKey(key='audio')]
-  )
-
+  transform_test = transform_val
   if not augment:
     transform_train = transform_val
 

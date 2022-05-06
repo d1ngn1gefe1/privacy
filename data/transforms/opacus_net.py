@@ -22,11 +22,7 @@ def get_opacus_net_transforms(augment):
     Normalize(mean=MEAN_CIFAR10, std=STD_CIFAR10)
   ])
 
-  transform_test = Compose([
-    ToTensor(),
-    Normalize(mean=MEAN_CIFAR10, std=STD_CIFAR10)
-  ])
-
+  transform_test = transform_val
   if not augment:
     transform_train = transform_val
 

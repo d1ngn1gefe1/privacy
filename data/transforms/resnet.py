@@ -26,13 +26,7 @@ def get_resnet_transforms(augment):
     Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)
   ])
 
-  transform_test = Compose([
-    Resize(256),
-    CenterCrop(224),
-    ToTensor(),
-    Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)
-  ])
-
+  transform_test = transform_val
   if not augment:
     transform_train = transform_val
 

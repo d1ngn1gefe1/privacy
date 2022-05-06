@@ -24,12 +24,7 @@ def get_dpsgd_net_transforms(augment):
     Normalize(mean=MEAN_DEFAULT, std=STD_DEFAULT)
   ])
 
-  transform_test = Compose([
-    CenterCrop(24),
-    ToTensor(),
-    Normalize(mean=MEAN_DEFAULT, std=STD_DEFAULT)
-  ])
-
+  transform_test = transform_val
   if not augment:
     transform_train = transform_val
 
