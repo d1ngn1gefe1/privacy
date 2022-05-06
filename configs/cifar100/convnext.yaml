@@ -2,7 +2,7 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-dataset: cifar100
+dataset: cifar10
 net: convnext
 adapter: mlp_adapter
 mode: fine_tuning
@@ -16,9 +16,6 @@ num_workers: 4
 num_epochs: 10
 warmup_steps: 0
 batch_size: 64
-# lr setting:
-# non-dp: 3e-3 for 'fine_tuning' and 'adapter', 1e-2 for 'linear_probing'
-# dp: 3e-3 for 'adapter' and 'linear_probing', 1e-3 for 'fine_tuning'
 lr:
   sgd: 3e-3
   adamw: 4e-4

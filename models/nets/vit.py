@@ -39,8 +39,8 @@ def compute_param_embed_grad_sample(
 
 
 class VisionTransformer(vision_transformer.VisionTransformer):
-  def __init__(self, *args, **kargs):
-    super().__init__(*args, **kargs)
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
     self.param_embed = ParamEmbed(self.cls_token, self.pos_embed)
 
   def forward_features(self, x):
@@ -63,6 +63,4 @@ def get_vit(num_classes, pretrained):
   vision_transformer.VisionTransformer = VisionTransformer
   # vit_tiny_patch16_224: in21k -> in1k, 21.7M parameters
   net = timm.create_model('vit_small_patch16_224', pretrained=pretrained, num_classes=num_classes)
-  delattr(net, 'cls_token')
-  delattr(net, 'pos_embed')
   return net

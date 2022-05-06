@@ -39,9 +39,9 @@ def compute_layer_norm_timm_grad_sample(
 
 
 class GammaEmbed(nn.Module):
-  def __init__(self, dim, ls_init_value):
+  def __init__(self, gamma):
     super().__init__()
-    self.gamma = nn.Parameter(ls_init_value*torch.ones(dim))
+    self.gamma = gamma
 
   def forward(self, x):
     x = x.mul(self.gamma.reshape(1, -1, 1, 1))
@@ -58,18 +58,11 @@ def compute_param_embed_grad_sample(
   return ret
 
 
-class ConvNeXtBlock(nn.Module):
-  def __init__(self, dim, drop_path=0., ls_init_value=1e-6, conv_mlp=False, mlp_ratio=4, norm_layer=None):
-    super().__init__()
-    if not norm_layer:
-      norm_layer = partial(LayerNorm2d, eps=1e-6) if conv_mlp else partial(nn.LayerNorm, eps=1e-6)
-    mlp_layer = ConvMlp if conv_mlp else Mlp
-    self.use_conv_mlp = conv_mlp
-    self.conv_dw = nn.Conv2d(dim, dim, kernel_size=7, padding=3, groups=dim)  # depthwise conv
-    self.norm = norm_layer(dim)
-    self.mlp = mlp_layer(dim, int(mlp_ratio*dim), act_layer=nn.GELU)
-    self.gamma_embed = GammaEmbed(dim, ls_init_value) if ls_init_value > 0 else None
-    self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
+class ConvNeXtBlock(convnext.ConvNeXtBlock):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    if self.gamma is not None:
+      self.gamma_embed = GammaEmbed(self.gamma)
 
   def forward(self, x):
     shortcut = x
