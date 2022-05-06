@@ -1,5 +1,5 @@
 import numpy as np
-import os
+import os.path as osp
 import pandas as pd
 from PIL import Image
 from torchvision.datasets import VisionDataset
@@ -15,10 +15,10 @@ class CheXpert(VisionDataset):
   def __init__(self, root, train=True, transform=None, target_transform=None) -> None:
     super().__init__(root, transform=transform, target_transform=target_transform)
 
-    data = pd.read_csv(os.path.join(root, 'CheXpert-v1.0-small', 'train.csv' if train else 'valid.csv'))
+    data = pd.read_csv(osp.join(root, 'CheXpert-v1.0-small', 'train.csv' if train else 'valid.csv'))
 
-    paths = [os.path.join(root, x) for x in data.Path.values]
-    assert all(os.path.exists(path) for path in paths), 'Dataset not found or corrupted'
+    paths = [osp.join(root, x) for x in data.Path.values]
+    assert all(osp.exists(path) for path in paths), 'Dataset not found or corrupted'
 
     targets = data[self.observations].values
     targets[np.isnan(targets)] = -1  # NaN and -1 are both stated as unknowns in the dataset
@@ -31,7 +31,7 @@ class CheXpert(VisionDataset):
 
   @classmethod
   def exists(cls, root):
-    return os.path.isdir(os.path.join(root, 'CheXpert-v1.0-small'))
+    return osp.isdir(osp.join(root, 'CheXpert-v1.0-small'))
 
   def __len__(self) -> int:
     return len(self.paths)

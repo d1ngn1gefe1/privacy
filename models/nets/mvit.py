@@ -7,7 +7,7 @@ Examples of register_grad_sampler :
 """
 
 from opacus.grad_sample import register_grad_sampler
-import os
+import os.path as osp
 from pytorchvideo.layers import SpatioTemporalClsPositionalEncoding
 from pytorchvideo.models.head import create_vit_basic_head
 from pytorchvideo.models.vision_transformers import create_multiscale_vision_transformers
@@ -86,11 +86,11 @@ def get_mvit(num_classes, pretrained, dir_weights):
   )
 
   if pretrained:
-    dir_pretrain = os.path.join(dir_weights, 'pretrain')
+    dir_pretrain = osp.join(dir_weights, 'pretrain')
     fname_pretrain = 'MVIT_B_16x4.pyth'
-    if not os.path.exists(os.path.join(dir_pretrain, fname_pretrain)):
+    if not osp.exists(osp.join(dir_pretrain, fname_pretrain)):
       download_url(f'https://dl.fbaipublicfiles.com/pytorchvideo/model_zoo/kinetics/{fname_pretrain}', dir_pretrain)
-    weights = torch.load(os.path.join(dir_pretrain, fname_pretrain))['model_state']
+    weights = torch.load(osp.join(dir_pretrain, fname_pretrain))['model_state']
     weights.pop('head.proj.weight', None)
     weights.pop('head.proj.bias', None)
     print(f'{list(set(net.state_dict().keys())-set(weights.keys()))} will be trained from scratch')

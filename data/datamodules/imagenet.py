@@ -1,4 +1,4 @@
-import os
+import os.path as osp
 from torchvision.datasets import ImageFolder
 
 from .base_datamodule import BaseDataModule
@@ -14,11 +14,11 @@ class ImageNetDataModule(BaseDataModule):
 
   def prepare_data(self):
     # Tutorial: https://github.com/facebookarchive/fb.resnet.torch/blob/master/INSTALL.md#download-the-imagenet-dataset
-    assert os.path.isdir(os.path.join(self.cfg.dir_data, 'imagenet/train')) and \
-           os.path.isdir(os.path.join(self.cfg.dir_data, 'imagenet/val'))
+    assert osp.isdir(osp.join(self.cfg.dir_data, 'imagenet/train')) and \
+           osp.isdir(osp.join(self.cfg.dir_data, 'imagenet/val'))
 
   def setup(self, stage=None):
     transform_train, transform_val, transform_test = get_transform(self.cfg.net, self.cfg.augment)
-    self.dataset_train = ImageFolder(os.path.join(self.cfg.dir_data, 'imagenet/train'), transform=transform_train)
-    self.dataset_val = ImageFolder(os.path.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_val)
-    self.dataset_test = ImageFolder(os.path.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_test)
+    self.dataset_train = ImageFolder(osp.join(self.cfg.dir_data, 'imagenet/train'), transform=transform_train)
+    self.dataset_val = ImageFolder(osp.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_val)
+    self.dataset_test = ImageFolder(osp.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_test)

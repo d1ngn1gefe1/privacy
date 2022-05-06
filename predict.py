@@ -1,6 +1,6 @@
 import numpy as np
 from omegaconf import OmegaConf
-import os
+import os.path as osp
 import torch
 from tqdm import tqdm
 
@@ -36,7 +36,7 @@ def main():
   model = get_model(cfg)
   trainer = get_trainer(cfg)
 
-  path_ckpt = os.path.join(cfg.dir_weights, cfg.relpath_ckpt)
+  path_ckpt = osp.join(cfg.dir_weights, cfg.relpath_ckpt)
   trainer.predict(model, datamodule=data, ckpt_path=path_ckpt)
 
   # Using python runtime to do inference
@@ -46,7 +46,7 @@ def main():
   train_dataloader = data.train_dataloader()
   train_save_dict = inference(model, train_dataloader)
 
-  path_predict = os.path.join(cfg.dir_weights, cfg.relpath_predict)
+  path_predict = osp.join(cfg.dir_weights, cfg.relpath_predict)
   np.savez(path_predict,
            train_preds=train_save_dict['preds'], train_gts=train_save_dict['gts'],
            test_preds=predict_save_dict['preds'], test_gts=predict_save_dict['gts'])

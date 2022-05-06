@@ -1,6 +1,6 @@
 from functools import partial
 from opacus.grad_sample import register_grad_sampler
-import os
+import os.path as osp
 import timm
 from timm.models.layers.norm import GroupNorm
 import torch
@@ -37,10 +37,10 @@ def get_resnet(num_classes, pretrained, dir_weights, implementation='ppwwyyxx'):
     net.get_classifier = get_classifier
 
     if pretrained:
-      path_pretrain = os.path.join(dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
-      if not os.path.isfile(path_pretrain):
+      path_pretrain = osp.join(dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
+      if not osp.isfile(path_pretrain):
         url = 'https://github.com/ppwwyyxx/GroupNorm-reproduce/releases/download/v0.1/ImageNet-ResNet50-GN.pth'
-        download_url(url, os.path.join(dir_weights, 'pretrain'))
+        download_url(url, osp.join(dir_weights, 'pretrain'))
       state_dict = torch.load(path_pretrain)['state_dict']
       state_dict = {k.replace('module.', ''):v for k, v in state_dict.items()}
       state_dict.pop('fc.weight', None)

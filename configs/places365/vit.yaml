@@ -1,0 +1,21 @@
+dir_data: /home/ssd/data
+dir_log: /home/ssd/log
+dir_weights: /home/ssd/weights
+
+dataset: places365
+net: vit
+mode: from_scratch
+optimizer: sgd
+
+gpus: [0]
+num_workers: 8
+
+num_epochs: 90
+warmup_steps: 500
+batch_size: 8
+lr: 0.4
+momentum: 0.9
+wd: 1e-4
+
+dp: False
+augment: True

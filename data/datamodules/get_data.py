@@ -11,6 +11,9 @@ def get_data(cfg):
   elif cfg.dataset == 'imagenet':
     from .imagenet import ImageNetDataModule
     data = ImageNetDataModule(cfg)
+  elif cfg.dataset == 'places365':
+    from .places365 import Places365DataModule
+    data = Places365DataModule(cfg)
   elif cfg.dataset == 'ucf101':
     from .ucf101 import UCF101DataModule
     data = UCF101DataModule(cfg)
