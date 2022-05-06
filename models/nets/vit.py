@@ -58,12 +58,6 @@ class VisionTransformer(vision_transformer.VisionTransformer):
   def no_weight_decay(self):
     return {'param_embed.pos_embed', 'param_embed.cls_token'}
 
-  def get_classifier(self):
-    if self.param_embed.dist_token is None:
-      return self.head
-    else:
-      return self.head, self.head_dist
-
 
 def get_vit(num_classes, pretrained):
   vision_transformer.VisionTransformer = VisionTransformer
