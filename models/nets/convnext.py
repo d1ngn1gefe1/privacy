@@ -85,6 +85,8 @@ def get_convnext(num_classes, pretrained):
   convnext.ConvNeXtBlock = ConvNeXtBlock
   # convnext_tiny_in22ft1k: in21k -> in1k, 29.5M parameters
   net = timm.create_model('convnext_tiny_in22ft1k', pretrained=pretrained, num_classes=num_classes)
-  delattr(net, 'gamma')
+  for stage in net.stages:
+    for block in stage.blocks:
+      delattr(block, 'gamma')
 
   return net
