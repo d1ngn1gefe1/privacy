@@ -2,6 +2,7 @@ from functools import partial
 from omegaconf import OmegaConf
 import optuna
 import os
+import os.path as osp
 
 from data import get_data
 from models import get_model
@@ -14,7 +15,7 @@ def main():
   cfg_tune = OmegaConf.load('configs/tune.yaml')
   utils.setup(cfg, 'tune')
 
-  if os.path.exists(cfg_tune.db):
+  if osp.exists(cfg_tune.db):
     os.remove(cfg_tune.db)
 
   storage = f'sqlite:///{cfg_tune.db}'

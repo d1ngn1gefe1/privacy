@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 
 from optuna.integration import PyTorchLightningPruningCallback
 from pytorch_lightning import Trainer
@@ -28,7 +29,7 @@ def get_trainer(cfg, trial=None):
     callbacks.append(PyTorchLightningPruningCallback(trial, monitor='val/acc'))
   else:
     callbacks.append(ModelCheckpoint(every_n_epochs=5, save_last=True,
-                                     dirpath=os.path.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}')))
+                                     dirpath=osp.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}')))
   if cfg.dp:
     callbacks.append(DPCallback())
 

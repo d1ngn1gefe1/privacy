@@ -8,6 +8,7 @@ adapter: mlp_adapter
 #mode: from_scratch
 mode: fine_tuning
 #mode: linear_probing
+#mode: fine_tuning
 #mode: adapter
 optimizer: adamw
 
