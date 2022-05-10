@@ -8,7 +8,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import models
 from torchvision.datasets.utils import download_url
-from types import MethodType
 from typing import Dict
 
 
@@ -28,19 +27,29 @@ def get_classifier(self):
   return self.fc
 
 
-def get_resnet(num_classes, pretrained, dir_weights, implementation='ppwwyyxx'):
+def get_resnet(cfg, implementation='ppwwyyxx'):
   assert implementation in ['ppwwyyxx', 'timm']
-  if implementation == 'ppwwyyxx':
-    net = models.__dict__['resnet50'](pretrained=False, num_classes=num_classes,
-                                      norm_layer=partial(nn.GroupNorm, 32))
 
+  if implementation == 'ppwwyyxx':
+    net = models.__dict__['resnet50'](pretrained=False, num_classes=cfg.num_classes,
+                                      norm_layer=partial(nn.GroupNorm, 32))
     net.get_classifier = get_classifier
 
-    if pretrained:
-      path_pretrain = osp.join(dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
+    if cfg.mode == 'from_scratch':
+      print('Initializing randomly')
+
+    elif cfg.weight == 'ckpt':
+      print('Loading checkpoint')
+      weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))
+      net.load_state_dict(weight)
+
+    else:
+      assert cfg.weight == 'pretrain'
+      print('Loading ImageNet pre-trained weight')
+      path_pretrain = osp.join(cfg.dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
       if not osp.isfile(path_pretrain):
         url = 'https://github.com/ppwwyyxx/GroupNorm-reproduce/releases/download/v0.1/ImageNet-ResNet50-GN.pth'
-        download_url(url, osp.join(dir_weights, 'pretrain'))
+        download_url(url, osp.join(cfg.dir_weights, 'pretrain'))
       state_dict = torch.load(path_pretrain)['state_dict']
       state_dict = {k.replace('module.', ''):v for k, v in state_dict.items()}
       state_dict.pop('fc.weight', None)
@@ -50,7 +59,20 @@ def get_resnet(num_classes, pretrained, dir_weights, implementation='ppwwyyxx'):
 
   elif implementation == 'timm':
     # resnet50_gn: in1k, 23.7M parameters
-    net = timm.create_model('resnet50_gn', pretrained=pretrained, num_classes=num_classes)
+    if cfg.mode == 'fine_tuning':
+      print('Initializing randomly')
+      net = timm.create_model('resnet50_gn', pretrained=False, num_classes=cfg.num_classes)
+
+    elif cfg.weight == 'ckpt':
+      print('Loading checkpoint')
+      net = timm.create_model('resnet50_gn', pretrained=False, num_classes=cfg.num_classes)
+      weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
+      net.load_state_dict(weight)
+
+    else:
+      assert cfg.weight == 'pretrain'
+      print('Loading ImageNet pre-trained weight')
+      net = timm.create_model('resnet50_gn', pretrained=True, num_classes=cfg.num_classes)
 
   else:
     raise NotImplementedError

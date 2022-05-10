@@ -1,5 +1,4 @@
 from omegaconf.dictconfig import DictConfig
-import os
 
 from .patches import patch
 
@@ -18,7 +17,6 @@ def get_name(cfg):
 
 
 def setup(cfg, phase):
-  os.environ['PL_RECONCILE_PROCESS'] = '1'
   patch()
 
   # TODO: fix partial private

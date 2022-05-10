@@ -14,7 +14,6 @@ from pytorchvideo.models.vision_transformers import create_multiscale_vision_tra
 import torch
 import torch.nn as nn
 from torchvision.datasets.utils import download_url
-from types import MethodType
 from typing import Dict
 
 
@@ -49,7 +48,7 @@ def get_classifier(self):
   return self.head.proj
 
 
-def get_mvit(num_classes, pretrained, dir_weights):
+def get_mvit(cfg):
   net = create_multiscale_vision_transformers(
     spatial_size=224,
     temporal_size=16,
@@ -82,11 +81,22 @@ def get_mvit(num_classes, pretrained, dir_weights):
     head=create_vit_basic_head,
     head_dropout_rate=0.5,
     head_activation=None,
-    head_num_classes=num_classes
+    head_num_classes=cfg.num_classes
   )
+  net.get_classifier = get_classifier
 
-  if pretrained:
-    dir_pretrain = osp.join(dir_weights, 'pretrain')
+  if cfg.mode == 'from_scratch':
+    print('Initializing randomly')
+
+  elif cfg.weight == 'ckpt':
+    print('Loading checkpoint')
+    weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
+    net.load_state_dict(weight)
+
+  else:
+    assert cfg.weight == 'pretrain'
+    print('Loading ImageNet pre-trained weight')
+    dir_pretrain = osp.join(cfg.dir_weights, 'pretrain')
     fname_pretrain = 'MVIT_B_16x4.pyth'
     if not osp.exists(osp.join(dir_pretrain, fname_pretrain)):
       download_url(f'https://dl.fbaipublicfiles.com/pytorchvideo/model_zoo/kinetics/{fname_pretrain}', dir_pretrain)
@@ -95,6 +105,5 @@ def get_mvit(num_classes, pretrained, dir_weights):
     weights.pop('head.proj.bias', None)
     print(f'{list(set(net.state_dict().keys())-set(weights.keys()))} will be trained from scratch')
     net.load_state_dict(weights, strict=False)
-    net.get_classifier = MethodType(get_classifier, net)
 
   return net

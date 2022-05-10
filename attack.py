@@ -11,7 +11,7 @@ def main():
   utils.setup(cfg, 'attach')
 
   if cfg.attacker == 'black_box':
-    path_result = osp.join(cfg.dir_weights, cfg.relpath_predict)+'.npz'
+    path_result = osp.join(cfg.dir_weights, cfg.rpath_predict)+'.npz'
     result = np.load(path_result)
     attacker_cls = get_attacker(cfg)
 

@@ -10,6 +10,7 @@ mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: adamw
+weight: pretrain
 
 gpus: [0,1,2,3,4,5,6,7]
 num_workers: 4
@@ -32,7 +33,7 @@ tau: 4
 fps: 30
 
 dp: True
-augment: True
+augment: False
 sigma: 0.5
 c: 0.5
 delta: 1e-5

@@ -20,7 +20,7 @@ class CIFARDataModule(BaseDataModule):
     CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, download=True)
 
   def setup(self, stage=None):
-    transform_train, transform_val, transform_test = get_transform(self.cfg.net, self.cfg.augment)
+    transform_train, transform_val, transform_test = get_transform(self.cfg)
     self.dataset_train = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=True, transform=transform_train)
     self.dataset_val = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_val)
     self.dataset_test = CIFAR[self.cfg.dataset](self.cfg.dir_data, train=False, transform=transform_test)

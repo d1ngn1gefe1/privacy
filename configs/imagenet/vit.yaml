@@ -1,30 +1,32 @@
 dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
+rpath_ckpt: ckpt_ylzou/places365_vit_from_scratch_adamw_epoch50_bs2048_lr0.003_gpu8/last.ckpt
 
 dataset: imagenet
-net: resnet
+net: vit
 adapter: bottleneck_adapter
-mode: from_scratch
-#mode: fine_tuning
+#mode: from_scratch
+mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
-optimizer: sgd
+optimizer: adamw
 attacker: black_box
-weight: pretrain
+weight: ckpt
 
-gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+gpus: [0,1,2,3,4,5,6,7]
 num_workers: 8
 
 num_epochs: 90
 warmup_steps: 500
 batch_size: 1024
-lr: 0.4
+max_batch_size: 512
+lr: 1e-4
 momentum: 0.9
-wd: 1e-4
+wd: 0
 
-dp: False
-augment: True
+dp: True
+augment: False
 sigma: 1.5
 c: 10
 delta: 1e-5

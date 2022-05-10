@@ -24,7 +24,7 @@ class Places365DataModule(BaseDataModule):
 
   def setup(self, stage=None):
     dir_places365 = osp.join(self.cfg.dir_data, 'places365')
-    transform_train, transform_val, transform_test = get_transform(self.cfg.net, self.cfg.augment)
+    transform_train, transform_val, transform_test = get_transform(self.cfg)
     self.dataset_train = Places365(dir_places365, split='train-standard', transform=transform_train)
     self.dataset_val = Places365(dir_places365, split='val', transform=transform_val)
     self.dataset_test = Places365(dir_places365, split='val', transform=transform_test)

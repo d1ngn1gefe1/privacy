@@ -6,6 +6,7 @@ dataset: places365
 net: vit
 mode: from_scratch
 optimizer: sgd
+weight: pretrain
 
 gpus: [0]
 num_workers: 8

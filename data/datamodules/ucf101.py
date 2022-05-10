@@ -70,7 +70,7 @@ class UCF101DataModule(BaseDataModule):
         writer.writerows(rows)
 
   def setup(self, stage=None):
-    transform_train, transform_val, transform_test = get_transform('mvit', True)
+    transform_train, transform_val, transform_test = get_transform(self.cfg)
 
     self.dataset_train = MapDataset.from_iterable_dataset(Ucf101(
       data_path=osp.join(self.cfg.dir_data, self.dname_metadata, 'trainlist01.csv'),

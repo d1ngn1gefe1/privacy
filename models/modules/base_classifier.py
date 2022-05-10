@@ -15,7 +15,7 @@ class BaseClassifierModule(LightningModule):
   def __init__(self, cfg):
     super().__init__()
     self.cfg = cfg
-    self.net = get_net(cfg.net, cfg.num_classes, cfg.mode != 'from_scratch', cfg.dir_weights)
+    self.net = get_net(cfg)
 
     # set trainable parameters
     if cfg.mode == 'linear_probing' or cfg.mode == 'adapter':

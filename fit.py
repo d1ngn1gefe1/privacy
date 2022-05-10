@@ -7,7 +7,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/places365/vit.yaml')
+  cfg = OmegaConf.load('configs/imagenet/vit.yaml')
   utils.setup(cfg, 'fit')
 
   data = get_data(cfg)

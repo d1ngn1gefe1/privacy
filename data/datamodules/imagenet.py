@@ -18,7 +18,7 @@ class ImageNetDataModule(BaseDataModule):
            osp.isdir(osp.join(self.cfg.dir_data, 'imagenet/val'))
 
   def setup(self, stage=None):
-    transform_train, transform_val, transform_test = get_transform(self.cfg.net, self.cfg.augment)
+    transform_train, transform_val, transform_test = get_transform(self.cfg)
     self.dataset_train = ImageFolder(osp.join(self.cfg.dir_data, 'imagenet/train'), transform=transform_train)
     self.dataset_val = ImageFolder(osp.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_val)
     self.dataset_test = ImageFolder(osp.join(self.cfg.dir_data, 'imagenet/val'), transform=transform_test)

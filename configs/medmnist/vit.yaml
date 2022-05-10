@@ -10,6 +10,7 @@ mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: sgd
+weight: pretrain
 
 gpus: [1]
 num_workers: 8

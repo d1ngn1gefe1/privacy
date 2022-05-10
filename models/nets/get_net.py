@@ -1,24 +1,22 @@
-def get_net(net, num_classes, pretrained, dir_weights):
-  if net == 'dpsgd_net':
-    assert pretrained is False, 'Pre-trained weights not available'
+def get_net(cfg):
+  if cfg.net == 'dpsgd_net':
     from .dpsgd_net import get_dpsgd_net
-    net = get_dpsgd_net(num_classes)
-  elif net == 'opacus_net':
-    assert pretrained is False, 'Pre-trained weights not available'
+    net = get_dpsgd_net(cfg)
+  elif cfg.net == 'opacus_net':
     from .opacus_net import get_opacus_net
-    net = get_opacus_net(num_classes)
-  elif net == 'vit':
+    net = get_opacus_net(cfg)
+  elif cfg.net == 'vit':
     from .vit import get_vit
-    net = get_vit(num_classes, pretrained)
-  elif net == 'resnet':
+    net = get_vit(cfg)
+  elif cfg.net == 'resnet':
     from .resnet import get_resnet
-    net = get_resnet(num_classes, pretrained, dir_weights)
-  elif net == 'convnext':
+    net = get_resnet(cfg)
+  elif cfg.net == 'convnext':
     from .convnext import get_convnext
-    net = get_convnext(num_classes, pretrained)
-  elif net == 'mvit':
+    net = get_convnext(cfg)
+  elif cfg.net == 'mvit':
     from .mvit import get_mvit
-    net = get_mvit(num_classes, pretrained, dir_weights)
+    net = get_mvit(cfg)
   else:
     raise NotImplementedError
 

@@ -5,12 +5,11 @@ Reference:
  - https://github.com/pytorch/pytorch/blob/master/torch/nn/modules/normalization.py#L188
 """
 
-from functools import partial
 from opacus.grad_sample import register_grad_sampler
+import os.path as osp
 import timm
 from timm.models import convnext
 from timm.models.convnext import LayerNorm2d, _is_contiguous
-from timm.models.layers import DropPath, ConvMlp, Mlp
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -81,12 +80,32 @@ class ConvNeXtBlock(convnext.ConvNeXtBlock):
     return x
 
 
-def get_convnext(num_classes, pretrained):
-  convnext.ConvNeXtBlock = ConvNeXtBlock
-  # convnext_tiny_in22ft1k: in21k -> in1k, 29.5M parameters
-  net = timm.create_model('convnext_tiny_in22ft1k', pretrained=pretrained, num_classes=num_classes)
+def delattrs(net):
   for stage in net.stages:
     for block in stage.blocks:
       delattr(block, 'gamma')
+
+
+def get_convnext(cfg):
+  convnext.ConvNeXtBlock = ConvNeXtBlock
+
+  # convnext_tiny_in22ft1k: in21k -> in1k, 29.5M parameters
+  if cfg.mode == 'from_scratch':
+    print('Initializing randomly')
+    net = timm.create_model('convnext_tiny_in22ft1k', pretrained=False, num_classes=cfg.num_classes)
+    delattrs(net)
+
+  elif cfg.weight == 'ckpt':
+    print('Loading checkpoint')
+    net = timm.create_model('convnext_tiny_in22ft1k', pretrained=False, num_classes=cfg.num_classes)
+    delattrs(net)
+
+    weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
+    net.load_state_dict(weight)
+
+  else:
+    print('Loading ImageNet pre-trained weight')
+    net = timm.create_model('convnext_tiny_in22ft1k', pretrained=True, num_classes=cfg.num_classes)
+    delattrs(net)
 
   return net

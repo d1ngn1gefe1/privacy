@@ -6,7 +6,6 @@ from pytorchvideo.transforms import (
   RandomResizedCrop,
   RemoveKey,
   ShortSideScale,
-  UniformCropVideo,
   UniformTemporalSubsample
 )
 from pytorchvideo.transforms.rand_augment import RandAugment

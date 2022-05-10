@@ -6,6 +6,7 @@ dataset: cifar100
 net: dpsgd_net
 mode: from_scratch
 optimizer: sgd
+weight: pretrain
 
 gpus: [0]
 num_workers: 3

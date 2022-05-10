@@ -15,7 +15,7 @@ def main():
   model = get_model(cfg)
   trainer = get_trainer(cfg)
 
-  path_ckpt = osp.join(cfg.dir_weights, cfg.relpath_ckpt)
+  path_ckpt = osp.join(cfg.dir_weights, cfg.rpath_ckpt)
   trainer.test(model, datamodule=data, ckpt_path=path_ckpt)
 
 

@@ -28,7 +28,7 @@ class MedMNISTDataModule(BaseDataModule):
     self.DataClass(root=self.cfg.dir_data, split='test', as_rgb=True, download=True)
 
   def setup(self, stage=None):
-    transform_train, transform_val, transform_test = get_transform(self.cfg.net, self.cfg.augment)
+    transform_train, transform_val, transform_test = get_transform(self.cfg)
     self.dataset_train = self.DataClass(root=self.cfg.dir_data, split='train', as_rgb=True,
                                         transform=transform_train, target_transform=self.target_transform)
     self.dataset_val = self.DataClass(root=self.cfg.dir_data, split='val', as_rgb=True,

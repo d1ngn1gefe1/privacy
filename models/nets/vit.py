@@ -7,6 +7,7 @@ Examples of register_grad_sampler :
 """
 
 from opacus.grad_sample import register_grad_sampler
+import os.path as osp
 import timm
 from timm.models import vision_transformer
 from timm.models.helpers import checkpoint_seq
@@ -59,11 +60,31 @@ class VisionTransformer(vision_transformer.VisionTransformer):
     return {'param_embed.pos_embed', 'param_embed.cls_token'}
 
 
-def get_vit(num_classes, pretrained):
-  vision_transformer.VisionTransformer = VisionTransformer
-  # vit_tiny_patch16_224: in21k -> in1k, 21.7M parameters
-  net = timm.create_model('vit_small_patch16_224', pretrained=pretrained, num_classes=num_classes)
+def delattrs(net):
   delattr(net, 'cls_token')
   delattr(net, 'pos_embed')
+
+
+def get_vit(cfg):
+  vision_transformer.VisionTransformer = VisionTransformer
+
+  # vit_tiny_patch16_224: in21k -> in1k, 21.7M parameters
+  if cfg.mode == 'from_scratch':
+    print('Initializing randomly')
+    net = timm.create_model('vit_small_patch16_224', pretrained=False, num_classes=cfg.num_classes)
+    delattrs(net)
+
+  elif cfg.weight == 'ckpt':
+    print('Loading checkpoint')
+    net = timm.create_model('vit_small_patch16_224', pretrained=False, num_classes=cfg.num_classes)
+    delattrs(net)
+
+    weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
+    net.load_state_dict(weight, strict=False)
+
+  else:
+    print('Loading ImageNet pre-trained weight')
+    net = timm.create_model('vit_small_patch16_224', pretrained=True, num_classes=cfg.num_classes)
+    delattrs(net)
 
   return net

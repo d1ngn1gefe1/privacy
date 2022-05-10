@@ -29,5 +29,7 @@ class DPSGDNet(nn.Module):
     return self.fc2
 
 
-def get_dpsgd_net(num_classes):
-  return DPSGDNet(num_classes)
+def get_dpsgd_net(cfg):
+  assert cfg.mode == 'from_scratch' or cfg.weight is None, 'Pre-trained weights not available'
+  net = DPSGDNet(cfg.num_classes)
+  return net

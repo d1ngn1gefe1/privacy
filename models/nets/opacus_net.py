@@ -33,5 +33,7 @@ class OpacusNet(nn.Module):
     return self.fc1
 
 
-def get_opacus_net(num_classes):
-  return OpacusNet(num_classes)
+def get_opacus_net(cfg):
+  assert cfg.mode == 'from_scratch' or cfg.weight is None, 'Pre-trained weights not available'
+  net = OpacusNet(cfg.num_classes)
+  return net
