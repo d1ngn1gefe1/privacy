@@ -66,8 +66,12 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
     elif cfg.weight == 'ckpt':
       print('Loading checkpoint')
       net = timm.create_model('resnet50_gn', pretrained=False, num_classes=cfg.num_classes)
+
       weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
-      net.load_state_dict(weight)
+      weight = {k.removeprefix('net.'): v for k, v in weight.items()}
+      weight.pop('head.weight')  # TODO: verify key
+      weight.pop('head.bias')
+      net.load_state_dict(weight, strict=False)
 
     else:
       assert cfg.weight == 'pretrain'

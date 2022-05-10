@@ -91,7 +91,10 @@ def get_mvit(cfg):
   elif cfg.weight == 'ckpt':
     print('Loading checkpoint')
     weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
-    net.load_state_dict(weight)
+    weight = {k.removeprefix('net.'): v for k, v in weight.items()}
+    weight.pop('head.weight')  # TODO: verify key
+    weight.pop('head.bias')
+    net.load_state_dict(weight, strict=False)
 
   else:
     assert cfg.weight == 'pretrain'
@@ -101,8 +104,8 @@ def get_mvit(cfg):
     if not osp.exists(osp.join(dir_pretrain, fname_pretrain)):
       download_url(f'https://dl.fbaipublicfiles.com/pytorchvideo/model_zoo/kinetics/{fname_pretrain}', dir_pretrain)
     weights = torch.load(osp.join(dir_pretrain, fname_pretrain))['model_state']
-    weights.pop('head.proj.weight', None)
-    weights.pop('head.proj.bias', None)
+    weights.pop('head.proj.weight')
+    weights.pop('head.proj.bias')
     print(f'{list(set(net.state_dict().keys())-set(weights.keys()))} will be trained from scratch')
     net.load_state_dict(weights, strict=False)
 
