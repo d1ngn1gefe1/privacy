@@ -80,6 +80,9 @@ def get_vit(cfg):
     delattrs(net)
 
     weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
+    weight = {k.removeprefix('net.'):v for k, v in weight.items()}
+    weight.pop('head.weight')
+    weight.pop('head.bias')
     net.load_state_dict(weight, strict=False)
 
   else:
