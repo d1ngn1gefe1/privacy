@@ -1,0 +1,32 @@
+dir_data: /home/ssd/data
+dir_log: /home/ssd/log
+dir_weights: /home/ssd/weights
+rpath_ckpt: ckpt/places365_convnext_0.5429.ckpt
+
+dataset: imagenet
+net: convnext
+adapter: bottleneck_adapter
+#mode: from_scratch
+mode: fine_tuning
+#mode: linear_probing
+#mode: adapter
+optimizer: adamw
+attacker: black_box
+weight: ckpt
+
+gpus: [0,1,2,3,4,5,6,7]
+num_workers: 8
+
+num_epochs: 90
+warmup_steps: 500
+batch_size: 1024
+max_batch_size: 512
+lr: 1e-4
+momentum: 0.9
+wd: 0
+
+dp: True
+augment: False
+sigma: 1.5
+c: 10
+delta: 1e-5

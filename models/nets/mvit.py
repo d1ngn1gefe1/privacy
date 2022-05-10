@@ -92,9 +92,11 @@ def get_mvit(cfg):
     print('Loading checkpoint')
     weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
     weight = {k.removeprefix('net.'): v for k, v in weight.items()}
-    weight.pop('head.weight')  # TODO: verify key
-    weight.pop('head.bias')
-    net.load_state_dict(weight, strict=False)
+    weight.pop('head.proj.weight')
+    weight.pop('head.proj.bias')
+    keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
+    assert len(keys_unexpected) == 0
+    print(f'{keys_missing} will be trained from scratch')
 
   else:
     assert cfg.weight == 'pretrain'
@@ -103,10 +105,12 @@ def get_mvit(cfg):
     fname_pretrain = 'MVIT_B_16x4.pyth'
     if not osp.exists(osp.join(dir_pretrain, fname_pretrain)):
       download_url(f'https://dl.fbaipublicfiles.com/pytorchvideo/model_zoo/kinetics/{fname_pretrain}', dir_pretrain)
-    weights = torch.load(osp.join(dir_pretrain, fname_pretrain))['model_state']
-    weights.pop('head.proj.weight')
-    weights.pop('head.proj.bias')
-    print(f'{list(set(net.state_dict().keys())-set(weights.keys()))} will be trained from scratch')
-    net.load_state_dict(weights, strict=False)
+
+    weight = torch.load(osp.join(dir_pretrain, fname_pretrain))['model_state']
+    weight.pop('head.proj.weight')
+    weight.pop('head.proj.bias')
+    keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
+    assert len(keys_unexpected) == 0
+    print(f'{keys_missing} will be trained from scratch')
 
   return net

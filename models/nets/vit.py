@@ -83,7 +83,9 @@ def get_vit(cfg):
     weight = {k.removeprefix('net.'):v for k, v in weight.items()}
     weight.pop('head.weight')
     weight.pop('head.bias')
-    net.load_state_dict(weight, strict=False)
+    keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
+    assert len(keys_unexpected) == 0
+    print(f'{keys_missing} will be trained from scratch')
 
   else:
     print('Loading ImageNet pre-trained weight')

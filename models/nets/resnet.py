@@ -50,12 +50,14 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
       if not osp.isfile(path_pretrain):
         url = 'https://github.com/ppwwyyxx/GroupNorm-reproduce/releases/download/v0.1/ImageNet-ResNet50-GN.pth'
         download_url(url, osp.join(cfg.dir_weights, 'pretrain'))
-      state_dict = torch.load(path_pretrain)['state_dict']
-      state_dict = {k.replace('module.', ''):v for k, v in state_dict.items()}
-      state_dict.pop('fc.weight', None)
-      state_dict.pop('fc.bias', None)
-      print(f'{list(set(net.state_dict())-set(state_dict.keys()))} will be trained from scratch')
-      net.load_state_dict(state_dict, strict=False)
+
+      weight = torch.load(path_pretrain)['state_dict']
+      weight = {k.removeprefix('module.'):v for k, v in weight.items()}
+      weight.pop('fc.weight')
+      weight.pop('fc.bias')
+      keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
+      assert len(keys_unexpected) == 0
+      print(f'{keys_missing} will be trained from scratch')
 
   elif implementation == 'timm':
     # resnet50_gn: in1k, 23.7M parameters
@@ -69,9 +71,11 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
 
       weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
       weight = {k.removeprefix('net.'): v for k, v in weight.items()}
-      weight.pop('head.weight')  # TODO: verify key
-      weight.pop('head.bias')
-      net.load_state_dict(weight, strict=False)
+      weight.pop('fc.weight')
+      weight.pop('fc.bias')
+      keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
+      assert len(keys_unexpected) == 0
+      print(f'{keys_missing} will be trained from scratch')
 
     else:
       assert cfg.weight == 'pretrain'
