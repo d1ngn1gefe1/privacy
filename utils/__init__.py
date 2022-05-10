@@ -1,2 +1,2 @@
 from .cfg import *
-from .info import *
+from .utils import *
