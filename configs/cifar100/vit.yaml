@@ -5,37 +5,31 @@ dir_weights: /home/ssd/weights
 dataset: cifar100
 net: vit
 adapter: mlp_adapter
-#mode: from_scratch
-mode: fine_tuning
+mode: from_scratch
+#mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
-optimizer: sgd
+optimizer: adamw
 
 gpus: [0, 1, 2, 3, 4, 5, 6, 7]
 num_workers: 4
 
-# 100 for 'from_scratch', 50 for others
 num_epochs: 50
 warmup_steps: 500
-batch_size: 1000
-max_batch_size: 500
+batch_size: 1024
+max_batch_size: 256
 # lr setting:
-# non-dp: 3e-3 for 'fine_tuning' and 'adapter', 1e-2 for 'linear_probing', 1e-1 for 'from_scratch'
-# dp: 3e-3 for 'adapter', 'linear_probing', and 'from_scratch', 1e-3 for 'fine_tuning'
-lr:
-  sgd: 3e-3
-  adamw: 3e-4
-  sgd_dp: 3e-3
-  adamw_dp: 3e-4
+# non-dp: 3e-4 for 'fine_tuning'
+# dp: 1e-3 for 'adapter', 'linear_probing', for 'from_scratch', 3e-4 for 'fine_tuning'
+lr: 1e-3
 momentum: 0.9
-wd:
-  sgd: 1e-4
-  adamw: 1e-2
+wd: 0.0
 
 dp: True
 augment: False
 #sigma: 1.5
-c: 10
-epsilon: 5
+#c: 10
+c: 1
+epsilon: 1
 delta: 1e-5
 #ratio_public: 1.0

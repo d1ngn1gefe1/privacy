@@ -5,30 +5,30 @@ dir_weights: /home/ssd/weights
 dataset: cifar100
 net: convnext
 adapter: mlp_adapter
+#mode: from_scratch
+mode: fine_tuning
+#mode: linear_probing
 #mode: fine_tuning
-mode: linear_probing
 #mode: adapter
 optimizer: adamw
 
 gpus: [0, 1, 2, 3, 4, 5, 6, 7]
 num_workers: 4
 
-num_epochs: 10
-warmup_steps: 0
+num_epochs: 50
+warmup_steps: 500
 batch_size: 1024
-max_batch_size: 256
-lr:
-  sgd: 3e-3
-  adamw: 4e-4
-  sgd_dp: 3e-3
-  adamw_dp: 3e-4
+max_batch_size: 64
+# lr setting:
+# non-dp: 3e-4 for 'fine_tuning'
+# dp: 7e-4 for 'fine_tuning', 1e-3 for 'linear_probing' and 'adapter'
+lr: 7e-4
 momentum: 0.9
-wd:
-  sgd: 1e-4
-  adamw: 0.05
+wd: 0.0
 
-dp: False
-augment: True
-sigma: 1.5
-c: 10
+dp: True
+augment: False
+#sigma: 0.01
+c: 1
+epsilon: 1
 delta: 1e-5
