@@ -6,7 +6,7 @@ from torchvision.transforms import CenterCrop, Compose, InterpolationMode, Norma
 from .constants import *
 
 
-def get_convnext_transforms(augment):
+def get_convnext_transforms(cfg):
   transform_train = create_transform(
     input_size=224,
     is_training=True,
@@ -28,7 +28,7 @@ def get_convnext_transforms(augment):
   ])
 
   transform_test = transform_val
-  if not augment:
+  if not cfg.augment:
     transform_train = transform_val
 
   return transform_train, transform_val, transform_test

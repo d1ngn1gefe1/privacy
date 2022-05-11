@@ -131,18 +131,18 @@ def wrap_collate_with_empty(collate_fn, sample_empty_shapes):
 
 
 def patch_opacus():
+  # calculate grad_sample correctly when the batch dimension is merged with another dimension in the forward pass
+  DPOptimizer.clip_and_accumulate = clip_and_accumulate
+
   # make closure compatible with lightning
   DistributedDPOptimizer.step = step
 
   # make number of steps per epoch consistent with PyTorch DDP
   DPDataLoader.from_data_loader = from_data_loader
 
-  # calculate grad_sample correctly when the batch dimension is merged with another dimension in the forward pass
-  DPOptimizer.clip_and_accumulate = clip_and_accumulate
-
   # sampler handles empty batch
   UniformWithReplacementSampler.__iter__ = __iter_sampler__
   DistributedUniformWithReplacementSampler.__iter__ = __iter_ddp_sampler__
 
-  # make it pickle-able
+  # make the function pickle-able
   opacus.data_loader.wrap_collate_with_empty = wrap_collate_with_empty

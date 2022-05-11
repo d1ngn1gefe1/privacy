@@ -11,7 +11,7 @@ from torchvision.transforms import (
 from .constants import *
 
 
-def get_vit_transforms(augment):
+def get_vit_transforms(cfg):
   transform_train = Compose([
     RandomResizedCrop(224, scale=(0.05, 1.0)),
     RandomHorizontalFlip(),
@@ -27,7 +27,7 @@ def get_vit_transforms(augment):
   ])
 
   transform_test = transform_val
-  if not augment:
+  if not cfg.augment:
     transform_train = transform_val
 
   return transform_train, transform_val, transform_test

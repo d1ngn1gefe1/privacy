@@ -10,7 +10,7 @@ from torchvision.transforms import (
 from .constants import *
 
 
-def get_dpsgd_net_transforms(augment):
+def get_dpsgd_net_transforms(cfg):
   transform_train = Compose([
     RandomCrop(24),
     RandomHorizontalFlip(),
@@ -25,7 +25,7 @@ def get_dpsgd_net_transforms(augment):
   ])
 
   transform_test = transform_val
-  if not augment:
+  if not cfg.augment:
     transform_train = transform_val
 
   return transform_train, transform_val, transform_test
