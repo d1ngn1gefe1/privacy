@@ -25,8 +25,7 @@ def get_mvit_transforms(cfg):
   transform_train = Compose(transforms=[
     ApplyTransformToKey(
       key='video',
-      transform=ApplyTransformOnList(
-        transform=Compose(
+      transform=Compose(
           transforms=[
             UniformTemporalSubsample(num_samples=cfg.T),
             Div255(),
@@ -41,10 +40,9 @@ def get_mvit_transforms(cfg):
             Permute(dims=(1, 0, 2, 3)),
           ]
         )
-      )
     ),
-    RemoveKey(key='audio')]
-  )
+    RemoveKey(key='audio')
+  ])
 
   transform_val = Compose(transforms=[
     ApplyTransformToKey(

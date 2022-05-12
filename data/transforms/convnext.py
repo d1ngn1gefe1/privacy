@@ -4,7 +4,6 @@ from timm.data import create_transform
 from torchvision.transforms import CenterCrop, Compose, InterpolationMode, Normalize, Resize, ToTensor
 
 from .constants import *
-from .transforms import ApplyTransformOnList, Repeat
 
 
 def get_convnext_transforms(cfg):
@@ -20,12 +19,6 @@ def get_convnext_transforms(cfg):
     mean=MEAN_IMAGENET,
     std=STD_IMAGENET
   )
-
-  if hasattr(cfg, 'num_views'):
-    transform_train = Compose([
-      Repeat(cfg.num_views),
-      ApplyTransformOnList(transform=transform_train)
-    ])
 
   transform_val = Compose([
     Resize(256, interpolation=InterpolationMode.BICUBIC),
