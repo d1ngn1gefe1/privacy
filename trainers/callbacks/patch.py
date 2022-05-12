@@ -7,4 +7,4 @@ class PatchCallback(Callback):
   """ Need another patching for ddp_spawn (multiprocessing)
   """
   def setup(self, trainer, pl_module, stage):
-    patch()
+    patch(pl_module.cfg)

@@ -100,7 +100,7 @@ def get_mvit(cfg):
 
   else:
     assert cfg.weight == 'pretrain'
-    print('Loading ImageNet pre-trained weight')
+    print('Loading Kinetics pre-trained weight')
     dir_pretrain = osp.join(cfg.dir_weights, 'pretrain')
     fname_pretrain = 'MVIT_B_16x4.pyth'
     if not osp.exists(osp.join(dir_pretrain, fname_pretrain)):

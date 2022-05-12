@@ -1,6 +1,7 @@
 from functools import partial
 import opacus.data_loader
 from opacus.data_loader import DPDataLoader
+from opacus.grad_sample import grad_sample_module
 from opacus.optimizers import DistributedDPOptimizer, DPOptimizer
 from opacus.optimizers.optimizer import _check_processed_flag, _mark_as_processed
 from opacus.utils.uniform_sampler import UniformWithReplacementSampler, DistributedUniformWithReplacementSampler
@@ -130,7 +131,16 @@ def wrap_collate_with_empty(collate_fn, sample_empty_shapes):
   return partial(_collate, collate_fn=collate_fn, sample_empty_shapes=sample_empty_shapes)
 
 
-def patch_opacus():
+def create_or_accumulate_grad_sample(*, param, grad_sample, max_batch_len, num_views):
+  batch_size = grad_sample.shape[0]//num_views
+  grad_sample = grad_sample.reshape(num_views, batch_size, *grad_sample.shape[1:]).mean(dim=0)
+  if hasattr(param, '_current_grad_sample'):
+    param._current_grad_sample += grad_sample
+  else:
+    param._current_grad_sample = grad_sample
+
+
+def patch_opacus(num_views=None):
   # calculate grad_sample correctly when the batch dimension is merged with another dimension in the forward pass
   DPOptimizer.clip_and_accumulate = clip_and_accumulate
 
@@ -146,3 +156,7 @@ def patch_opacus():
 
   # make the function pickle-able
   opacus.data_loader.wrap_collate_with_empty = wrap_collate_with_empty
+
+  # support groupwise DP
+  if num_views is not None:
+    grad_sample_module.create_or_accumulate_grad_sample = partial(create_or_accumulate_grad_sample, num_views=num_views)

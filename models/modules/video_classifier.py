@@ -13,7 +13,13 @@ class VideoClassifierModule(BaseClassifierModule):
     self._prepare_ensemble()
 
   def training_step(self, batch, batch_idx):
-    batch_size = batch['video'].shape[0]
+    if isinstance(batch['video'], list):
+      batch_size = batch['video'][0].shape[0]
+      batch['video'] = torch.cat(batch['video'])
+      batch['label'] = torch.cat(batch['label'])
+    else:
+      batch_size = batch['video'].shape[0]
+
     x, y = batch['video'], batch['label']
     logits = self(x)
 
@@ -28,6 +34,7 @@ class VideoClassifierModule(BaseClassifierModule):
 
   def validation_step(self, batch, batch_idx):
     batch_size = batch['video'].shape[0]
+
     x, y = batch['video'], batch['label']
     logits = self(x)
 
@@ -40,6 +47,7 @@ class VideoClassifierModule(BaseClassifierModule):
 
   def test_step(self, batch, batch_idx):
     batch_size = batch['video'].shape[0]
+
     x, y = batch['video'], batch['label']
     logits = self(x)
 

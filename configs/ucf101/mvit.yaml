@@ -18,6 +18,8 @@ num_workers: 4
 num_epochs: 30
 warmup_steps: 500
 batch_size: 64
+max_batch_size: 4
+num_views: 4
 lr:
   sgd: 3e-4
   adamw: 4e-4
@@ -33,7 +35,7 @@ tau: 4
 fps: 30
 
 dp: True
-augment: False
+augment: True
 sigma: 0.5
 c: 0.5
 delta: 1e-5

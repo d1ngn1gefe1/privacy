@@ -9,6 +9,7 @@ from pytorchvideo.transforms import (
   UniformTemporalSubsample
 )
 from pytorchvideo.transforms.rand_augment import RandAugment
+from pytorchvideo_trainer.datamodule.transforms import RepeatandConverttoList, ApplyTransformToKeyOnList
 from pytorchvideo_trainer.datamodule.rand_erase_transform import RandomErasing
 from torchvision.transforms import (
   CenterCrop,
@@ -22,7 +23,8 @@ from .constants import *
 # Reference: https://github.com/facebookresearch/pytorchvideo/blob/main/pytorchvideo_trainer/pytorchvideo_trainer/conf/datamodule/transforms/kinetics_classification_mvit_16x4.yaml
 def get_mvit_transforms(cfg):
   transform_train = Compose(transforms=[
-    ApplyTransformToKey(
+    RepeatandConverttoList(repeat_num=cfg.num_views),
+    ApplyTransformToKeyOnList(
       key='video',
       transform=Compose(
         transforms=[

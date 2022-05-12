@@ -4,8 +4,8 @@ from .opacus import patch_opacus
 from .optuna import patch_optuna
 
 
-def patch():
+def patch(cfg):
   patch_pytorch_lightning()
   patch_pytorchvideo()
-  patch_opacus()
+  patch_opacus(cfg.num_views if hasattr(cfg, 'num_views') else None)
   patch_optuna()

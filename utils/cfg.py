@@ -17,7 +17,7 @@ def get_name(cfg):
 
 
 def setup(cfg, phase):
-  patch()
+  patch(cfg)
 
   # TODO: fix partial private
   if isinstance(cfg.lr, DictConfig):
