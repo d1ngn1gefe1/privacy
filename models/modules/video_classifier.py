@@ -3,6 +3,7 @@ import torch
 
 from models.modules.base_classifier import BaseClassifierModule
 import utils
+from .utils import handle_multi_view
 
 
 class VideoClassifierModule(BaseClassifierModule):
@@ -13,14 +14,9 @@ class VideoClassifierModule(BaseClassifierModule):
     self._prepare_ensemble()
 
   def training_step(self, batch, batch_idx):
-    if isinstance(batch['video'], list):
-      batch_size = batch['video'][0].shape[0]
-      batch['video'] = torch.cat(batch['video'])
-      batch['label'] = torch.cat(batch['label'])
-    else:
-      batch_size = batch['video'].shape[0]
-
     x, y = batch['video'], batch['label']
+    x, y, batch_size = handle_multi_view(x, y)
+
     logits = self(x)
 
     loss = self.get_loss(logits, y)

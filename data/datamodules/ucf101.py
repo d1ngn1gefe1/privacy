@@ -72,9 +72,13 @@ class UCF101DataModule(BaseDataModule):
   def setup(self, stage=None):
     transform_train, transform_val, transform_test = get_transform(self.cfg)
 
+    if hasattr(self.cfg, 'num_views'):
+      clip_sampler = make_clip_sampler('random_multi', self.cfg.T*self.cfg.tau/self.cfg.fps, self.cfg.num_views)
+    else:
+      clip_sampler = make_clip_sampler('random', self.cfg.T*self.cfg.tau/self.cfg.fps)
     self.dataset_train = MapDataset.from_iterable_dataset(Ucf101(
       data_path=osp.join(self.cfg.dir_data, self.dname_metadata, 'trainlist01.csv'),
-      clip_sampler=make_clip_sampler('random', self.cfg.T*self.cfg.tau/self.cfg.fps),
+      clip_sampler=clip_sampler,
       video_sampler=DistributedSampler if utils.is_ddp() else RandomSampler,  # ignored
       transform=transform_train,
       video_path_prefix=osp.join(self.cfg.dir_data, self.dname_video),

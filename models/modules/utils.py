@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchmetrics
@@ -41,3 +42,15 @@ class MaskedAUROC(nn.Module):
       stats.append(stat)
 
     return sum(stats)/len(stats)
+
+
+def handle_multi_view(x, y):
+  if isinstance(x, list):
+    num_repeats = len(x)
+    batch_size = x[0].shape[0]
+    x = torch.cat(x)
+    y = y.repeat(num_repeats)
+  else:
+    batch_size = x.shape[0]
+
+  return x, y, batch_size

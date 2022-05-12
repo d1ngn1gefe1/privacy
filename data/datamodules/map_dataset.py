@@ -67,7 +67,22 @@ class MapDataset(Dataset):
         is_last_clip,
       ) = self._clip_sampler(None, video.duration, info_dict)
 
-      _loaded_clip = video.get_clip(clip_start, clip_end)
+      if isinstance(clip_start, list):
+        _loaded_clip = {}
+        loaded_clip_list = []
+        for i in range(len(clip_start)):
+          clip_dict = video.get_clip(clip_start[i], clip_end[i])
+          if clip_dict is None or clip_dict['video'] is None:
+            _loaded_clip = None
+            break
+          loaded_clip_list.append(clip_dict)
+
+        if _loaded_clip is not None:
+          for key in loaded_clip_list[0].keys():
+            _loaded_clip[key] = [x[key] for x in loaded_clip_list]
+
+      else:
+        _loaded_clip = video.get_clip(clip_start, clip_end)
 
       video_is_null = (
           _loaded_clip is None or _loaded_clip['video'] is None
