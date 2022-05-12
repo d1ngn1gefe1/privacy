@@ -33,7 +33,7 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
   if implementation == 'ppwwyyxx':
     net = models.__dict__['resnet50'](pretrained=False, num_classes=cfg.num_classes,
                                       norm_layer=partial(nn.GroupNorm, 32))
-    net.get_classifier = get_classifier
+    net.get_classifier = partial(get_classifier, self=net)
 
     if cfg.mode == 'from_scratch':
       print('Initializing randomly')
