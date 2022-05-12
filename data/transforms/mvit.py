@@ -22,28 +22,39 @@ from .constants import *
 
 # Reference: https://github.com/facebookresearch/pytorchvideo/blob/main/pytorchvideo_trainer/pytorchvideo_trainer/conf/datamodule/transforms/kinetics_classification_mvit_16x4.yaml
 def get_mvit_transforms(cfg):
-  transform_train = Compose(transforms=[
-    RepeatandConverttoList(repeat_num=cfg.num_views),
-    ApplyTransformToKeyOnList(
-      key='video',
-      transform=Compose(
-        transforms=[
-          UniformTemporalSubsample(num_samples=cfg.T),
-          Div255(),
-          Permute(dims=(1, 0, 2, 3)),
-          RandAugment(magnitude=7, num_layers=4),
-          Permute(dims=(1, 0, 2, 3)),
-          Normalize(mean=MEAN_KINETICS, std=STD_KINETICS),
-          RandomResizedCrop(target_height=224, target_width=224, scale=(0.08, 1.0), aspect_ratio=(0.75, 1.3333)),
-          RandomHorizontalFlip(p=0.5),
-          Permute(dims=(1, 0, 2, 3)),
-          RandomErasing(probability=0.25, mode='pixel', max_count=1, num_splits=1, device='cpu'),
-          Permute(dims=(1, 0, 2, 3)),
-        ]
-      )
-    ),
-    RemoveKey(key='audio')]
+  transform_train_video = Compose(
+    transforms=[
+      UniformTemporalSubsample(num_samples=cfg.T),
+      Div255(),
+      Permute(dims=(1, 0, 2, 3)),
+      RandAugment(magnitude=7, num_layers=4),
+      Permute(dims=(1, 0, 2, 3)),
+      Normalize(mean=MEAN_KINETICS, std=STD_KINETICS),
+      RandomResizedCrop(target_height=224, target_width=224, scale=(0.08, 1.0), aspect_ratio=(0.75, 1.3333)),
+      RandomHorizontalFlip(p=0.5),
+      Permute(dims=(1, 0, 2, 3)),
+      RandomErasing(probability=0.25, mode='pixel', max_count=1, num_splits=1, device='cpu'),
+      Permute(dims=(1, 0, 2, 3)),
+    ]
   )
+
+  if hasattr(cfg, 'num_views'):
+    transform_train = Compose(transforms=[
+      RepeatandConverttoList(repeat_num=cfg.num_views),
+      ApplyTransformToKeyOnList(
+        key='video',
+        transform=transform_train_video
+      ),
+      RemoveKey(key='audio')]
+    )
+  else:
+    transform_train = Compose(transforms=[
+      ApplyTransformToKey(
+        key='video',
+        transform=transform_train_video
+      ),
+      RemoveKey(key='audio')]
+    )
 
   transform_val = Compose(transforms=[
     ApplyTransformToKey(
