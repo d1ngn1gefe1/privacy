@@ -7,11 +7,14 @@ def get_name(cfg):
   name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_{cfg.optimizer}'
   name += f'_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}_gpu{len(cfg.gpus)}'
 
+  if hasattr(cfg, 'num_views'):
+    name += f'_view{cfg.num_views}'
+
   if cfg.dp:
     if hasattr(cfg, 'sigma'):
       name += f'_delta{cfg.delta}_sigma{cfg.sigma}_c{cfg.c}'
     else:
-      name += f'epsilon{cfg.epsilon}_delta{cfg.delta}_c{cfg.c}'
+      name += f'_epsilon{cfg.epsilon}_delta{cfg.delta}_c{cfg.c}'
 
   return name
 
