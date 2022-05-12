@@ -19,7 +19,7 @@ num_epochs: 200
 warmup_steps: 30
 batch_size: 16
 max_batch_size: 4
-num_views: 4
+num_views: 3
 lr:
   sgd: 1e-4
   adamw: 1e-4

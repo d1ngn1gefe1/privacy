@@ -60,5 +60,7 @@ def get_mvit_transforms(cfg):
   )
 
   transform_test = transform_val
+  if not cfg.augment:
+    transform_train = transform_val
 
   return transform_train, transform_val, transform_test
