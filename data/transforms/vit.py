@@ -9,6 +9,7 @@ from torchvision.transforms import (
 )
 
 from .constants import *
+from .transforms import ApplyTransformOnList, Repeat
 
 
 def get_vit_transforms(cfg):
@@ -18,6 +19,12 @@ def get_vit_transforms(cfg):
     ToTensor(),
     Normalize(mean=MEAN_IMAGENET, std=STD_IMAGENET)
   ])
+
+  if hasattr(cfg, 'num_views'):
+    transform_train = Compose([
+      Repeat(cfg.num_views),
+      ApplyTransformOnList(transform=transform_train)
+    ])
 
   transform_val = Compose([
     Resize(224),

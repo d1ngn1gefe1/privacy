@@ -134,6 +134,7 @@ def wrap_collate_with_empty(collate_fn, sample_empty_shapes):
 def create_or_accumulate_grad_sample(*, param, grad_sample, max_batch_len, num_views):
   batch_size = grad_sample.shape[0]//num_views
   grad_sample = grad_sample.reshape(num_views, batch_size, *grad_sample.shape[1:]).mean(dim=0)
+
   if hasattr(param, '_current_grad_sample'):
     param._current_grad_sample += grad_sample
   else:

@@ -22,7 +22,7 @@ from .constants import *
 
 # Reference: https://github.com/facebookresearch/pytorchvideo/blob/main/pytorchvideo_trainer/pytorchvideo_trainer/conf/datamodule/transforms/kinetics_classification_mvit_16x4.yaml
 def get_mvit_transforms(cfg):
-  transform_train_video = Compose(
+  transform_train = Compose(
     transforms=[
       UniformTemporalSubsample(num_samples=cfg.T),
       Div255(),
@@ -43,7 +43,7 @@ def get_mvit_transforms(cfg):
       RepeatandConverttoList(repeat_num=cfg.num_views),
       ApplyTransformToKeyOnList(
         key='video',
-        transform=transform_train_video
+        transform=transform_train
       ),
       RemoveKey(key='audio')]
     )
@@ -51,7 +51,7 @@ def get_mvit_transforms(cfg):
     transform_train = Compose(transforms=[
       ApplyTransformToKey(
         key='video',
-        transform=transform_train_video
+        transform=transform_train
       ),
       RemoveKey(key='audio')]
     )
@@ -73,7 +73,5 @@ def get_mvit_transforms(cfg):
   )
 
   transform_test = transform_val
-  if not cfg.augment:
-    transform_train = transform_val
 
   return transform_train, transform_val, transform_test

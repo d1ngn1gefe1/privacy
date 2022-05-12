@@ -20,7 +20,8 @@ num_workers: 4
 num_epochs: 50
 warmup_steps: 500
 batch_size: 1024
-max_batch_size: 256
+max_batch_size: 64
+num_views: 3
 # lr setting:
 # non-dp: for 'fine_tuning'
 # dp: 7e-4 for 'fine_tuning', 5e-3 for 'linear_probing', for 'adapter', for 'from_scratch'
@@ -28,8 +29,8 @@ lr: 1e-4
 momentum: 0.9
 wd: 0.0
 
-dp: False
-augment: False
+dp: True
+augment: True
 #sigma: 1.5
 #c: 10
 c: 1
