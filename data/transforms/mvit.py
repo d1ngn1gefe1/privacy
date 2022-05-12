@@ -17,7 +17,6 @@ from torchvision.transforms import (
 )
 
 from .constants import *
-from .transforms import ApplyTransformOnList
 
 
 # Reference: https://github.com/facebookresearch/pytorchvideo/blob/main/pytorchvideo_trainer/pytorchvideo_trainer/conf/datamodule/transforms/kinetics_classification_mvit_16x4.yaml

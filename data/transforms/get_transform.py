@@ -1,3 +1,4 @@
+from pytorchvideo_trainer.datamodule.transforms import ApplyTransformToKeyOnList
 from torchvision.transforms import Compose
 from .transforms import ApplyTransformOnList, Repeat
 
@@ -26,7 +27,10 @@ def get_transform(cfg):
 
   if hasattr(cfg, 'num_views'):
     if cfg.net == 'mvit':
-      transform_train = ApplyTransformOnList(transform=transform_train)
+      transform_train = Compose(transforms=[
+        ApplyTransformToKeyOnList(key='video', transform=transform_train.transforms[0]._transform),
+        transform_train.transforms[1]
+      ])
     else:
       transform_train = Compose([
         Repeat(cfg.num_views),
