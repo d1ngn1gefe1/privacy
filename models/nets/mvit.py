@@ -16,6 +16,8 @@ from torchvision.datasets.utils import download_url
 from types import MethodType
 from typing import Dict
 
+from .misc import get_norms
+
 
 @register_grad_sampler(SpatioTemporalClsPositionalEncoding)
 def compute_spatio_temporal_cls_positional_encoding_sample(
@@ -83,7 +85,6 @@ def get_mvit(cfg):
     head_activation=None,
     head_num_classes=cfg.num_classes
   )
-  net.get_classifier = MethodType(get_classifier, net)
 
   if cfg.mode == 'from_scratch':
     print('Initializing randomly')
@@ -112,5 +113,8 @@ def get_mvit(cfg):
     keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
     assert len(keys_unexpected) == 0
     print(f'{keys_missing} will be trained from scratch')
+
+  net.get_classifier = MethodType(get_classifier, net)
+  net.get_norms = MethodType(get_norms, net)
 
   return net

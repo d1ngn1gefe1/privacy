@@ -13,7 +13,10 @@ from timm.models import vision_transformer
 from timm.models.helpers import checkpoint_seq
 import torch
 import torch.nn as nn
+from types import MethodType
 from typing import Dict
+
+from .misc import get_norms
 
 
 class ParamEmbed(nn.Module):
@@ -91,5 +94,7 @@ def get_vit(cfg):
     print('Loading ImageNet pre-trained weight')
     net = timm.create_model('vit_small_patch16_224', pretrained=True, num_classes=cfg.num_classes)
     delattrs(net)
+
+  net.get_norms = MethodType(get_norms, net)
 
   return net

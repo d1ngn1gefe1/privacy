@@ -13,7 +13,10 @@ from timm.models.convnext import LayerNorm2d, _is_contiguous
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from types import MethodType
 from typing import Dict
+
+from .misc import get_norms
 
 
 @register_grad_sampler(LayerNorm2d)
@@ -112,5 +115,7 @@ def get_convnext(cfg):
     print('Loading ImageNet pre-trained weight')
     net = timm.create_model('convnext_tiny_in22ft1k', pretrained=True, num_classes=cfg.num_classes)
     delattrs(net)
+
+  net.get_norms = MethodType(get_norms, net)
 
   return net

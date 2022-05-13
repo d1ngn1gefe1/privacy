@@ -8,7 +8,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import torchmetrics
 
 from models.nets import get_net
-from .utils import MaskedAUROC, multilabel_loss_with_uncertainty
+from .misc import MaskedAUROC, multilabel_loss_with_uncertainty
 
 
 class BaseClassifierModule(LightningModule):

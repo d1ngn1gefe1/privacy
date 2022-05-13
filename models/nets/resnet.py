@@ -11,6 +11,8 @@ from torchvision.datasets.utils import download_url
 from types import MethodType
 from typing import Dict
 
+from .misc import get_norms
+
 
 @register_grad_sampler(GroupNorm)
 def compute_group_norm_timm_grad_sample(
@@ -34,7 +36,6 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
   if implementation == 'ppwwyyxx':
     net = models.__dict__['resnet50'](pretrained=False, num_classes=cfg.num_classes,
                                       norm_layer=partial(nn.GroupNorm, 32))
-    net.get_classifier = MethodType(get_classifier, net)
 
     if cfg.mode == 'from_scratch':
       print('Initializing randomly')
@@ -60,6 +61,9 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
       assert len(keys_unexpected) == 0
       print(f'{keys_missing} will be trained from scratch')
 
+    net.get_classifier = MethodType(get_classifier, net)
+    net.get_norms = MethodType(get_norms, net)
+
   elif implementation == 'timm':
     # resnet50_gn: in1k, 23.7M parameters
     if cfg.mode == 'fine_tuning':
@@ -82,6 +86,8 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
       assert cfg.weight == 'pretrain'
       print('Loading ImageNet pre-trained weight')
       net = timm.create_model('resnet50_gn', pretrained=True, num_classes=cfg.num_classes)
+
+    net.get_norms = MethodType(get_norms, net)
 
   else:
     raise NotImplementedError

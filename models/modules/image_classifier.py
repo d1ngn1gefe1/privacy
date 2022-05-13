@@ -1,5 +1,5 @@
 from models.modules.base_classifier import BaseClassifierModule
-from .utils import handle_multi_view
+from .misc import handle_multi_view
 
 
 class ImageClassifierModule(BaseClassifierModule):

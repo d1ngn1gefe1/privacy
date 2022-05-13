@@ -28,6 +28,10 @@ class DPSGDNet(nn.Module):
   def get_classifier(self):
     return self.fc2
 
+  @staticmethod
+  def get_norms():
+    return []
+
 
 def get_dpsgd_net(cfg):
   assert cfg.mode == 'from_scratch' or cfg.weight is None, 'Pre-trained weights not available'
