@@ -9,9 +9,18 @@ plt.plot([7.53], [66.2], label='Tempered Sigmoids', marker='o')
 plt.plot([3], [69.3], label='ScatterNet', marker='o')
 plt.plot([2, 4, 8], [77.4, 79.1, 79.5], label='Norm-DP-SGD', marker='o')
 plt.plot([1.93, 4.21, 7.42], [58.6, 66.2, 70.1], label='Dormann et al.', marker='o')
+plt.plot([1.99, 5.01, 7.01, 10.00], [50.85, 61.75, 62.32, 64.73], label='DPlis', marker='o')
+
+xs = [1, 2, 4, 8]
+ys = [96.03, 96.07, 96.29, 96.54]
+plt.plot(xs, ys, label='Ours (ViT-S/16-224)', marker='o', color='firebrick')
+for x, y in zip(xs, ys):
+  plt.text(x-0.3, y+1, str(y), color='firebrick', fontsize=12)
 
 plt.xlabel('Privacy (epsilon)')
 plt.ylabel('Utility (accuracy)')
 
-plt.legend()
+plt.ylim(40, 100)
+plt.legend(loc='lower right', ncol=2)
+plt.tight_layout()
 plt.show()
