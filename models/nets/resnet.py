@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import models
 from torchvision.datasets.utils import download_url
+from types import MethodType
 from typing import Dict
 
 
@@ -33,7 +34,7 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
   if implementation == 'ppwwyyxx':
     net = models.__dict__['resnet50'](pretrained=False, num_classes=cfg.num_classes,
                                       norm_layer=partial(nn.GroupNorm, 32))
-    net.get_classifier = partial(get_classifier, self=net)
+    net.get_classifier = MethodType(get_classifier, net)
 
     if cfg.mode == 'from_scratch':
       print('Initializing randomly')

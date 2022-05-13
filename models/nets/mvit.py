@@ -5,8 +5,6 @@ Examples of register_grad_sampler :
   - https://github.com/pytorch/opacus/blob/main/opacus/layers/dp_multihead_attention.py#L24
   - https://github.com/pytorch/opacus/blob/main/opacus/grad_sample/dp_multihead_attention.py
 """
-
-from functools import partial
 from opacus.grad_sample import register_grad_sampler
 import os.path as osp
 from pytorchvideo.layers import SpatioTemporalClsPositionalEncoding
@@ -15,6 +13,7 @@ from pytorchvideo.models.vision_transformers import create_multiscale_vision_tra
 import torch
 import torch.nn as nn
 from torchvision.datasets.utils import download_url
+from types import MethodType
 from typing import Dict
 
 
@@ -84,7 +83,7 @@ def get_mvit(cfg):
     head_activation=None,
     head_num_classes=cfg.num_classes
   )
-  net.get_classifier = partial(get_classifier, self=net)
+  net.get_classifier = MethodType(get_classifier, net)
 
   if cfg.mode == 'from_scratch':
     print('Initializing randomly')
