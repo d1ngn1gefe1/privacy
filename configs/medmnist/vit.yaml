@@ -6,7 +6,7 @@ dataset: pathmnist
 #dataset: chestmnist
 net: vit
 adapter: mlp_adapter
-mode: fine_tuning
+mode: full_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: sgd

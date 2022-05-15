@@ -6,7 +6,7 @@ dataset: cifar100
 net: resnet
 adapter: bottleneck_adapter
 #mode: from_scratch
-mode: fine_tuning
+mode: full_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: adamw
@@ -23,8 +23,8 @@ batch_size: 1024
 max_batch_size: 64
 num_views: 3
 # lr setting:
-# non-dp: for 'fine_tuning'
-# dp: 7e-4 for 'fine_tuning', 5e-3 for 'linear_probing', for 'adapter', for 'from_scratch'
+# non-dp: for 'full_tuning'
+# dp: 7e-4 for 'full_tuning', 5e-3 for 'linear_probing', for 'adapter', for 'from_scratch'
 lr: 1e-4
 momentum: 0.9
 wd: 0.0

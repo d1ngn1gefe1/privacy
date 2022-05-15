@@ -6,7 +6,7 @@ dataset: cifar100
 net: vit
 adapter: mlp_adapter
 #mode: from_scratch
-mode: fine_tuning
+mode: full_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: adamw
@@ -21,8 +21,8 @@ batch_size: 1024
 max_batch_size: 64
 num_views: 3
 # lr setting:
-# non-dp: 3e-4 for 'fine_tuning'
-# dp: 1e-3 for 'adapter', 'linear_probing', for 'from_scratch', 3e-4 for 'fine_tuning'
+# non-dp: 3e-4 for 'full_tuning'
+# dp: 1e-3 for 'adapter', 'linear_probing', for 'from_scratch', 3e-4 for 'full_tuning'
 lr: 1e-3
 momentum: 0.9
 wd: 0.0
