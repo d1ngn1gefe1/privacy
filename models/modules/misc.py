@@ -1,4 +1,5 @@
 from functools import partial
+import itertools
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -66,13 +67,13 @@ def set_mode(net, cfg):
       param.requires_grad = True
 
   elif cfg.mode == 'linear_probing' or cfg.mode == 'adapter':
-    for param in net.get_classifier.parameters():
+    for param in net.get_classifier().parameters():
       param.requires_grad = True
 
   elif cfg.mode == 'sparse_tuning':
-    for param in net.get_classifier.parameters():
+    for param in net.get_classifier().parameters():
       param.requires_grad = True
-    for param in net.get_norms.parameters():
+    for param in itertools.chain(*[norm.parameters() for norm in net.get_norms()]):
       param.requires_grad = True
 
   else:
