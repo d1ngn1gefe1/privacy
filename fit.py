@@ -7,7 +7,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar100/vit.yaml')
+  cfg = OmegaConf.load('configs/ucf101/mvit.yaml')
   utils.setup(cfg, 'fit')
 
   data = get_data(cfg)
