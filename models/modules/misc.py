@@ -1,3 +1,4 @@
+from functools import partial
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -54,3 +55,48 @@ def handle_multi_view(x, y):
     batch_size = x.shape[0]
 
   return x, y, batch_size
+
+
+def set_mode(net, cfg):
+  for param in net.parameters():
+    param.requires_grad = False
+
+  if cfg.mode == 'from_scratch' or cfg.mode == 'full_tuning':
+    for param in net.parameters():
+      param.requires_grad = True
+
+  elif cfg.mode == 'linear_probing' or cfg.mode == 'adapter':
+    for param in net.get_classifier.parameters():
+      param.requires_grad = True
+
+  elif cfg.mode == 'sparse_tuning':
+    for param in net.get_classifier.parameters():
+      param.requires_grad = True
+    for param in net.get_norms.parameters():
+      param.requires_grad = True
+
+  else:
+    raise NotImplementedError
+
+
+def set_task(cfg):
+  if cfg.task == 'multi-class':
+    get_loss = F.cross_entropy
+    get_pred = partial(F.softmax, dim=-1)  # avoid using lambda because it cannot be pickled
+    metrics = nn.ModuleDict({'acc1': torchmetrics.Accuracy(average='micro', top_k=1),
+                             'acc5': torchmetrics.Accuracy(average='micro', top_k=5)})
+
+  elif cfg.task == 'multi-label':
+    if hasattr(cfg, 'uncertainty'):
+      get_loss = partial(multilabel_loss_with_uncertainty, uncertainty_approach=cfg.uncertainty)
+      metrics = nn.ModuleDict({'roc': MaskedAUROC(num_classes=cfg.num_classes)})
+    else:
+      get_loss = F.multilabel_soft_margin_loss
+      metrics = nn.ModuleDict({'acc': torchmetrics.Accuracy(average='macro', num_classes=cfg.num_classes),
+                               'roc': torchmetrics.AUROC(num_classes=cfg.num_classes)})
+    get_pred = torch.sigmoid
+
+  else:
+    raise NotImplementedError
+
+  return get_loss, get_pred, metrics

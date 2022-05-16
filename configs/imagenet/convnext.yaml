@@ -7,7 +7,7 @@ dataset: imagenet
 net: convnext
 adapter: bottleneck_adapter
 #mode: from_scratch
-mode: fine_tuning
+mode: full_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: adamw

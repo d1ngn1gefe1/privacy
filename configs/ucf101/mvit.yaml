@@ -6,7 +6,7 @@ dataset: ucf101
 net: mvit
 adapter: video_mlp_adapter
 #mode: from_scratch
-#mode: fine_tuning
+#mode: full_tuning
 #mode: linear_probing
 mode: adapter
 optimizer: adamw

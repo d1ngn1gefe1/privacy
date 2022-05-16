@@ -66,7 +66,7 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
 
   elif implementation == 'timm':
     # resnet50_gn: in1k, 23.7M parameters
-    if cfg.mode == 'fine_tuning':
+    if cfg.mode == 'full_tuning':
       print('Initializing randomly')
       net = timm.create_model('resnet50_gn', pretrained=False, num_classes=cfg.num_classes)
 

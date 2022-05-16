@@ -6,9 +6,9 @@ dataset: cifar100
 net: convnext
 adapter: mlp_adapter
 #mode: from_scratch
-mode: fine_tuning
+mode: full_tuning
 #mode: linear_probing
-#mode: fine_tuning
+#mode: full_tuning
 #mode: adapter
 optimizer: adamw
 weight: pretrain
@@ -22,8 +22,8 @@ batch_size: 1024
 max_batch_size: 32
 num_views: 3
 # lr setting:
-# non-dp: 3e-4 for 'fine_tuning'
-# dp: 7e-4 for 'fine_tuning', 1e-3 for 'linear_probing' and 'adapter'
+# non-dp: 3e-4 for 'full_tuning'
+# dp: 7e-4 for 'full_tuning', 1e-3 for 'linear_probing' and 'adapter'
 lr: 7e-4
 momentum: 0.9
 wd: 0.0

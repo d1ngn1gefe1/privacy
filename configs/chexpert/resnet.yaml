@@ -7,7 +7,7 @@ uncertainty: u_zeros  # u_zeros or u_ones
 net: resnet
 adapter: bottleneck_adapter
 #mode: from_scratch
-mode: fine_tuning
+mode: full_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: adamw
