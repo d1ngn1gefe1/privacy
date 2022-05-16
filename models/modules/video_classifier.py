@@ -55,14 +55,14 @@ class VideoClassifierModule(BaseClassifierModule):
 
   def on_validation_epoch_end(self):
     y_hat, y = self.ensembler.sync_and_aggregate_results()
-    if utils.get_rank() == 0:
+    if not utils.is_ddp() or utils.get_rank() == 0:
       for name, get_stat in self.metrics.items():
         stat = get_stat(y_hat, y)
         self.log(f'val/{name}', stat, on_epoch=True, prog_bar=True, rank_zero_only=True)
 
   def on_test_epoch_end(self):
     y_hat, y = self.ensembler.sync_and_aggregate_results()
-    if utils.get_rank() == 0:
+    if not utils.is_ddp() or utils.get_rank() == 0:
       for name, get_stat in self.metrics.items():
         stat = get_stat(y_hat, y)
         self.log(f'test/{name}', stat, on_epoch=True, prog_bar=True, rank_zero_only=True)
