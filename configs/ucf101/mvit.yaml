@@ -6,25 +6,21 @@ dataset: ucf101
 net: mvit
 adapter: video_mlp_adapter
 #mode: from_scratch
-mode: full_tuning
+#mode: full_tuning
 #mode: linear_probing
-#mode: adapter
+mode: adapter
 optimizer: adamw
 weight: pretrain
 
 gpus: [0,1,2,3,4,5,6,7]
 num_workers: 4
 
-num_epochs: 200
+num_epochs: 10
 warmup_steps: 30
 batch_size: 16
-max_batch_size: 4
-num_views: 3
-lr:
-  sgd: 1e-4
-  adamw: 1e-4
-  sgd_dp: 3e-4
-  adamw_dp: 1e-3
+max_batch_size: 2
+num_views: 8
+lr: 3e-4
 momentum: 0.9
 wd:
   sgd: 1e-4
@@ -34,8 +30,9 @@ T: 16
 tau: 4
 fps: 30
 
-dp: False
-augment: True
-sigma: 0.5
+dp: True
+augment: False
+#sigma: 0.5
 c: 1.0
+epsilon: 10
 delta: 1e-5

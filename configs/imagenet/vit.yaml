@@ -1,15 +1,15 @@
 dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
-rpath_ckpt: ckpt_ylzou/places365_vit_from_scratch_adamw_epoch50_bs2048_lr0.003_gpu8/last.ckpt
+rpath_ckpt: ckpt/places365_vit_0.51978.ckpt
 
 dataset: imagenet
 net: vit
-adapter: bottleneck_adapter
+adapter: mlp_adapter
 #mode: from_scratch
-mode: full_tuning
+#mode: full_tuning
 #mode: linear_probing
-#mode: adapter
+mode: adapter
 optimizer: adamw
 attacker: black_box
 weight: ckpt
@@ -21,12 +21,13 @@ num_epochs: 90
 warmup_steps: 500
 batch_size: 1024
 max_batch_size: 512
-lr: 1e-4
+lr: 1e-3
 momentum: 0.9
 wd: 0
 
 dp: True
 augment: False
-sigma: 1.5
-c: 10
-delta: 1e-5
+#sigma: 1.5
+c: 1
+epsilon: 10
+delta: 1e-6
