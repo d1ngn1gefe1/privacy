@@ -86,7 +86,7 @@ def train_dataloader(self):
   if 'ratio_public' in self.cfg:
     dataset_subsample = SubsampleDataset(self.dataset_train, self.cfg['ratio_public'])
     # TODO: cleanup
-    dataloader_subsample = DataLoader(dataset_subsample, batch_size=self.cfg.batch_size//len(self.cfg.gpus),
+    dataloader_subsample = DataLoader(dataset_subsample, batch_size=self.cfg.batch_size['train']//len(self.cfg.gpus),
                                       shuffle=True, num_workers=self.cfg.num_workers, pin_memory=True)
     return [dataloader, dataloader_subsample]
   else:

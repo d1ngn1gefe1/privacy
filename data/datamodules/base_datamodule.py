@@ -17,21 +17,21 @@ class BaseDataModule(LightningDataModule, ABC):
 
   def train_dataloader(self):
     # TODO: verify shuffle
-    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size//len(self.cfg.gpus), shuffle=True,
-                            num_workers=self.cfg.num_workers, pin_memory=True)
+    dataloader = DataLoader(self.dataset_train, batch_size=self.cfg.batch_size['train']//len(self.cfg.gpus),
+                            shuffle=True, num_workers=self.cfg.num_workers, pin_memory=True)
     return dataloader
 
   def val_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus), shuffle=False,
-                            num_workers=self.cfg.num_workers, pin_memory=True)
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size['val']//len(self.cfg.gpus),
+                            shuffle=False, num_workers=self.cfg.num_workers, pin_memory=True)
     return dataloader
 
   def test_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus), shuffle=False,
-                            num_workers=self.cfg.num_workers, pin_memory=True)
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size['test']//len(self.cfg.gpus),
+                            shuffle=False, num_workers=self.cfg.num_workers, pin_memory=True)
     return dataloader
 
   def predict_dataloader(self):
-    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size//len(self.cfg.gpus), shuffle=False,
-                            num_workers=self.cfg.num_workers, pin_memory=True)
+    dataloader = DataLoader(self.dataset_val, batch_size=self.cfg.batch_size['test']//len(self.cfg.gpus),
+                            shuffle=False, num_workers=self.cfg.num_workers, pin_memory=True)
     return dataloader

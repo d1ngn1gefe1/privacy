@@ -5,7 +5,7 @@ from .patches import patch
 
 def get_name(cfg):
   name = f'{cfg.dataset}_{cfg.net}_{cfg.mode}_{cfg.optimizer}'
-  name += f'_epoch{cfg.num_epochs}_bs{cfg.batch_size}_lr{cfg.lr}_gpu{len(cfg.gpus)}'
+  name += f'_epoch{cfg.num_epochs}_bs{cfg.batch_size["train"]}_lr{cfg.lr}_gpu{len(cfg.gpus)}'
 
   if hasattr(cfg, 'num_views'):
     name += f'_view{cfg.num_views}'
@@ -28,6 +28,9 @@ def setup(cfg, phase):
 
   if isinstance(cfg.wd, DictConfig):
     cfg.wd = cfg.wd[cfg.optimizer]
+
+  if not isinstance(cfg.batch_size, DictConfig):
+    cfg.batch_size = DictConfig({'train': cfg.batch_size, 'val': cfg.batch_size, 'test': cfg.batch_size})
 
   cfg.phase = phase
   cfg.name = get_name(cfg)
