@@ -7,7 +7,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/ucf101/mvit.yaml')
+  cfg = OmegaConf.load('configs/imagenet/vit.yaml')
   utils.setup(cfg, 'fit')
 
   data = get_data(cfg)

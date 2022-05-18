@@ -20,7 +20,10 @@ num_workers: 8
 
 num_epochs: 90
 warmup_steps: 500
-batch_size: 1024
+batch_size:
+  train: 1024
+  val: 512
+  test: 512
 max_batch_size: 512
 # lr setting
 # dp: 1e-4 for 'full_tuning', 5e-4 for 'adapter'
