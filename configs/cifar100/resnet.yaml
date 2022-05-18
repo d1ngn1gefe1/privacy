@@ -21,16 +21,16 @@ num_epochs: 50
 warmup_steps: 500
 batch_size: 1024
 max_batch_size: 64
-num_views: 3
+#num_views: 3
 # lr setting:
-# non-dp: for 'full_tuning'
-# dp: 7e-4 for 'full_tuning', 5e-3 for 'linear_probing', for 'adapter', for 'from_scratch'
+# non-dp: 3e-4 for 'full_tuning'
+# dp: 7e-4 for 'full_tuning' and 'adapter', 5e-3 for 'linear_probing', 3e-3 for 'from_scratch', 1e-3 for 'sparse_tuning'
 lr: 1e-4
 momentum: 0.9
 wd: 0.0
 
 dp: True
-augment: True
+augment: False
 #sigma: 1.5
 #c: 10
 c: 1

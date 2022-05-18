@@ -4,26 +4,27 @@ dir_weights: /home/ssd/weights
 
 dataset: chexpert
 uncertainty: u_zeros  # u_zeros or u_ones
-net: vit
-adapter: mlp_adapter
-#mode: from_scratch
-mode: full_tuning
+net: convnext
+#adapter: mlp_adapter
+mode: from_scratch
+#mode: fine_tuning
 #mode: linear_probing
 #mode: adapter
 optimizer: adamw
-weight: pretrain
 
-gpus: [1]
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]
 num_workers: 4
 
-num_epochs: 18
+num_epochs: 10
 warmup_steps: 500
-batch_size: 256
+batch_size: 1024
+# 256 for adapter
+max_batch_size: 64
 #batch_size: 16
 #max_batch_size: 512
 # lr setting
-# dp: 1e-3 for 'adapter', 'linear_probing', and 'sparse_tuning', 3e-4 for 'full_tuning', 1e-4 for 'from_scratch'
-lr: 1e-3
+# dp: 3e-3 for 'adapter' and 'from_scratch'
+lr: 3e-3
 momentum: 0.9
 wd: 0.0
 
@@ -31,5 +32,5 @@ dp: True
 augment: False
 #sigma: 1.5
 c: 1
-epsilon: 4
+epsilon: 8
 delta: 1e-5

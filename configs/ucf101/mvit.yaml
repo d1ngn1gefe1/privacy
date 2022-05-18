@@ -8,7 +8,8 @@ adapter: video_mlp_adapter
 #mode: from_scratch
 #mode: full_tuning
 #mode: linear_probing
-mode: adapter
+#mode: adapter
+mode: sparse_tuning
 optimizer: adamw
 weight: pretrain
 
@@ -20,6 +21,8 @@ warmup_steps: 30
 batch_size: 16
 max_batch_size: 2
 num_views: 8
+# lr setting
+# dp: 3e-4 for 'full_tuning', 'sparse_tuning', and 'adapter'
 lr: 3e-4
 momentum: 0.9
 wd:
@@ -34,5 +37,5 @@ dp: True
 augment: False
 #sigma: 0.5
 c: 1.0
-epsilon: 10
+epsilon: 5
 delta: 1e-5
