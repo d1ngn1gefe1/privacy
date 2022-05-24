@@ -7,7 +7,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/places365/resnet18.yaml')
+  cfg = OmegaConf.load('configs/cifar100/vit_clip.yaml')
   utils.setup(cfg, 'fit')
 
   data = get_data(cfg)

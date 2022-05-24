@@ -1,0 +1,38 @@
+dir_data: /home/ssd/data
+dir_log: /home/ssd/log
+dir_weights: /home/ssd/weights
+
+dataset: cifar100
+net: vit
+#adapter: mlp_adapter
+#mode: from_scratch
+mode: full_tuning
+#mode: linear_probing
+#mode: adapter
+#mode: sparse_tuning
+optimizer: adamw
+weight: pretrain_clip
+
+gpus: [0]
+num_workers: 1
+
+num_epochs: 50
+warmup_steps: 500
+batch_size: 8
+max_batch_size: 8
+#num_views: 3
+# lr setting:
+# non-dp: 3e-4 for 'full_tuning'
+# dp: 1e-3 for 'adapter', 'linear_probing', and 'sparse_tuning' , 3e-3 for 'from_scratch', 3e-4 for 'full_tuning'
+lr: 1e-3
+momentum: 0.9
+wd: 0.0
+
+dp: False
+augment: False
+#sigma: 1.5
+#c: 10
+c: 1
+epsilon: 8
+delta: 1e-5
+#ratio_public: 1.0

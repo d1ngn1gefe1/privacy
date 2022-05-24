@@ -6,6 +6,7 @@ Examples of register_grad_sampler :
   - https://github.com/pytorch/opacus/blob/main/opacus/grad_sample/dp_multihead_attention.py
 """
 
+import clip
 from opacus.grad_sample import register_grad_sampler
 import os.path as osp
 import timm
@@ -68,17 +69,35 @@ def delattrs(net):
   delattr(net, 'pos_embed')
 
 
-def get_vit(cfg):
-  vision_transformer.VisionTransformer = VisionTransformer
+class VisionTransformerCLIP(nn.Module):
+  def __init__(self, num_classes):
+    super(VisionTransformerCLIP, self).__init__()
+    net, _ = clip.load('ViT-B/32')
+    net.proj = nn.Linear(in_features=512, out_features=num_classes, bias=True)
+    self.visual = net.visual
 
-  # vit_tiny_patch16_224: in21k -> in1k, 21.7M parameters
+  def forward(self, images):
+    return self.visual(images)
+
+  def get_classifier(self):
+    return self.visual.proj
+
+
+def convert_weights(model):
+  pass
+
+
+def get_vit(cfg):
+  # vit_small_patch16_224: in21k -> in1k, 21.7M parameters
   if cfg.mode == 'from_scratch':
     print('Initializing randomly')
+    vision_transformer.VisionTransformer = VisionTransformer
     net = timm.create_model('vit_small_patch16_224', pretrained=False, num_classes=cfg.num_classes)
     delattrs(net)
 
   elif cfg.weight == 'ckpt':
     print('Loading checkpoint')
+    vision_transformer.VisionTransformer = VisionTransformer
     net = timm.create_model('vit_small_patch16_224', pretrained=False, num_classes=cfg.num_classes)
     delattrs(net)
 
@@ -90,10 +109,19 @@ def get_vit(cfg):
     assert len(keys_unexpected) == 0
     print(f'{keys_missing} will be trained from scratch')
 
-  else:
-    print('Loading ImageNet pre-trained weight')
+  elif cfg.weight == 'pretrain':
+    vision_transformer.VisionTransformer = VisionTransformer
+    print('Loading ImageNet pre-trained weight (timm)')
     net = timm.create_model('vit_small_patch16_224', pretrained=True, num_classes=cfg.num_classes)
     delattrs(net)
+
+  elif cfg.weight == 'pretrain_clip':
+    print('Loading ImageNet pre-trained weight (CLIP)')
+    import clip.model
+    clip.model.convert_weights = convert_weights
+    net = VisionTransformerCLIP(cfg.num_classes)
+  else:
+    raise NotImplementedError
 
   net.get_norms = MethodType(get_norms, net)
 
