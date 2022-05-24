@@ -8,7 +8,7 @@ def get_net(cfg):
   elif cfg.net == 'vit':
     from .vit import get_vit
     net = get_vit(cfg)
-  elif cfg.net == 'resnet':
+  elif cfg.net.startswith('resnet'):
     from .resnet import get_resnet
     net = get_resnet(cfg)
   elif cfg.net == 'convnext':

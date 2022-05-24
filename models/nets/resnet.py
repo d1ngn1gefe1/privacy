@@ -34,8 +34,8 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
   assert implementation in ['ppwwyyxx', 'timm']
 
   if implementation == 'ppwwyyxx':
-    net = models.__dict__['resnet50'](pretrained=False, num_classes=cfg.num_classes,
-                                      norm_layer=partial(nn.GroupNorm, 32))
+    net = models.__dict__[cfg.net](pretrained=False, num_classes=cfg.num_classes,
+                                   norm_layer=partial(nn.GroupNorm, 32 if cfg.net == 'resnet50' else 8))
 
     if cfg.mode == 'from_scratch':
       print('Initializing randomly')
@@ -46,7 +46,7 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
       net.load_state_dict(weight)
 
     else:
-      assert cfg.weight == 'pretrain'
+      assert cfg.weight == 'pretrain' and cfg.net == 'resnet50'
       print('Loading ImageNet pre-trained weight')
       path_pretrain = osp.join(cfg.dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
       if not osp.isfile(path_pretrain):

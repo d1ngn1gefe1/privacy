@@ -1,0 +1,22 @@
+dir_data: /home/ssd/data
+dir_log: /home/ssd/log
+dir_weights: /home/ssd/weights
+
+dataset: places365
+net: resnet18
+mode: from_scratch
+optimizer: sgd
+weight: pretrain
+
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+num_workers: 4
+
+num_epochs: 90
+warmup_steps: 500
+batch_size: 1024
+lr: 0.4
+momentum: 0.9
+wd: 1e-4
+
+dp: False
+augment: True
