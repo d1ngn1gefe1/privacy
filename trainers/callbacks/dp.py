@@ -1,10 +1,11 @@
+from functools import partial
 import inspect
-
 from opacus import PrivacyEngine
-from opacus.data_loader import DPDataLoader
 from opacus.accountants.utils import get_noise_multiplier
+from opacus.data_loader import DPDataLoader
 from opacus.privacy_engine import forbid_accumulation_hook
 from opacus.utils.batch_memory_manager import BatchSplittingSampler, wrap_data_loader
+from opacus.utils.module_utils import trainable_modules
 from pytorch_lightning.callbacks.base import Callback
 from torch.utils.data import DataLoader
 from types import MethodType
@@ -103,6 +104,16 @@ class DPCallback(Callback):
     # make net private
     pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
     pl_module.register_full_backward_hook(forbid_accumulation_hook)
+
+    # change batch dimension in CLIP ViT
+    if trainer.datamodule.cfg.net == 'vit' and trainer.datamodule.cfg.weight == 'pretrain_clip':
+      for _module_name, module in trainable_modules(pl_module.net._module):
+        if '.attn.' in _module_name:
+          key = next(iter(module._backward_hooks.keys()))
+          hook = module._backward_hooks[key]
+          module._backward_hooks[key] = partial(pl_module.net.capture_backprops_hook,
+                                                loss_reduction=hook.keywords['loss_reduction'],
+                                                batch_first=False)
 
     # make dataloader private
     trainer.datamodule.train_dataloader_old = trainer.datamodule.train_dataloader
