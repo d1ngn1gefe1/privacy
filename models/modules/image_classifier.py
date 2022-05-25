@@ -19,6 +19,12 @@ class ImageClassifierModule(BaseClassifierModule):
     for name, get_stat in self.metrics.items():
       self.log(f'train/{name}', get_stat(y_hat, y), prog_bar=True, batch_size=batch_size)
 
+    names = []
+    for name, p in self.net.named_parameters():
+      if p.requires_grad:
+        names.append(name)
+    print(names, len(names))
+
     return loss
 
   def validation_step(self, batch, batch_idx):

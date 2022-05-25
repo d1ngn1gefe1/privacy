@@ -145,6 +145,26 @@ class VisionTransformerCLIP(nn.Module):
     return self.fc
 
 
+class TransposedLinear(nn.Linear):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+  def forward(self, input):
+    return super().forward(input)
+
+
+@register_grad_sampler(TransposedLinear)
+def compute_transposed_linear_grad_sample(
+    layer: TransposedLinear, activations: torch.Tensor, backprops: torch.Tensor
+) -> Dict[nn.Parameter, torch.Tensor]:
+  gs = torch.einsum('ln...i,ln...j->nij', backprops, activations)
+  ret = {layer.weight: gs}
+  if layer.bias is not None:
+    ret[layer.bias] = torch.einsum('ln...k->nk', backprops)
+
+  return ret
+
+
 def get_vit(cfg):
   # vit_small_patch16_224: in21k -> in1k, 21.7M parameters
   if cfg.mode == 'from_scratch':
@@ -160,7 +180,7 @@ def get_vit(cfg):
     delattrs_timm(net)
 
     weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
-    weight = {k.removeprefix('net.'):v for k, v in weight.items()}
+    weight = {k.removeprefix('net.'): v for k, v in weight.items()}
     weight.pop('head.weight')
     weight.pop('head.bias')
     keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
@@ -180,6 +200,7 @@ def get_vit(cfg):
     clip.model.ResidualAttentionBlock.forward = forward
     net, _ = clip.load('ViT-B/16')
     net = VisionTransformerCLIP(net.train(), cfg.num_classes)
+    nn.Linear = TransposedLinear
     net = ModuleValidator.fix(net)  # nn.MultiheadAttention -> opacus.layers.DPMultiheadAttention
 
   else:

@@ -58,7 +58,13 @@ def clip_and_accumulate(self):
   if any(dim != batch_size for dim in dims):
     quotients = [dim//batch_size for dim in dims]
     remainders = [dim%batch_size for dim in dims]
-    assert all(remainder == 0 for remainder in remainders), 'Incorrect batch size.'
+    # assert all(remainder == 0 for remainder in remainders), 'Incorrect batch size.'
+    if not all(remainder == 0 for remainder in remainders):
+      hi = [x.shape for x in self.grad_samples]
+      print('\n\n')
+      print(hi)
+      print(len(hi))
+      breakpoint()
     for i, quotient in enumerate(quotients):
       if quotient > 1:
         grad_samples[i] = torch.sum(grad_samples[i].view(batch_size, quotient, *grad_samples[i].shape[1:]), dim=1)
