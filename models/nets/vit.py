@@ -78,8 +78,17 @@ class EmbedCLIP(nn.Module):
     self.positional_embedding = positional_embedding
 
   def forward(self, x):
-    x = torch.cat([self.class_embedding+torch.zeros(x.shape[0], 1, x.shape[-1], device=x.device), x], dim=1)
+    # x = torch.cat([self.class_embedding+torch.zeros(x.shape[0], 1, x.shape[-1], device=x.device), x], dim=1)
+    # x = x+self.positional_embedding
+
+    x = torch.cat([self.class_embedding.unsqueeze(0).unsqueeze(0).expand(x.shape[0], -1, -1), x], dim=1)
     x = x+self.positional_embedding
+
+    # print(in_shape, out_shape, self.class_embedding.shape, self.positional_embedding.shape)
+    # torch.Size([2, 196, 768])
+    # torch.Size([2, 197, 768])
+    # torch.Size([768])
+    # torch.Size([197, 768])
 
     return x
 
@@ -89,8 +98,8 @@ def compute_embed_clip_grad_sample(
     layer: EmbedCLIP, activations: torch.Tensor, backprops: torch.Tensor
 ) -> Dict[nn.Parameter, torch.Tensor]:
   ret = {
-    layer.positional_embedding: backprops.unsqueeze(1),
-    layer.class_embedding: backprops[:, 0].unsqueeze(1).unsqueeze(2)  # TODO
+    layer.positional_embedding: backprops,
+    layer.class_embedding: backprops[:, 0]
   }
   return ret
 

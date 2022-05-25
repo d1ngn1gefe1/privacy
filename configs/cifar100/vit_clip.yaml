@@ -6,15 +6,15 @@ dataset: cifar100
 net: vit
 #adapter: mlp_adapter
 #mode: from_scratch
-mode: full_tuning
-#mode: linear_probing
+#mode: full_tuning
+mode: linear_probing
 #mode: adapter
 #mode: sparse_tuning
 optimizer: adamw
 weight: pretrain_clip
 
-gpus: [0]
-num_workers: 1
+gpus: [1]
+num_workers: 4
 
 num_epochs: 50
 warmup_steps: 500
