@@ -4,22 +4,22 @@ dir_weights: /home/ssd/weights
 
 dataset: cifar100
 net: vit
-#adapter: mlp_adapter
+adapter: mlp_adapter
 #mode: from_scratch
 #mode: full_tuning
-#mode: linear_probing
+mode: linear_probing
 #mode: adapter
-mode: sparse_tuning
+#mode: sparse_tuning
 optimizer: adamw
 weight: pretrain_clip
 
-gpus: [1]
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]
 num_workers: 4
 
 num_epochs: 50
 warmup_steps: 500
-batch_size: 2
-max_batch_size: 2
+batch_size: 1024
+max_batch_size: 48
 #num_views: 3
 # lr setting:
 # non-dp: 3e-4 for 'full_tuning'
@@ -28,7 +28,7 @@ lr: 1e-3
 momentum: 0.9
 wd: 0.0
 
-dp: True
+dp: False
 augment: False
 #sigma: 1.5
 #c: 10

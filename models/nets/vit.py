@@ -78,18 +78,8 @@ class EmbedCLIP(nn.Module):
     self.positional_embedding = positional_embedding
 
   def forward(self, x):
-    # x = torch.cat([self.class_embedding+torch.zeros(x.shape[0], 1, x.shape[-1], device=x.device), x], dim=1)
-    # x = x+self.positional_embedding
-
     x = torch.cat([self.class_embedding.unsqueeze(0).unsqueeze(0).expand(x.shape[0], -1, -1), x], dim=1)
     x = x+self.positional_embedding
-
-    # print(in_shape, out_shape, self.class_embedding.shape, self.positional_embedding.shape)
-    # torch.Size([2, 196, 768])
-    # torch.Size([2, 197, 768])
-    # torch.Size([768])
-    # torch.Size([197, 768])
-
     return x
 
 
@@ -107,9 +97,11 @@ def compute_embed_clip_grad_sample(
 class VisionTransformerCLIP(nn.Module):
   def __init__(self, net, num_classes):
     super().__init__()
-    self.visual = net.visual
-    for resblock in self.visual.transformer.resblocks:
+
+    for resblock in net.visual.transformer.resblocks:
       resblock.attn.batch_first = True
+
+    self.visual = net.visual
     self.embed_clip = EmbedCLIP(self.visual.class_embedding, self.visual.positional_embedding)
     self.proj = nn.Linear(in_features=768, out_features=num_classes, bias=True)
 
@@ -162,8 +154,8 @@ def get_vit(cfg):
 
   elif cfg.weight == 'pretrain_clip':
     print('Loading ImageNet pre-trained weight (CLIP)')
-    clip.model.convert_weights = lambda model: None
-    clip.model.LayerNorm = nn.LayerNorm
+    clip.model.convert_weights = lambda model: None  # use fp32
+    clip.model.LayerNorm = nn.LayerNorm  # no need to handle fp16
     net, _ = clip.load('ViT-B/16')
     net = VisionTransformerCLIP(net.train(), cfg.num_classes)
     net = ModuleValidator.fix(net)  # nn.MultiheadAttention -> opacus.layers.DPMultiheadAttention
