@@ -108,6 +108,8 @@ class VisionTransformerCLIP(nn.Module):
   def __init__(self, net, num_classes):
     super().__init__()
     self.visual = net.visual
+    for resblock in self.visual.transformer.resblocks:
+      resblock.attn.batch_first = True
     self.embed_clip = EmbedCLIP(self.visual.class_embedding, self.visual.positional_embedding)
     self.proj = nn.Linear(in_features=768, out_features=num_classes, bias=True)
 
@@ -121,13 +123,8 @@ class VisionTransformerCLIP(nn.Module):
     x = x.permute(0, 2, 1)
     x = self.embed_clip(x)
     x = self.visual.ln_pre(x)
-
-    x = x.permute(1, 0, 2)  # NLD -> LND
     x = self.visual.transformer(x)
-    x = x.permute(1, 0, 2)  # LND -> NLD
-
     x = self.visual.ln_post(x[:, 0, :])
-
     x = self.proj(x)
     return x
 

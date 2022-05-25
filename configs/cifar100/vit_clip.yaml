@@ -7,9 +7,9 @@ net: vit
 #adapter: mlp_adapter
 #mode: from_scratch
 #mode: full_tuning
-mode: linear_probing
+#mode: linear_probing
 #mode: adapter
-#mode: sparse_tuning
+mode: sparse_tuning
 optimizer: adamw
 weight: pretrain_clip
 
