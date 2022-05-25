@@ -111,7 +111,7 @@ class Project(nn.Module):
 
 
 class VisionTransformerCLIP(nn.Module):
-  def __init__(self, net, num_classes, extra_fc=True):
+  def __init__(self, net, num_classes, extra_fc=False):
     super().__init__()
 
     self.visual = net.visual
