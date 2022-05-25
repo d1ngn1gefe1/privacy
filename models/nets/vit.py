@@ -122,6 +122,9 @@ class VisionTransformerCLIP(nn.Module):
     x = self.proj(x)
     return x
 
+  def get_classifier(self):
+    return self.proj
+
 
 def get_vit(cfg):
   # vit_small_patch16_224: in21k -> in1k, 21.7M parameters
