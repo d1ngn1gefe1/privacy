@@ -94,12 +94,15 @@ def compute_embed_clip_grad_sample(
   return ret
 
 
+def forward(self, x):
+  x = x+self.attention(self.ln_1(x).permute(1, 0, 2)).permute(1, 0, 2)
+  x = x+self.mlp(self.ln_2(x))
+  return x
+
+
 class VisionTransformerCLIP(nn.Module):
   def __init__(self, net, num_classes):
     super().__init__()
-
-    for resblock in net.visual.transformer.resblocks:
-      resblock.attn.batch_first = True
 
     self.visual = net.visual
     self.embed_clip = EmbedCLIP(self.visual.class_embedding, self.visual.positional_embedding)
@@ -156,6 +159,7 @@ def get_vit(cfg):
     print('Loading ImageNet pre-trained weight (CLIP)')
     clip.model.convert_weights = lambda model: None  # use fp32
     clip.model.LayerNorm = nn.LayerNorm  # no need to handle fp16
+    clip.model.ResidualAttentionBlock.forward = forward
     net, _ = clip.load('ViT-B/16')
     net = VisionTransformerCLIP(net.train(), cfg.num_classes)
     net = ModuleValidator.fix(net)  # nn.MultiheadAttention -> opacus.layers.DPMultiheadAttention
