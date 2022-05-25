@@ -9,6 +9,7 @@ Examples of register_grad_sampler :
 import clip
 import clip.model
 from opacus.grad_sample import register_grad_sampler
+from opacus.validators import ModuleValidator
 import os.path as osp
 import timm
 from timm.models import vision_transformer
@@ -145,17 +146,18 @@ def get_vit(cfg):
     print(f'{keys_missing} will be trained from scratch')
 
   elif cfg.weight == 'pretrain':
-    vision_transformer.VisionTransformer = VisionTransformerTimm
     print('Loading ImageNet pre-trained weight (timm)')
+    vision_transformer.VisionTransformer = VisionTransformerTimm
     net = timm.create_model('vit_small_patch16_224', pretrained=True, num_classes=cfg.num_classes)
     delattrs_timm(net)
 
   elif cfg.weight == 'pretrain_clip':
     print('Loading ImageNet pre-trained weight (CLIP)')
-
     clip.model.convert_weights = lambda model: None
+    clip.model.LayerNorm = nn.LayerNorm
     net, _ = clip.load('ViT-B/16')
-    net = VisionTransformerCLIP(net, cfg.num_classes)
+    net = VisionTransformerCLIP(net.train(), cfg.num_classes)
+    net = ModuleValidator.fix(net)  # nn.MultiheadAttention -> opacus.layers.DPMultiheadAttention
 
   else:
     raise NotImplementedError
