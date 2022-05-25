@@ -6,6 +6,7 @@ Examples of register_grad_sampler :
   - https://github.com/pytorch/opacus/blob/main/opacus/grad_sample/dp_multihead_attention.py
 """
 
+import clip
 import clip.model
 from opacus.grad_sample import register_grad_sampler
 import os.path as osp
