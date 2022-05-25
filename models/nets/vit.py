@@ -100,13 +100,29 @@ def forward(self, x):
   return x
 
 
+class Project(nn.Module):
+  def __init__(self, proj):
+    super().__init__()
+    self.fc = nn.Linear(in_features=proj.shape[0], out_features=proj.shape[1], bias=False)
+    self.fc.weight = nn.Parameter(torch.transpose(proj, 0, 1))
+
+  def forward(self, x):
+    return self.fc(x)
+
+
 class VisionTransformerCLIP(nn.Module):
-  def __init__(self, net, num_classes):
+  def __init__(self, net, num_classes, extra_fc=True):
     super().__init__()
 
     self.visual = net.visual
     self.embed_clip = EmbedCLIP(self.visual.class_embedding, self.visual.positional_embedding)
-    self.proj = nn.Linear(in_features=768, out_features=num_classes, bias=True)
+    if extra_fc:
+      self.proj = Project(self.visual.proj)
+      self.fc = nn.Linear(in_features=512, out_features=num_classes, bias=True)
+    else:
+      self.fc = nn.Linear(in_features=768, out_features=num_classes, bias=True)
+
+    self.extra_fc = extra_fc
 
     delattr(self.visual, 'class_embedding')
     delattr(self.visual, 'positional_embedding')
@@ -120,11 +136,13 @@ class VisionTransformerCLIP(nn.Module):
     x = self.visual.ln_pre(x)
     x = self.visual.transformer(x)
     x = self.visual.ln_post(x[:, 0, :])
-    x = self.proj(x)
+    if self.extra_fc:
+      x = self.proj(x)
+    x = self.fc(x)
     return x
 
   def get_classifier(self):
-    return self.proj
+    return self.fc
 
 
 def get_vit(cfg):
