@@ -1,6 +1,7 @@
 from .mlp import MlpAdapter
 from .bottleneck import BottleneckAdapter
 from .video_mlp import VideoMlpAdapter
+from .mlp_clip import MlpClipAdapter
 
 
 def get_adapter(cfg):
@@ -10,6 +11,8 @@ def get_adapter(cfg):
     adapter = BottleneckAdapter
   elif cfg.adapter == 'video_mlp_adapter':
     adapter = VideoMlpAdapter
+  elif cfg.adapter == 'mlp_clip_adapter':
+    adapter = MlpClipAdapter
   else:
     raise NotImplementedError
 
