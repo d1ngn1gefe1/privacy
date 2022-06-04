@@ -4,11 +4,11 @@ dir_weights: /home/ssd/weights
 
 dataset: cifar100
 net: vit
-adapter: mlp_adapter
+adapter: mlp_clip_adapter
 #mode: from_scratch
-mode: full_tuning
+#mode: full_tuning
 #mode: linear_probing
-#mode: adapter
+mode: adapter
 #mode: sparse_tuning
 optimizer: adamw
 weight: pretrain_clip

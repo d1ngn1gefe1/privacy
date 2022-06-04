@@ -12,8 +12,9 @@ class BaseClassifierModule(LightningModule):
     self.cfg = cfg
     self.net = get_net(cfg)
 
+
     set_mode(self.net, cfg)  # set trainable parameters
-    self.get_loss, self.get_pred, self.metrics = set_task(cfg)  # set task-specific variables
+    self.get_loss, self.get_pred, self.metrics_train, self.metrics_val, self.metrics_test = set_task(cfg)  # set task
 
   def forward(self, x):
     return self.net(x)
