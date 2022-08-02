@@ -4,7 +4,7 @@ dir_weights: /home/ssd/weights
 
 dataset: chexpert
 uncertainty: u_zeros  # u_zeros or u_ones
-net: resnet
+net: resnet50
 adapter: bottleneck_adapter
 #mode: from_scratch
 mode: full_tuning

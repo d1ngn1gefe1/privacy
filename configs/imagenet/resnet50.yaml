@@ -3,7 +3,7 @@ dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
 dataset: imagenet
-net: resnet
+net: resnet50
 adapter: bottleneck_adapter
 mode: from_scratch
 #mode: full_tuning

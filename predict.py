@@ -28,7 +28,7 @@ def inference(model, dataloader):
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
+  cfg = OmegaConf.load('configs/cifar100/resnet50.yaml')
   utils.setup(cfg, 'predict')
 
   data = get_data(cfg)

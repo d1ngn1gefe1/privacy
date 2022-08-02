@@ -34,19 +34,24 @@ def get_resnet(cfg, implementation='ppwwyyxx'):
   assert implementation in ['ppwwyyxx', 'timm']
 
   if implementation == 'ppwwyyxx':
-    net = models.__dict__['resnet50'](pretrained=False, num_classes=cfg.num_classes,
-                                      norm_layer=partial(nn.GroupNorm, 32))
+    net = models.__dict__[cfg.net](pretrained=False, num_classes=cfg.num_classes,
+                                   norm_layer=partial(nn.GroupNorm, 32 if cfg.net == 'resnet50' else 8))
 
     if cfg.mode == 'from_scratch':
       print('Initializing randomly')
 
     elif cfg.weight == 'ckpt':
       print('Loading checkpoint')
-      weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))
-      net.load_state_dict(weight)
+      weight = torch.load(osp.join(cfg.dir_weights, cfg.rpath_ckpt))['state_dict']
+      weight = {k.removeprefix('net.'):v for k, v in weight.items()}
+      weight.pop('fc.weight')
+      weight.pop('fc.bias')
+      keys_missing, keys_unexpected = net.load_state_dict(weight, strict=False)
+      assert len(keys_unexpected) == 0
+      print(f'{keys_missing} will be trained from scratch')
 
     else:
-      assert cfg.weight == 'pretrain'
+      assert cfg.weight == 'pretrain' and cfg.net == 'resnet50'
       print('Loading ImageNet pre-trained weight')
       path_pretrain = osp.join(cfg.dir_weights, 'pretrain/ImageNet-ResNet50-GN.pth')
       if not osp.isfile(path_pretrain):

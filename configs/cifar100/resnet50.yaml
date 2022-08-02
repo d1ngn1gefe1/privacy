@@ -1,0 +1,38 @@
+dir_data: /home/ssd/data
+dir_log: /home/ssd/log
+dir_weights: /home/ssd/weights
+
+dataset: cifar100
+net: resnet50
+adapter: bottleneck_adapter
+#mode: from_scratch
+mode: full_tuning
+#mode: linear_probing
+#mode: adapter
+optimizer: adamw
+attacker: black_box
+weight: pretrain
+
+gpus: [0, 1, 2, 3, 4, 5, 6, 7]
+num_workers: 4
+
+
+num_epochs: 50
+warmup_steps: 500
+batch_size: 1024
+max_batch_size: 64
+#num_views: 3
+# lr setting:
+# non-dp: 3e-4 for 'full_tuning'
+# dp: 7e-4 for 'full_tuning' and 'adapter', 5e-3 for 'linear_probing', 3e-3 for 'from_scratch', 1e-3 for 'sparse_tuning'
+lr: 1e-4
+momentum: 0.9
+wd: 0.0
+
+dp: True
+augment: False
+#sigma: 1.5
+#c: 10
+c: 1
+delta: 1e-5
+epsilon: 8

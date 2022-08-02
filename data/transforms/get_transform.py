@@ -13,7 +13,7 @@ def get_transform(cfg):
   elif cfg.net == 'vit':
     from .vit import get_vit_transforms
     transform_train, transform_val, transform_test = get_vit_transforms(cfg)
-  elif cfg.net == 'resnet':
+  elif cfg.net.startswith('resnet'):
     from .resnet import get_resnet_transforms
     transform_train, transform_val, transform_test = get_resnet_transforms(cfg)
   elif cfg.net == 'convnext':

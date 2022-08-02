@@ -11,7 +11,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar100/resnet.yaml')
+  cfg = OmegaConf.load('configs/cifar100/resnet50.yaml')
   cfg_tune = OmegaConf.load('configs/tune.yaml')
   utils.setup(cfg, 'tune')
 
