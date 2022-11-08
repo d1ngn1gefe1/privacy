@@ -1,9 +1,10 @@
 -e git+https://github.com/openai/CLIP.git#egg=clip
+-e git+https://github.com/facebookresearch/pytorchvideo.git#egg=pytorchvideo
+-e git+https://github.com/facebookresearch/recipes.git#egg=recipes
 medmnist
 omegaconf
 opacus==1.2.0
 pytorch-lightning==1.7.7
--e git+https://github.com/facebookresearch/pytorchvideo.git#egg=pytorchvideo
 pytorchvideo_trainer
 rarfile
 timm==0.6.11
