@@ -23,20 +23,16 @@ def get_trainer(cfg, trial=None):
   # callbacks
   callbacks = [
     LearningRateMonitor(logging_interval='step'),
-    PatchCallback()
+    PatchCallback(),
+    ModelCheckpoint(every_n_epochs=5, save_last=True,
+                    dirpath=osp.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}'))
   ]
-  if cfg.phase == 'tune':
-    callbacks.append(PyTorchLightningPruningCallback(trial, monitor='val/acc'))
-  else:
-    callbacks.append(ModelCheckpoint(every_n_epochs=5, save_last=True,
-                                     dirpath=osp.join(cfg.dir_weights, f'ckpt_{os.getlogin()}/{cfg.name}')))
   if cfg.dp:
     callbacks.append(DPCallback())
 
   # strategy
   if len(cfg.gpus) > 1:
-    strategy = DDPSpawnStrategy(find_unused_parameters=False) if cfg.phase == 'tune' else \
-               DDPStrategy(find_unused_parameters=False)
+    strategy = DDPStrategy(find_unused_parameters=False)
   else:
     strategy = None
 
@@ -45,7 +41,7 @@ def get_trainer(cfg, trial=None):
     'max_epochs': cfg.num_epochs,
     'logger': logger,
     'callbacks': callbacks,
-    'enable_checkpointing': cfg.phase != 'tune',
+    'enable_checkpointing': True,
     'check_val_every_n_epoch': 1,
     'num_sanity_val_steps': 2,
     'log_every_n_steps': 10,
