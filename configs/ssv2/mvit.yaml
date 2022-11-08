@@ -29,8 +29,8 @@ wd:
   sgd: 1e-4
   adamw: 0.05
 
-T: 8
-tau: 8
+T: 16
+tau: 4
 fps: 30
 
 dp: True
