@@ -8,8 +8,8 @@ import torchvision.datasets.utils
 from torchvision.datasets.utils import download_and_extract_archive, _ARCHIVE_EXTRACTORS
 
 from .base_datamodule import BaseDataModule
-from .map_dataset import MapDataset
 from data.transforms import get_transform
+from .map_dataset import MapDataset
 import utils
 
 

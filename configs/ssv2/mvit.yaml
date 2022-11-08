@@ -1,0 +1,41 @@
+dir_data: /home/ssd/data
+dir_log: /home/ssd/log
+dir_weights: /home/ssd/weights
+
+dataset: ssv2
+net: mvit
+adapter: video_mlp_adapter
+#mode: from_scratch
+#mode: full_tuning
+#mode: linear_probing
+#mode: adapter
+mode: sparse_tuning
+optimizer: adamw
+weight: pretrain
+
+gpus: [0,1,2,3,4,5,6,7]
+num_workers: 4
+
+num_epochs: 10
+warmup_steps: 30
+batch_size: 16
+max_batch_size: 2
+num_views: 8
+# lr setting
+# dp: 3e-4 for 'full_tuning', 'sparse_tuning', and 'adapter'
+lr: 3e-4
+momentum: 0.9
+wd:
+  sgd: 1e-4
+  adamw: 0.05
+
+T: 8
+tau: 8
+fps: 30
+
+dp: True
+augment: False
+#sigma: 0.5
+c: 1.0
+epsilon: 5
+delta: 1e-5

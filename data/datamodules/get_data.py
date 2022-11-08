@@ -17,6 +17,9 @@ def get_data(cfg):
   elif cfg.dataset == 'ucf101':
     from .ucf101 import UCF101DataModule
     data = UCF101DataModule(cfg)
+  elif cfg.dataset == 'ssv2':
+    from .ssv2 import SSv2DataModule
+    data = SSv2DataModule(cfg)
   else:
     raise NotImplementedError
 
