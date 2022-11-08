@@ -1,6 +1,6 @@
 medmnist
 omegaconf
-opacus==v1.1.1
+opacus==1.2.0
 pytorch-lightning==1.7.7
 -e git+https://github.com/facebookresearch/pytorchvideo.git#egg=pytorchvideo
 pytorchvideo_trainer
