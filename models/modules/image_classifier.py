@@ -17,8 +17,8 @@ class ImageClassifierModule(BaseClassifierModule):
 
     y_hat = self.get_pred(logits)
     for name, metric in self.metrics_train.items():
-      metric(y_hat, y)
-      self.log(f'train/{name}', metric, prog_bar=True, batch_size=batch_size)
+      result = metric(y_hat, y)
+      self.log(f'train/{name}', result, prog_bar=True, batch_size=batch_size)
 
     return loss
 
@@ -31,8 +31,8 @@ class ImageClassifierModule(BaseClassifierModule):
 
     y_hat = self.get_pred(logits)
     for name, metric in self.metrics_val.items():
-      metric(y_hat, y)
-      self.log(f'val/{name}', metric, sync_dist=True, prog_bar=True)
+      result = metric(y_hat, y)
+      self.log(f'val/{name}', result, sync_dist=True, prog_bar=True)
 
   def test_step(self, batch, batch_idx):
     x, y = batch
@@ -43,8 +43,8 @@ class ImageClassifierModule(BaseClassifierModule):
 
     y_hat = self.get_pred(logits)
     for name, metric in self.metrics_test.items():
-      metric(y_hat, y)
-      self.log(f'test/{name}', metric, sync_dist=True, prog_bar=True)
+      result = metric(y_hat, y)
+      self.log(f'test/{name}', result, sync_dist=True, prog_bar=True)
 
   def predict_step(self, batch, batch_idx):
     pass

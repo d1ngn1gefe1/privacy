@@ -8,5 +8,6 @@ pytorchvideo_trainer
 rarfile
 timm==0.6.1
 torch
+torchmetrics==0.10.2
 torchvision
 wandb

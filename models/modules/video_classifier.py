@@ -20,8 +20,8 @@ class VideoClassifierModule(BaseClassifierModule):
 
     y_hat = self.get_pred(logits)
     for name, metric in self.metrics_train.items():
-      metric(y_hat, y)
-      self.log(f'train/{name}', metric, prog_bar=True, batch_size=batch_size)
+      result = metric(y_hat, y)
+      self.log(f'train/{name}', result, prog_bar=True, batch_size=batch_size)
 
     return loss
 
@@ -58,12 +58,12 @@ class VideoClassifierModule(BaseClassifierModule):
     y_hat, y = self.ensembler.sync_and_aggregate_results()
     if not utils.is_ddp() or utils.get_rank() == 0:
       for name, metric in self.metrics_val.items():
-        metric(y_hat, y)
-        self.log(f'val/{name}', metric, on_epoch=True, prog_bar=True, rank_zero_only=True)
+        result = metric(y_hat, y)
+        self.log(f'val/{name}', result, on_epoch=True, prog_bar=True, rank_zero_only=True)
 
   def on_test_epoch_end(self):
     y_hat, y = self.ensembler.sync_and_aggregate_results()
     if not utils.is_ddp() or utils.get_rank() == 0:
       for name, metric in self.metrics_test.items():
-        metric(y_hat, y)
-        self.log(f'test/{name}', metric, on_epoch=True, prog_bar=True, rank_zero_only=True)
+        result = metric(y_hat, y)
+        self.log(f'test/{name}', result, on_epoch=True, prog_bar=True, rank_zero_only=True)
