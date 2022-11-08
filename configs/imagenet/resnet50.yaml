@@ -10,7 +10,6 @@ mode: from_scratch
 #mode: linear_probing
 #mode: adapter
 optimizer: sgd
-attacker: black_box
 weight: pretrain
 
 gpus: [0, 1, 2, 3, 4, 5, 6, 7]

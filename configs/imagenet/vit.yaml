@@ -12,7 +12,6 @@ adapter: mlp_adapter
 #mode: adapter
 mode: sparse_tuning
 optimizer: adamw
-attacker: black_box
 weight: ckpt
 
 gpus: [0,1,2,3,4,5,6,7]
