@@ -15,7 +15,6 @@ class SSv2DataModule(BaseDataModule):
   def __init__(self, cfg):
     super().__init__(cfg)
 
-    self.cfg.num_classes = 174
     self.cfg.task = 'multi-class'
 
   def prepare_data(self):
@@ -26,25 +25,47 @@ class SSv2DataModule(BaseDataModule):
     names_video = [osp.splitext(osp.basename(x))[0] for x in glob.glob(osp.join(dir_videos, '*.webm'))]
     assert len(names_video) == 220847
 
+    num_classes = {'ssv2': 174, 'ssv2mini': 10}
     splits = ['train', 'validation']
-    if all([osp.exists(osp.join(dir_labels, f'{split}.csv')) for split in splits]):
+
+    self.cfg.num_classes = num_classes[self.cfg.dataset]
+
+    if all([osp.exists(osp.join(dir_labels, f'{split}_{dataset}.csv'))
+            for split in splits for dataset in num_classes.keys()]):
       return
 
     with open(osp.join(dir_labels, 'labels.json'), 'r') as f:
-      labels = json.load(f)
+      labels_ssv2 = json.load(f)
+
+    with open(osp.join(dir_labels, '10_class_subset.csv'), 'r') as f:
+      reader = csv.reader(f)
+      labels_ssv2mini = {name:index for index, name in list(reader)[1:]}
+
+    with open(osp.join(dir_labels, 'fine_to_10_classes.csv'), 'r') as f:
+      reader = csv.reader(f)
+      fine_to_coarse = {fine:coarse for _, fine, coarse, _, _ in list(reader)[1:]}
 
     for split in splits:
       with open(osp.join(dir_labels, f'{split}.json'), 'r') as f:
         data = json.load(f)
 
-      with open(osp.join(dir_labels, f'{split}.csv'), 'w') as f:
+      with open(osp.join(dir_labels, f'{split}_ssv2.csv'), 'w') as f:
         writer = csv.writer(f, delimiter=' ')
 
         for x in data:
           template = x['template'].replace('[', '').replace(']', '')
-          label = labels[template]
+          label = labels_ssv2[template]
           path = f'{x["id"]}.webm'
           writer.writerow([path, label])
+
+      with open(osp.join(dir_labels, f'{split}_ssv2mini.csv'), 'w') as f:
+        writer = csv.writer(f, delimiter=' ')
+
+        for x in data:
+          if x['template'] in fine_to_coarse:
+            label = labels_ssv2mini[fine_to_coarse[x['template']]]
+            path = f'{x["id"]}.webm'
+            writer.writerow([path, label])
 
   def setup(self, stage=None):
     transform_train, transform_val, transform_test = get_transform(self.cfg)
@@ -58,7 +79,7 @@ class SSv2DataModule(BaseDataModule):
       clip_sampler = make_clip_sampler('random', self.cfg.T*self.cfg.tau/self.cfg.fps)
 
     self.dataset_train = MapDataset.from_iterable_dataset(labeled_video_dataset(
-      data_path=osp.join(dir_labels, f'train.csv'),
+      data_path=osp.join(dir_labels, f'train_{self.cfg.dataset}.csv'),
       clip_sampler=clip_sampler,
       video_sampler=DistributedSampler if utils.is_ddp() else RandomSampler,  # ignored
       transform=transform_train,
@@ -67,7 +88,7 @@ class SSv2DataModule(BaseDataModule):
     ))
 
     self.dataset_val = labeled_video_dataset(
-      data_path=osp.join(dir_labels, f'validation.csv'),
+      data_path=osp.join(dir_labels, f'validation_{self.cfg.dataset}.csv'),
       clip_sampler=make_clip_sampler('uniform', self.cfg.T*self.cfg.tau/self.cfg.fps),
       video_sampler=DistributedSampler if utils.is_ddp() else RandomSampler,
       transform=transform_val,
@@ -76,7 +97,7 @@ class SSv2DataModule(BaseDataModule):
     )
 
     self.dataset_test = labeled_video_dataset(
-      data_path=osp.join(dir_labels, f'validation.csv'),
+      data_path=osp.join(dir_labels, f'validation_{self.cfg.dataset}.csv'),
       clip_sampler=make_clip_sampler('constant_clips_per_video', self.cfg.T*self.cfg.tau/self.cfg.fps, 10, 3),
       video_sampler=DistributedSampler if utils.is_ddp() else RandomSampler,
       transform=transform_test,

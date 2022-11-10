@@ -2,7 +2,7 @@ dir_data: /home/ssd/data
 dir_log: /home/ssd/log
 dir_weights: /home/ssd/weights
 
-dataset: ssv2
+dataset: ssv2mini
 net: mvit
 adapter: video_mlp_adapter
 #mode: from_scratch
@@ -20,7 +20,7 @@ num_epochs: 10
 warmup_steps: 30
 batch_size: 16
 max_batch_size: 2
-num_views: 8
+num_views: 1
 # lr setting
 # dp: 3e-4 for 'full_tuning', 'sparse_tuning', and 'adapter'
 lr: 3e-4
@@ -33,8 +33,8 @@ T: 16
 tau: 4
 fps: 30
 
-dp: True
-augment: False
+dp: False
+augment: True
 #sigma: 0.5
 c: 1.0
 epsilon: 5
