@@ -12,9 +12,12 @@ import utils
 
 
 class SSv2DataModule(BaseDataModule):
+  num_classes = {'ssv2': 174, 'ssv2mini': 10}
+
   def __init__(self, cfg):
     super().__init__(cfg)
 
+    self.cfg.num_classes = self.num_classes[self.cfg.dataset]
     self.cfg.task = 'multi-class'
 
   def prepare_data(self):
@@ -25,13 +28,10 @@ class SSv2DataModule(BaseDataModule):
     names_video = [osp.splitext(osp.basename(x))[0] for x in glob.glob(osp.join(dir_videos, '*.webm'))]
     assert len(names_video) == 220847
 
-    num_classes = {'ssv2': 174, 'ssv2mini': 10}
     splits = ['train', 'validation']
 
-    self.cfg.num_classes = num_classes[self.cfg.dataset]
-
     if all([osp.exists(osp.join(dir_labels, f'{split}_{dataset}.csv'))
-            for split in splits for dataset in num_classes.keys()]):
+            for split in splits for dataset in self.num_classes.keys()]):
       return
 
     with open(osp.join(dir_labels, 'labels.json'), 'r') as f:
