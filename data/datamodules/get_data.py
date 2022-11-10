@@ -20,6 +20,9 @@ def get_data(cfg):
   elif cfg.dataset == 'ssv2' or cfg.dataset == 'ssv2mini':
     from .ssv2 import SSv2DataModule
     data = SSv2DataModule(cfg)
+  elif cfg.dataset == 'diving48':
+    from .diving48 import Diving48DataModule
+    data = Diving48DataModule(cfg)
   else:
     raise NotImplementedError
 
