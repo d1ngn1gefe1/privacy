@@ -20,25 +20,9 @@ class Diving48DataModule(BaseDataModule):
     self.cfg.task = 'multi-class'
 
   def prepare_data(self):
-    """ sanity check """
-    if False:
-      dir_videos = osp.join(self.cfg.dir_data, 'Diving48', 'rgb')
-      dir_labels = osp.join(self.cfg.dir_data, 'Diving48', 'labels')
-      with open(osp.join(dir_labels, 'Diving48_V2_train.json'), 'r') as f:
-        data_train = json.load(f)
-      with open(osp.join(dir_labels, 'Diving48_V2_test.json'), 'r') as f:
-        data_test = json.load(f)
-      names_video = [osp.splitext(osp.basename(x))[0] for x in glob.glob(osp.join(dir_videos, '*.mp4'))]
-      for x in data_train+data_test:
-        path = osp.join(dir_videos, f'{x["vid_name"]}.mp4')
-        num_frames = int(ffmpeg.probe(path)["streams"][0]['nb_frames'])
-        assert x['vid_name'] in names_video
-        assert x['start_frame'] == 0
-        assert x['end_frame'] == num_frames-1
-
     dir_labels = osp.join(self.cfg.dir_data, 'Diving48', 'labels')
-
     splits = ['train', 'test']
+
     for split in splits:
       with open(osp.join(dir_labels, f'Diving48_V2_{split}.json'), 'r') as f:
         data = json.load(f)
