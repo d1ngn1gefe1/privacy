@@ -77,7 +77,6 @@ class SSv2DataModule(BaseDataModule):
       clip_sampler = make_clip_sampler('random_multi', self.cfg.T*self.cfg.tau/self.cfg.fps, self.cfg.num_views)
     else:
       clip_sampler = make_clip_sampler('random', self.cfg.T*self.cfg.tau/self.cfg.fps)
-
     self.dataset_train = MapDataset.from_iterable_dataset(labeled_video_dataset(
       data_path=osp.join(dir_labels, f'train_{self.cfg.dataset}.csv'),
       clip_sampler=clip_sampler,
