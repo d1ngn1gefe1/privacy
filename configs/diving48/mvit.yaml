@@ -16,13 +16,13 @@ weight: pretrain
 gpus: [0,1,2,3,4,5,6,7]
 num_workers: 4
 
-num_epochs: 10
+num_epochs: 50
 warmup_steps: 30
 batch_size: 16
 max_batch_size: 2
 num_views: 1
 # lr setting
-# dp: 3e-4 for 'full_tuning', 'sparse_tuning', and 'adapter'
+# dp: ?? for 'full_tuning', ?? for 'sparse_tuning', and ?? for 'adapter'
 lr: 3e-4
 momentum: 0.9
 wd:
@@ -37,5 +37,5 @@ dp: True
 augment: False
 #sigma: 0.5
 c: 1.0
-epsilon: 5
+epsilon: 10
 delta: 1e-5

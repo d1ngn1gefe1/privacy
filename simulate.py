@@ -7,7 +7,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/cifar100/opacus_net.yaml')
+  cfg = OmegaConf.load('configs/diving48/mvit.yaml')
   utils.setup(cfg, 'simulate')
 
   data = get_data(cfg)
