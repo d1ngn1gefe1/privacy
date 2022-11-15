@@ -22,10 +22,8 @@ def on_train_epoch_end(self):
 def configure_optimizers(self):
   dataloader = self.trainer._data_connector._train_dataloader_source.dataloader()
 
-  len_dataloader = len(dataloader[0]) if isinstance(dataloader, list) else len(dataloader)
-  len_dataset = len(dataloader[0].dataset) if isinstance(dataloader, list) else len(dataloader.dataset)
-  expected_batch_size = int(len_dataset/len_dataloader/len(self.cfg.gpus))
-  sample_rate = 1/len_dataloader
+  expected_batch_size = int(len(dataloader.dataset)/len(dataloader)/len(self.cfg.gpus))
+  sample_rate = 1/len(dataloader)
 
   # get privacy budgets
   assert sum([hasattr(self.cfg, 'sigma'), hasattr(self.cfg, 'epsilon')]) == 1
@@ -53,10 +51,7 @@ def configure_optimizers(self):
             if key not in ['self', 'optimizer']}
   scheduler = scheduler_old.__class__(optimizer, **kwargs)
 
-  if isinstance(dataloader, list):
-    return [optimizer, optimizer_old], [scheduler, scheduler_old]
-  else:
-    return [optimizer], [scheduler]
+  return [optimizer], [scheduler]
 
 
 def train_dataloader(self):

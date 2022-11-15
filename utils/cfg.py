@@ -22,7 +22,6 @@ def get_name(cfg):
 def setup(cfg, phase):
   patch(cfg)
 
-  # TODO: fix partial private
   if isinstance(cfg.lr, DictConfig):
     cfg.lr = cfg.lr[cfg.optimizer+('_dp' if cfg.dp else '')]
 
