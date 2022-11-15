@@ -35,4 +35,3 @@ augment: False
 c: 1
 epsilon: 8
 delta: 1e-5
-#ratio_public: 1.0

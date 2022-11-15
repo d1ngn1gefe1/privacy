@@ -11,7 +11,6 @@ from torch.utils.data import DataLoader
 from types import MethodType
 
 import utils
-from data.datamodules.subsample_dataset import SubsampleDataset
 
 
 def on_train_epoch_end(self):
@@ -60,20 +59,6 @@ def configure_optimizers(self):
     return [optimizer], [scheduler]
 
 
-def training_step(self, batch, batch_idx, optimizer_idx):
-  x, y = batch[optimizer_idx]
-  y_hat = self(x)
-
-  loss = self.get_loss(y_hat, y)
-  self.log(f'train/loss{optimizer_idx}', loss, prog_bar=True)
-
-  pred = self.get_pred(y_hat)
-  for name, get_stat in self.metrics.items():
-    self.log(f'train/{name}{optimizer_idx}', get_stat(pred, y), prog_bar=True)
-
-  return loss
-
-
 def train_dataloader(self):
   dataloader = DPDataLoader.from_data_loader(self.train_dataloader_old(), distributed=utils.is_ddp())
 
@@ -84,22 +69,13 @@ def train_dataloader(self):
                                   max_batch_size=self.cfg.max_batch_size,
                                   optimizer=self.trainer.optimizers[0])
 
-  if 'ratio_public' in self.cfg:
-    dataset_subsample = SubsampleDataset(self.dataset_train, self.cfg['ratio_public'])
-    # TODO: cleanup
-    dataloader_subsample = DataLoader(dataset_subsample, batch_size=self.cfg.batch_size['train']//len(self.cfg.gpus),
-                                      shuffle=True, num_workers=self.cfg.num_workers, pin_memory=True)
-    return [dataloader, dataloader_subsample]
-  else:
-    return dataloader
+  return dataloader
 
 
 class DPCallback(Callback):
   def setup(self, trainer, pl_module, stage):
     pl_module.privacy_engine = PrivacyEngine()
     pl_module.on_train_epoch_end = MethodType(on_train_epoch_end, pl_module)
-    if 'ratio_public' in trainer.datamodule.cfg:
-      pl_module.training_step = MethodType(training_step, pl_module)
 
     # make net private
     pl_module.net = pl_module.privacy_engine._prepare_model(pl_module.net)
