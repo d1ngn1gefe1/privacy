@@ -9,7 +9,7 @@ def get_model(cfg):
 
   if cfg.dataset in ['cifar100', 'cifar10', 'medmnist', 'chexpert', 'imagenet', 'places365']:
     model = ImageClassifierModule(cfg)
-  elif cfg.dataset in ['ucf101', 'ssv2', 'ssv2mini', 'diving48']:
+  elif cfg.dataset in ['ucf101', 'ssv2', 'ssv2mini', 'diving48', 'hmdb51']:
     model = VideoClassifierModule(cfg)
   else:
     raise NotImplementedError

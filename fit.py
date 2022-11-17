@@ -7,7 +7,7 @@ import utils
 
 
 def main():
-  cfg = OmegaConf.load('configs/diving48/mvit.yaml')
+  cfg = OmegaConf.load('configs/hmdb51/mvit.yaml')
   utils.setup(cfg, 'fit')
 
   data = get_data(cfg)

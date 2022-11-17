@@ -12,7 +12,6 @@ class VideoClassifierModule(BaseClassifierModule):
   def training_step(self, batch, batch_idx):
     x, y = batch['video'], batch['label']
     x, y, batch_size = handle_multi_view(x, y)
-
     logits = self(x)
 
     loss = self.get_loss(logits, y)
@@ -27,7 +26,6 @@ class VideoClassifierModule(BaseClassifierModule):
 
   def validation_step(self, batch, batch_idx):
     batch_size = batch['video'].shape[0]
-
     x, y = batch['video'], batch['label']
     logits = self(x)
 
@@ -40,7 +38,6 @@ class VideoClassifierModule(BaseClassifierModule):
 
   def test_step(self, batch, batch_idx):
     batch_size = batch['video'].shape[0]
-
     x, y = batch['video'], batch['label']
     logits = self(x)
 

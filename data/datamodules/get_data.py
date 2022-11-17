@@ -23,6 +23,9 @@ def get_data(cfg):
   elif cfg.dataset == 'diving48':
     from .diving48 import Diving48DataModule
     data = Diving48DataModule(cfg)
+  elif cfg.dataset == 'hmdb51':
+    from .hmdb51 import HMDB51DataModule
+    data = HMDB51DataModule(cfg)
   else:
     raise NotImplementedError
 
