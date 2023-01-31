@@ -5,7 +5,7 @@ def get_net(cfg):
   elif cfg.net == 'opacus_net':
     from .opacus_net import get_opacus_net
     net = get_opacus_net(cfg)
-  elif cfg.net == 'vit':
+  elif cfg.net == 'vit' or cfg.net == 'vit_video':
     from .vit import get_vit
     net = get_vit(cfg)
   elif cfg.net.startswith('resnet'):

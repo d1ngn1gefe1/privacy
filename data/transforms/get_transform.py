@@ -10,6 +10,9 @@ def get_transform(cfg):
   elif cfg.net == 'opacus_net':
     from .opacus_net import get_opacus_net_transforms
     transform_train, transform_val, transform_test = get_opacus_net_transforms(cfg)
+  elif cfg.net == 'vit_video':
+    from .vit_video import get_vit_transforms
+    transform_train, transform_val, transform_test = get_vit_transforms(cfg)
   elif cfg.net == 'vit':
     from .vit import get_vit_transforms
     transform_train, transform_val, transform_test = get_vit_transforms(cfg)
@@ -26,7 +29,7 @@ def get_transform(cfg):
     raise NotImplementedError
 
   if hasattr(cfg, 'num_views'):
-    if cfg.net == 'mvit':
+    if cfg.net == 'mvit' or cfg.net == 'vit_video':
       transform_train = Compose(transforms=[
         ApplyTransformToKeyOnList(key='video', transform=transform_train.transforms[0]._transform),
         transform_train.transforms[1]
